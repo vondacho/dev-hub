@@ -1,0 +1,219 @@
+---
+title: The process
+description: The two questions every activity answers — doing the right thing and doing the thing right — and how the artefacts connect from inception to a running cluster.
+---
+
+Everything in this hub serves one of two questions. They are asked continuously,
+by different people, and answered by different artefacts.
+
+**To do the right thing — correctness and completeness.** Is this what the user
+actually needs? Does it do what was agreed, in every case that matters, including
+the ones nobody wrote down? This question is answered from *outside* the
+software, by the people who will live with it.
+
+**To do the thing right — good code, good design.** Is this built so that the
+next change is cheap? Can the next person read it, and estimate it without
+guessing? Is it free of the debt that turns a two-day change into a two-week one?
+This question is answered from *inside*, by the people who will maintain it, and
+it is where economy and developer experience turn out to be the same concern
+rather than competing ones.
+
+## Why neither survives alone
+
+The right thing built wrong is a product that dies of its next feature. It ships,
+it is correct, and then the cost of each change climbs until the team is
+negotiating over what can be touched. Correctness is a property of a moment;
+maintainability is what lets you keep it.
+
+The thing right built on the wrong thing is a well-designed answer to a question
+nobody asked. The tests pass, the design is clean, and it is deleted.
+
+They are not a trade-off between quality and speed. Doing the thing right is
+precisely what keeps doing the right thing affordable on the *next* iteration —
+which is the only iteration anyone can still influence.
+
+## The chain
+
+Each activity consumes the previous one's artefact and produces the next one's.
+The value is in the connections: an activity whose output nothing consumes is
+ceremony, and an activity whose input was retyped from a document is a handover.
+
+### 1. Inception — what the domain is, and what the journey is
+
+[Event storming](/doc/practices/event-storming/) puts what happens in the domain
+on a wall and finds its seams. In parallel, the
+[user journey](/doc/attitudes/user-first/) records what the person using the
+software is trying to get done. [Story mapping](/doc/practices/story-mapping/)
+lays that journey along a backbone and cuts it into releases, the first of which
+crosses the whole journey.
+
+*Out:* a domain map, bounded-context candidates, a story map with slices.
+*Serves:* the right thing.
+
+### 2. Shaping — what one story means
+
+The cell at the top of the map is opened. [Three amigos](/doc/practices/three-amigos/)
+finds the ambiguity; [example mapping](/doc/practices/example-mapping/) turns the
+story into rules, examples and open questions in twenty-five minutes. The
+examples become [BDD](/doc/practices/bdd/) scenarios in the language of the
+business.
+
+*Out:* rules, scenarios, and the open questions that stop the story from being
+estimated.
+*Serves:* the right thing — completeness in particular, since the red cards are
+the cases that would otherwise be settled by an assumption.
+
+### 3. Emission — what gets scheduled
+
+Scenarios become [tickets](/doc/practices/story-tickets/), each carrying a subset
+of whole scenarios, each demonstrable on its own. The ticket's acceptance
+criteria are its scenarios; nothing is rephrased.
+
+*Out:* Story tickets whose definition of done is machine-checkable.
+*Serves:* the right thing, and it is where "done" stops being a judgement call.
+
+### 4. Grooming — what is next, and how big
+
+[Grooming](/doc/practices/grooming/) checks readiness, splits what is too large,
+sizes in points and orders the result. An item too big to size is an item too
+vague to build cleanly, which is why this session guards both questions at once.
+
+*Out:* an ordered, ready, sized backlog, and a forecast with a range.
+*Serves:* both.
+
+### 5. Agreement — what crosses the boundaries
+
+Before either side is implemented, the interface is written down and agreed:
+[API-first](/doc/practices/api-first/) for the shape,
+[contract-first](/doc/practices/contract-first/) for the machine-checkable
+agreement. The contract is registered in the [API catalogue](/go/api), messages
+in the [event catalogue](/go/events), structure in the [C4 model](/go/c4).
+
+*Out:* a contract that generates both sides and mocks the provider from day one.
+*Serves:* both — it is the point where two teams stop blocking each other, and
+the point where an integration failure becomes a build failure.
+
+### 6. Building — outside in
+
+The scenario becomes the failing [acceptance test](/doc/practices/atdd/) at the
+use case port. Inside that outer loop runs the usual red-green-refactor cycle,
+and the design that emerges is described with the shared vocabulary of the
+[pattern catalogues](/doc/code-design/).
+
+*Out:* working software, and a suite that says why each part behaves as it does.
+*Serves:* the right thing is what drives it; the thing right is what the refactor
+step buys — and it is the step that gets skipped when the process is under
+pressure, which is exactly when skipping it costs the most.
+
+### 7. Verification — what fails when it is breached
+
+[All-in-one testing](/doc/practices/all-in-one-testing/) puts each intent at
+exactly one level. [Microcks](/doc/testing-tools/microcks/) replays the contract
+against the deployed provider, so contract-first is a gate rather than an
+intention. [Playwright](/doc/testing-tools/playwright/) covers the handful of
+journeys that genuinely need a browser.
+
+*Out:* a pipeline that fails for a reason someone agreed to.
+*Serves:* both.
+
+### 8. Delivery — onto a cluster
+
+The build produces one immutable artefact — a container image — and a chart that
+describes how it runs. What differs between environments is configuration, read
+at request time, never baked into the image.
+
+*Out:* a running deployment the scenarios can be replayed against.
+*Serves:* both, and it is what closes the loop: feedback needs something running.
+
+### 9. Feedback — back to the map
+
+The slice is done when its scenarios are green against the real deployment, not
+when the tickets are closed. What is learned there re-cuts the map, and the chain
+starts again one slice further along.
+
+## What connects to what
+
+| Activity | Artefact | Consumed by |
+|----------|----------|-------------|
+| Event storming | Domain map, seams | Architecture, [C4 model](/go/c4), [event catalogue](/go/events) |
+| User journey | The journey, as the first artefact | Story mapping, UI design |
+| Story mapping | Backbone, slices, candidate stories | Grooming, three amigos |
+| Three amigos | A story that is clear, or visibly ambiguous | Example mapping |
+| Example mapping | Rules, examples, open questions | BDD scenarios |
+| BDD | `Given / When / Then` in business language | Tickets, acceptance tests |
+| Ticket emission | Story tickets carrying whole scenarios | Grooming, the sprint |
+| Grooming | Ready, sized, ordered backlog | Planning, forecasting |
+| API-first | An agreed interface | Contract, both implementations |
+| Contract-first | OpenAPI / AsyncAPI in the registry | Code generation, mocks, conformance tests |
+| ATDD | A failing acceptance test at the port | Implementation, definition of done |
+| Code design | A design named in shared vocabulary | Review, the next change |
+| All-in-one testing | One suite, one intent per level | The pipeline |
+| Pipeline | An immutable image, and a chart | The cluster |
+| Deployment | A running slice | End-to-end journeys, feedback, the map |
+
+Read the middle column downwards and it is the same information, progressively
+sharpened: a sentence on a wall, a rule, an example with real values, a scenario,
+a test, a gate in a pipeline. Nothing is retyped and nothing is paraphrased,
+which is why the thing that ships is the thing that was agreed.
+
+## On the cluster
+
+The last step deserves its own words, because it is where a process either
+becomes real or stays a diagram.
+
+**One image, many environments.** The artefact promoted to production is the one
+the tests ran against. Anything that differs per environment — the address of a
+neighbouring service, a feature flag — is injected as configuration and read at
+request time, so a change of address is a restart rather than a rebuild.
+
+**The chart is part of the deliverable.** Probes, resource limits, the update
+strategy and the ingress are versioned next to the code, reviewed like code, and
+changed by the same people. Operations knowledge that lives only in a cluster is
+knowledge that leaves with whoever last touched it.
+
+**A health endpoint that answers a question worth asking.** A probe route says
+the server is serving. A post-deployment test should go further and fetch one URL
+per thing that can independently fail — a rendered page, a page that reads its
+configuration, a dynamic route — because a process that only verifies the process
+verifies nothing.
+
+**Rolling updates with no gap**, so a deployment is not an event anyone has to
+schedule. Frequent, boring deployments are what make the feedback in step 9
+arrive early enough to act on.
+
+**Preview environments per change.** The [user-first](/doc/attitudes/user-first/)
+attitude is only affordable if a designer or a domain expert can open the change
+and react to it before it merges — a demo at the end of the sprint arrives after
+every decision has already been taken.
+
+## Where the two questions are answered
+
+| Gate | Question | What it costs to skip |
+|------|----------|----------------------|
+| Story map has a first slice crossing the journey | Right thing | Releases nobody can use |
+| No red cards left on the story | Right thing | An assumption made alone, at 4pm, by whoever hit it first |
+| Ticket carries whole scenarios | Right thing | A closed ticket that delivered nothing |
+| Item is small enough to size | Both | Debt committed to before a line is written |
+| Contract agreed before implementation | Both | An integration failure found after both sides are built |
+| Acceptance test red for the right reason | Right thing | A definition of done that is a matter of opinion |
+| The refactor step actually runs | Thing right | The next change costs more than this one did |
+| One intent per test level | Thing right | A suite that is slow, brittle, and stops being trusted |
+| Conformance replayed against the deployment | Right thing | A contract that is documentation rather than a rule |
+| Scenarios green against the real deployment | Right thing | "Done" on a board, not in production |
+
+## What is here today
+
+This page describes how the pieces connect; the pieces themselves are at
+different stages. The [practices](/doc/practices/) and
+[code design](/doc/code-design/) sections are written. The
+[testing tools](/doc/testing-tools/) recommendations are settled, with no worked
+example running in a repository here yet. The [MCP](/doc/mcp/) servers that would
+automate the mechanical parts of this chain — scaffolding, model generation,
+draft API design — are described and not built.
+
+The delivery step is real: this portal ships as a container image with a Helm
+chart alongside it, configuration injected rather than baked, probes on a health
+route, and a post-install test that fetches several routes rather than just the
+probe. The continuous integration that should run steps 6 and 7 before that
+happens is not in this repository yet — which is the honest state of a process
+whose last mile is written down and half wired up.

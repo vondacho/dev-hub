@@ -1,0 +1,60 @@
+---
+title: Android
+description: Kotlin and Compose, where the same build has to behave on hardware and OS versions spanning most of a decade.
+---
+
+**Kotlin · Jetpack Compose · Gradle**
+
+*How does effective development look across a device population you do not
+control?*
+
+Kotlin and Compose, where the same build has to behave on hardware and OS
+versions spanning most of a decade.
+
+## The contract
+
+Generated clients from the registered OpenAPI documents, with the serialization
+boundary tested against real payloads. Backwards compatibility is not optional
+here: an old version of the app stays installed for years after you stop shipping
+it.
+
+## The tests
+
+Domain logic in a pure Kotlin module — JVM tests, no Robolectric, no emulator.
+Compose UI tests for the screens, and instrumented tests kept to the few things
+that genuinely need a device.
+
+## The patterns
+
+Unidirectional data flow with immutable state, coroutines and flows at the seams,
+dependency inversion at the platform boundary so the domain never imports
+`android.*`.
+
+## The delivery
+
+Staged rollout with a crash-rate gate that can halt it. R8 configuration,
+baseline profiles and a size budget checked in the pipeline — on this stack,
+performance is a contract with the low end of the device population.
+
+## Testing tools
+
+| Job | What to use |
+|-----|-------------|
+| Acceptance, at the domain port | [Cucumber-JVM](/doc/testing-tools/cucumber/), on the pure Kotlin module |
+| Consumer contract | pact-jvm |
+| Provider mock in development | [Microcks](/doc/testing-tools/microcks/) |
+| Local HTTP stubbing | MockWebServer |
+| UI tests | Compose UI test + Kaspresso |
+| End-to-end journeys | Maestro |
+| Visual regression | Paparazzi |
+
+Why each one, and what it costs: [testing tools](/doc/testing-tools/), and the
+[mobile analysis](/doc/testing-tools/mobile/) in particular.
+
+## Where it stands
+
+Outline only. The guidance above is agreed; the worked examples and the starter
+project are not written yet.
+
+A stack page earns its detail from a project that actually ran this way. Until
+then it states the intent and admits the gap.

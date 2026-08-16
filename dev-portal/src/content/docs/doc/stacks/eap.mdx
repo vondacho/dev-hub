@@ -1,0 +1,60 @@
+---
+title: EAP
+description: Jakarta EE on JBoss EAP — the stack that carries the systems already in production, where every improvement has to be made without stopping the world.
+---
+
+**Java · Jakarta EE · JBoss EAP**
+
+*How do these practices apply to a system that was not built with them?*
+
+Jakarta EE on JBoss EAP — the stack that carries the systems already in
+production, where every improvement has to be made without stopping the world.
+
+## The contract
+
+The boundary is usually already there and undocumented. The first move is to
+write the contract for what the system actually exposes today, register it, and
+only then start changing it — you cannot design forward from a promise nobody has
+read.
+
+## The tests
+
+Characterisation tests before any refactoring: pin the current behaviour,
+including the parts that look wrong, then change with a net underneath.
+Arquillian where the container is genuinely needed, plain JUnit everywhere it is
+not.
+
+## The patterns
+
+Strangler fig at the system scale, an
+[anti-corruption layer](/doc/code-design/integration-patterns/) at every seam
+with the new code, and seams introduced deliberately so that a testable design
+becomes reachable from an untestable one.
+
+## The delivery
+
+Automate the deployment before improving the code. A release that cannot be
+repeated is a release nobody dares to make often, and everything else here
+depends on being able to ship a small change.
+
+## Testing tools
+
+| Job | What to use |
+|-----|-------------|
+| Characterisation, before any change | JUnit, pinning current behaviour |
+| Acceptance, once a seam exists | [Cucumber-JVM](/doc/testing-tools/cucumber/) |
+| Contract conformance | [Microcks](/doc/testing-tools/microcks/), against what the system exposes today |
+| Consumer contract | pact-jvm, once consumers are known |
+| Container-dependent tests | Arquillian, only where the container is needed |
+| Integration dependencies | Testcontainers |
+| Coverage of the untested | JaCoCo, to find the unpinned parts |
+
+Why each one, and what it costs: [testing tools](/doc/testing-tools/).
+
+## Where it stands
+
+Outline only, and the least developed of the six. Legacy modernisation is the
+case where generic advice helps least, so this page owes the most worked detail.
+
+A stack page earns its detail from a project that actually ran this way. Until
+then it states the intent and admits the gap.

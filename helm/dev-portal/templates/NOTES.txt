@@ -14,10 +14,10 @@ Browse the portal:
 {{- range $host := .Values.ingress.hosts }}
 {{- $scheme := ternary "https" "http" (not (empty $.Values.ingress.tls)) }}
   {{ $scheme }}://{{ $host.host }}/                home
-  {{ $scheme }}://{{ $host.host }}/catalog         the seven catalogs
-  {{ $scheme }}://{{ $host.host }}/catalog/stacks  the six technology stacks
+  {{ $scheme }}://{{ $host.host }}/catalog         the eight catalogs
   {{ $scheme }}://{{ $host.host }}/academy         the curriculum
   {{ $scheme }}://{{ $host.host }}/doc/            documentation
+  {{ $scheme }}://{{ $host.host }}/doc/stacks/     the six technology stacks
 {{- end }}
 {{- else }}
   kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "dev-portal.fullname" . }} 4321:{{ .Values.service.port }}

@@ -16,9 +16,10 @@ spec:
     #   /                     server-side rendering works at all
     #   /catalog              a page that resolves the outbound hub addresses
     #                         from the ConfigMap — proves envFrom is wired
-    #   /catalog/stacks/ios   the [slug] dynamic route resolves
     #   /doc/                 the prerendered Starlight docs shipped in the image
     #   /doc/practices/bdd/   a nested docs page, not just the section index
+    #   /doc/stacks/ios/      the section the stacks moved into, which used to be
+    #                         the /catalog/stacks/[slug] portal route
     - name: health
       image: curlimages/curl:8.11.1
       args:
@@ -28,6 +29,6 @@ spec:
         - http://{{ include "dev-portal.fullname" . }}:{{ .Values.service.port }}{{ .Values.probes.path }}
         - http://{{ include "dev-portal.fullname" . }}:{{ .Values.service.port }}/
         - http://{{ include "dev-portal.fullname" . }}:{{ .Values.service.port }}/catalog
-        - http://{{ include "dev-portal.fullname" . }}:{{ .Values.service.port }}/catalog/stacks/ios
         - http://{{ include "dev-portal.fullname" . }}:{{ .Values.service.port }}/doc/
         - http://{{ include "dev-portal.fullname" . }}:{{ .Values.service.port }}/doc/practices/bdd/
+        - http://{{ include "dev-portal.fullname" . }}:{{ .Values.service.port }}/doc/stacks/ios/

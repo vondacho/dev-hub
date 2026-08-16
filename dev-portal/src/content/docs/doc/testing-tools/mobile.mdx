@@ -15,12 +15,12 @@ avoid, and the arrangement that works despite it.
 
 **Push the acceptance tests below the UI.** Both stacks in this hub already put
 their domain in a module with no platform import — pure Kotlin on
-[Android](/catalog/stacks/android), plain Swift on [iOS](/catalog/stacks/ios).
+[Android](/doc/stacks/android/), plain Swift on [iOS](/doc/stacks/ios/).
 That module is where acceptance tests belong, and it is precisely where the
 tooling is good:
 
 - On Android it is an ordinary JVM module, so **Cucumber-JVM** works exactly as
-  it does on [Spring Boot](/catalog/stacks/spring-boot) — no emulator, no
+  it does on [Spring Boot](/doc/stacks/spring-boot/) — no emulator, no
   Robolectric, milliseconds per scenario.
 - On iOS it is a plain Swift target, so **Quick and Nimble** give
   `describe/context/it` specs. Not Gherkin, but BDD-structured and readable by
@@ -39,7 +39,7 @@ it is why the mobile gap is narrower than it looks — see below.
 endpoint generated from the registered contract, and it does not know or care
 what is calling it. So an iOS or Android app points its base URL at a Microcks
 instance and develops against the contract before the provider exists, exactly as
-the [Angular](/catalog/stacks/angular) app does.
+the [Angular](/doc/stacks/angular/) app does.
 
 Nothing about that is web-specific. The mobile client gets the full benefit of
 [contract-first](/doc/practices/contract-first/) with no mobile-specific tooling
@@ -110,5 +110,5 @@ answer — and that layer was the least valuable one on the web too.
 ## Status
 
 Recommendation, not a worked example. Nothing on this page is running in a
-repository here yet; the [iOS](/catalog/stacks/ios) and
-[Android](/catalog/stacks/android) stack pages carry the same caveat.
+repository here yet; the [iOS](/doc/stacks/ios/) and
+[Android](/doc/stacks/android/) stack pages carry the same caveat.

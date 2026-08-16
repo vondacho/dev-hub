@@ -1,0 +1,106 @@
+---
+title: Story mapping
+description: Laying the user's journey out along a backbone and slicing it into releases, so a backlog keeps the narrative a flat list destroys.
+---
+
+A workshop that arranges everything the product might do into two dimensions: the
+user's journey from left to right, and the depth of each step from top to bottom.
+The result is a map you can cut horizontally, and each cut is a release.
+
+It exists because a backlog is a flat list, and a flat list has lost the one
+thing that made the work make sense — the order in which a person actually does
+things. Two hundred rows sorted by priority cannot answer "what will a user be
+able to do at the end of this release?", which is the only question a release
+should have to answer.
+
+## The two dimensions
+
+**The backbone**, left to right: the activities a user goes through, in narrative
+order. `Find a product`, `Choose it`, `Pay`, `Track delivery`. This is the spine
+of the story, told in the order it happens, and it is deliberately at a level
+where a non-specialist can read the whole row aloud.
+
+**The body**, top to bottom under each activity: the tasks and variations that
+make that step real, ordered by necessity. The item at the top is what the
+activity cannot exist without; everything below it is refinement.
+
+## Slicing it
+
+A horizontal cut across the whole map is a release. The first slice is the
+thinnest path that still crosses every activity in the backbone — a user can get
+from one end of the journey to the other, badly, but completely.
+
+That constraint is the entire value of the technique. Cutting vertically instead
+— finishing `Pay` completely before starting `Track delivery` — produces a
+sequence of releases in which nobody can do anything until the last one.
+
+- **First slice** — the walking skeleton. Every activity present, each in its
+  crudest usable form.
+- **Later slices** — depth, added where the evidence says it is worth adding.
+- **Below the line** — everything the map holds that nobody has committed to,
+  kept visible rather than deleted, because the map is also the record of what
+  was consciously not built.
+
+## Who is in the room
+
+The product owner, a UX designer, developers, a quality engineer, domain experts
+— and, when it can be arranged, someone who will actually use the thing. It is
+the same mixed room as [event storming](/doc/practices/event-storming/), asking a
+different question: that workshop maps what happens in the *domain*, this one
+maps what happens to a *person*.
+
+## How it differs from example mapping
+
+The two are constantly confused because both involve cards on a wall and both
+produce stories. They operate on different axes and neither substitutes for the
+other.
+
+| | Story mapping | [Example mapping](/doc/practices/example-mapping/) |
+|---|---|---|
+| **Scope** | The whole journey, many stories at once | Exactly one story |
+| **Axis** | Breadth — what exists, and in what order | Depth — what one item actually means |
+| **Question** | What do we build, and what does a release give a user? | What are the rules here, and what do we not know? |
+| **Duration** | Half a day, occasionally, revisited per release | Twenty-five minutes, per story, continuously |
+| **Room** | PO, UX, developers, QE, domain experts, a user | The [three amigos](/doc/practices/three-amigos/), plus a domain expert |
+| **Cards** | Activities, tasks, variations | Story, rules, examples, questions |
+| **Output** | A backbone with slices — releases and candidate stories | Rules, examples and open questions — scenarios |
+| **Prevents** | A pile of features that never adds up to a usable journey | One story meaning something different to each person |
+
+The relationship is sequential: story mapping decides **which stories exist and
+in what order**, example mapping decides **what one of them means**. The map
+chooses the next card to open; example mapping opens it.
+
+Run without the other, each fails in a recognisable way. Story mapping alone
+produces a well-ordered backlog of items nobody can implement without guessing.
+Example mapping alone produces beautifully specified stories with no way to tell
+whether the set of them adds up to something a user can complete.
+
+## What it produces
+
+A photographed wall, transcribed into the backlog with its structure intact: the
+backbone as epics or activities, the slices as releases, the cells as candidate
+stories. The cells are not yet tickets — a cell becomes a story, the story goes
+through [example mapping](/doc/practices/example-mapping/), and only the
+scenarios that come out of that become
+[tickets](/doc/practices/story-tickets/).
+
+## Common failure modes
+
+- **A backbone of features rather than activities.** `Search`, `Filters`,
+  `Sorting` is a component list wearing a narrative's clothes. The test is
+  whether a user would recognise the row as a description of their day.
+- **The first slice is not a slice.** If it stops short of the last activity,
+  it is a vertical cut and the release will demo nothing.
+- **Drawn once and never opened.** The map is a planning instrument, not an
+  artefact. If it is not re-cut when the evidence changes, the backlog silently
+  goes flat again.
+- **Mapped by the product owner alone.** Then it records one person's model of
+  the journey, which is the assumption the workshop existed to test.
+
+## Where it leads
+
+The slices go to [grooming](/doc/practices/grooming/) to be ordered and sized.
+The individual cells go to [three amigos](/doc/practices/three-amigos/) and then
+[example mapping](/doc/practices/example-mapping/). The journey itself is the
+[user-first](/doc/attitudes/user-first/) artefact the rest of the work is
+supposed to serve.

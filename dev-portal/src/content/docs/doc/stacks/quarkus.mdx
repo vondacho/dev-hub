@@ -1,0 +1,58 @@
+---
+title: Quarkus
+description: Supersonic Java, where decisions get made at build time rather than at startup — which is a real constraint on how you are allowed to design.
+---
+
+**Java · Quarkus · GraalVM**
+
+*What changes when build-time and native compilation are part of the design?*
+
+Supersonic Java, where decisions get made at build time rather than at startup —
+which is a real constraint on how you are allowed to design.
+
+## The contract
+
+Same rule as [Spring Boot](/doc/stacks/spring-boot/): contract first, stubs
+generated, revision registered before the implementation. The difference is that
+reflection-based tricks around the boundary have to be declared for native
+builds, which is a useful pressure towards explicitness.
+
+## The tests
+
+`@QuarkusTest` for the wiring, Dev Services for the dependencies, and a
+native-image test run in the pipeline — because a service that passes on the JVM
+and fails as a native binary has not been tested.
+
+## The patterns
+
+[Hexagonal](/doc/code-design/architecture-patterns/) again, with the domain free
+of CDI. Build-time initialisation rewards a design where the dependency graph is
+knowable statically — the same property that makes the code easy to reason about.
+
+## The delivery
+
+Native binaries where startup latency is the point, JVM images where it is not.
+That is a per-service decision with a real cost on both sides, so it gets
+recorded as a decision.
+
+## Testing tools
+
+| Job | What to use |
+|-----|-------------|
+| Acceptance, at the use case port | [Cucumber-JVM](/doc/testing-tools/cucumber/) |
+| Contract conformance | [Microcks](/doc/testing-tools/microcks/), against the deployed provider |
+| Consumer contract | pact-jvm |
+| Provider mock in development | [Microcks](/doc/testing-tools/microcks/), as a dev service |
+| Integration dependencies | Quarkus Dev Services |
+| Architecture rules | ArchUnit |
+| Native build | `@QuarkusIntegrationTest`, in the pipeline |
+
+Why each one, and what it costs: [testing tools](/doc/testing-tools/).
+
+## Where it stands
+
+**Starter project:** `arch-blueprint-quarkus` — a sibling repository in the same
+workspace already carries this shape.
+
+Outline only. The blueprint repository exists; this page does not walk through it
+yet.

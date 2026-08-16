@@ -1,0 +1,66 @@
+---
+title: Stacks
+description: Effective software development expressed per technology stack — iOS, Android, Angular, Spring Boot, Quarkus and JBoss EAP — each answering the same four questions.
+---
+
+Practices and patterns are written to be true regardless of technology, which is
+exactly what makes them easy to agree with and hard to act on. This section owes
+the reader the other half: what [contract-first](/doc/practices/contract-first/)
+means when the contract is an OpenAPI document served by a Spring controller, and
+what [test-first](/doc/attitudes/test-first/) means when the test is an XCTest on
+a SwiftUI view.
+
+## The six stacks
+
+| Stack | Runtime | The question it answers |
+|-------|---------|-------------------------|
+| [iOS](/doc/stacks/ios/) | Swift · SwiftUI · Xcode | How does effective development look on a platform that ships through review? |
+| [Android](/doc/stacks/android/) | Kotlin · Jetpack Compose · Gradle | How does effective development look across a device population you do not control? |
+| [Angular](/doc/stacks/angular/) | TypeScript · Angular · RxJS | How does user-first become a working practice rather than a slogan? |
+| [Spring Boot](/doc/stacks/spring-boot/) | Java · Kotlin · Spring Boot | How is a hexagonal service built when the framework wants to be everywhere? |
+| [Quarkus](/doc/stacks/quarkus/) | Java · Quarkus · GraalVM | What changes when build-time and native compilation are part of the design? |
+| [EAP](/doc/stacks/eap/) | Java · Jakarta EE · JBoss EAP | How do these practices apply to a system that was not built with them? |
+
+## The same four concerns, every time
+
+Each page answers the same four questions in the same order, so a reader who
+knows one page knows where to look on the next — and so a difference between two
+stacks is visible as a difference rather than as a different page.
+
+**The contract.** Where the boundary is written down, what generates what, and
+what breaks when the agreement is broken. See
+[API-first](/doc/practices/api-first/) and
+[contract-first](/doc/practices/contract-first/).
+
+**The tests.** Which level carries which intent on this stack, what runs in a
+second and what needs a device, an emulator or a container. See
+[all-in-one testing](/doc/practices/all-in-one-testing/).
+
+**The patterns.** The part of the [pattern vocabulary](/doc/code-design/) that
+actually pays here, which is rarely the same list twice.
+
+**The delivery.** What has to be true before a small change can be shipped
+often — the constraint that decides how fast any of the rest can be learned.
+
+## The toolchains, side by side
+
+Each page carries its testing toolchain as a table, with the rows phrased
+identically across stacks so the six can be read as one comparison. The reasoning
+behind each choice lives in [testing tools](/doc/testing-tools/); the stack pages
+carry the answer, not the argument.
+
+Two things recur on every stack and are worth noticing:
+[Microcks](/doc/testing-tools/microcks/) mocks the provider from the registered
+contract everywhere, and the acceptance test attaches at a **port** — the domain
+module, the use case, the journey — never at the framework.
+
+## Where it stands
+
+All six are outlines. Each page states the intent for its stack, names its
+testing toolchain, and admits its own gap in a closing block, because a scaffold
+described as a guide is worse than no page at all.
+
+Spring Boot and Quarkus are the best supported, because `arch-blueprint-java`,
+`arch-blueprint-kotlin` and `arch-blueprint-quarkus` already carry the shape
+those pages describe. EAP is the least developed and owes the most, since legacy
+modernisation is exactly the case where generic advice helps least.

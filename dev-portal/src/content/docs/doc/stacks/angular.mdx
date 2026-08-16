@@ -1,0 +1,63 @@
+---
+title: Angular
+description: The stack where the user-first half of effective development is concrete — the design system is a contract, the API contract is consumed, and the journey is the acceptance test.
+---
+
+**TypeScript · Angular · RxJS**
+
+*How does user-first become a working practice rather than a slogan?*
+
+The stack where the [user-first](/doc/attitudes/user-first/) half of effective
+development is concrete: the design system is a contract, the API contract is
+consumed, and the journey is the acceptance test.
+
+## The contract
+
+Typed clients generated from the registered [API contracts](/go/api), so a
+breaking change lands as a TypeScript error at build time instead of an
+`undefined` at runtime. No hand-written interface duplicating a schema that
+already exists.
+
+## The tests
+
+Acceptance scenarios run in Playwright against a contract-mocked backend, so the
+journey is tested without the deployment. Components are built and tested in
+Storybook against their declared states before they are wired into a page, and
+tested through the DOM the user actually sees; services tested as plain classes.
+
+## The patterns
+
+Standalone components, signals for state, and a clear split between
+presentational and container components. Smart use of the type system is the
+pattern vocabulary here — the model that makes an invalid screen state
+unrepresentable.
+
+## The delivery
+
+Bundle budgets enforced in CI, accessibility checks in the acceptance suite
+rather than in a spreadsheet, design tokens generated from Figma rather than
+retyped, and preview deployments per pull request so a UX designer can review the
+running thing.
+
+## Testing tools
+
+| Job | What to use |
+|-----|-------------|
+| Acceptance, at the journey level | [Playwright](/doc/testing-tools/playwright/) |
+| Consumer contract | pact-js |
+| Provider mock in development | [Microcks](/doc/testing-tools/microcks/) |
+| Local HTTP stubbing | Angular `HttpTestingController` |
+| Component tests | Testing Library, through the DOM |
+| Component workbench | Storybook — stories as fixtures |
+| Accessibility | axe, per story and inside the Playwright run |
+| Visual regression | Storybook stories, compared per commit |
+
+Why each one, and what it costs: [testing tools](/doc/testing-tools/).
+
+## Where it stands
+
+Outline only. The guidance above is agreed; the worked examples and the starter
+project are not written yet.
+
+A stack page earns its detail from a project that actually ran this way. Until
+then it states the intent and admits the gap.

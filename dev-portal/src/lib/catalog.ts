@@ -5,7 +5,7 @@
  * a contract, a diagram, a message schema, a running component, a named practice,
  * a pattern, a stack blueprint. The Catalog page is the index over all seven.
  *
- * Three kinds of destination, and the distinction matters more than it looks:
+ * Two kinds of destination, and the distinction matters more than it looks:
  *
  *   external — the catalogue already exists in a neighbouring hub. API lives in
  *              api-hub; C4, Events and Components live in arch-hub. Rebuilding
@@ -13,8 +13,10 @@
  *              same source, so the panel links out. Addresses come from
  *              src/lib/links.ts and are resolved per request.
  *   docs     — the catalogue is prose, so it is a Starlight section under /doc/*.
- *   internal — the catalogue is rendered by this portal (Stacks, which needs a
- *              page per stack).
+ *
+ * There used to be a third kind: Stacks was rendered by this portal, from
+ * src/lib/stacks.ts. It is a Starlight section now like the rest, which is why
+ * no panel here points at a page this portal renders itself.
  *
  * `status` is what is actually reachable behind the link, not how finished the
  * subject is. See SectionPanels for the three values.
@@ -31,7 +33,7 @@ import { apiPortalUrl, archAppmapUrl, archC4Url, archEventcatalogUrl } from './l
 type PanelStatus = 'live' | 'soon' | 'planned';
 
 export interface Subcatalog {
-	/** Stable identity; also the URL segment for internal ones. */
+	/** Stable identity, and the anchor a panel is referred to by elsewhere. */
 	slug: string;
 	title: string;
 	/** The one question this catalogue answers that the others cannot. */
@@ -103,7 +105,7 @@ export const subcatalogs: readonly Subcatalog[] = [
 		title: 'Practices',
 		question: 'Which rituals connect the specialists, and how are they run?',
 		description:
-			'The eight practices that keep a team connected: BDD, example mapping, three amigos, event storming, ATDD, API-first, contract-first and all-in-one testing.',
+			'The eleven practices that keep a team connected, in the order a feature passes through them: event storming, story mapping, three amigos, example mapping, ticket emission, grooming, BDD, ATDD, API-first, contract-first and all-in-one testing.',
 		icon: 'M8 7.5a3 3 0 1 1 0-.1ZM3 20v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1m3-13.5a3 3 0 1 1 0-.1ZM14 20v-1a4 4 0 0 1 4-4h.5a3 3 0 0 1 3 3v2',
 		href: '/doc/practices/',
 		cta: 'Read the practices',
@@ -138,8 +140,8 @@ export const subcatalogs: readonly Subcatalog[] = [
 		description:
 			'The same practices and patterns expressed per stack — iOS, Android, Angular, Spring Boot, Quarkus and EAP — because advice that never names a framework is advice nobody can follow on Monday.',
 		icon: 'm12 3 9 4.5-9 4.5-9-4.5L12 3Zm9 9-9 4.5L3 12m18 4.5L12 21l-9-4.5',
-		href: '/catalog/stacks',
-		cta: 'Browse the stacks',
+		href: '/doc/stacks/',
+		cta: 'Read the stacks',
 		status: 'live',
 	},
 ] as const;

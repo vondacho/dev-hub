@@ -13,6 +13,17 @@ export default defineConfig({
   // than baked into the image at build time.
   output: 'server',
   adapter: node({ mode: 'standalone' }),
+  // The stacks used to be portal pages under /catalog/stacks. They are now a
+  // Starlight section, so the Catalog panel points into /doc/* like Practices,
+  // Code design and Testing tools already do, and src/lib/stacks.ts is gone —
+  // the content has exactly one home again.
+  //
+  // 301 rather than the 302 used by /go/*: those targets are configuration and
+  // move between environments, while these two routes have moved permanently.
+  redirects: {
+    '/catalog/stacks': '/doc/stacks/',
+    '/catalog/stacks/[slug]': '/doc/stacks/[slug]/',
+  },
   // Tailwind 4 is a Vite plugin, not an Astro integration. src/styles/global.css
   // is imported only by the portal's own Layout, so Tailwind's preflight never
   // reaches the Starlight pages under /doc/* — the two themes stay separate and
@@ -36,6 +47,10 @@ export default defineConfig({
       // changing the href in src/lib/catalog.ts or src/pages/index.astro too.
       sidebar: [
         { label: 'Overview', link: '/doc/' },
+        // The synthesis page: it introduces the two questions every activity
+        // answers and connects the artefacts from inception to the cluster, so
+        // it sits directly under the Overview rather than inside a section.
+        { label: 'The process', link: '/doc/process/' },
         {
           label: 'Attitudes',
           items: [
@@ -45,17 +60,37 @@ export default defineConfig({
           ],
         },
         {
+          // Ordered as a feature passes through them, matching the table on
+          // /doc/practices/ — the two orders used to disagree, and three new
+          // pages had nowhere coherent to be inserted.
           label: 'Practices',
           items: [
             { label: 'Overview', link: '/doc/practices/' },
-            { label: 'BDD', link: '/doc/practices/bdd/' },
-            { label: 'Example mapping', link: '/doc/practices/example-mapping/' },
-            { label: 'Three amigos', link: '/doc/practices/three-amigos/' },
             { label: 'Event storming', link: '/doc/practices/event-storming/' },
+            { label: 'Story mapping', link: '/doc/practices/story-mapping/' },
+            { label: 'Three amigos', link: '/doc/practices/three-amigos/' },
+            { label: 'Example mapping', link: '/doc/practices/example-mapping/' },
+            { label: 'From examples to tickets', link: '/doc/practices/story-tickets/' },
+            { label: 'Grooming and estimation', link: '/doc/practices/grooming/' },
+            { label: 'BDD', link: '/doc/practices/bdd/' },
             { label: 'ATDD', link: '/doc/practices/atdd/' },
             { label: 'API-first', link: '/doc/practices/api-first/' },
             { label: 'Contract-first', link: '/doc/practices/contract-first/' },
             { label: 'All-in-one testing', link: '/doc/practices/all-in-one-testing/' },
+          ],
+        },
+        {
+          // Where the general advice has to name a framework. Migrated from
+          // /catalog/stacks; the old routes redirect here.
+          label: 'Stacks',
+          items: [
+            { label: 'Overview', link: '/doc/stacks/' },
+            { label: 'iOS', link: '/doc/stacks/ios/' },
+            { label: 'Android', link: '/doc/stacks/android/' },
+            { label: 'Angular', link: '/doc/stacks/angular/' },
+            { label: 'Spring Boot', link: '/doc/stacks/spring-boot/' },
+            { label: 'Quarkus', link: '/doc/stacks/quarkus/' },
+            { label: 'EAP', link: '/doc/stacks/eap/' },
           ],
         },
         {

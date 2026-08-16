@@ -1,0 +1,59 @@
+---
+title: Spring Boot
+description: The most common backend stack, and the one where framework annotations most easily leak into a domain that should not know the framework exists.
+---
+
+**Java · Kotlin · Spring Boot**
+
+*How is a hexagonal service built when the framework wants to be everywhere?*
+
+The most common backend stack, and the one where framework annotations most
+easily leak into a domain that should not know the framework exists.
+
+## The contract
+
+The OpenAPI document is written first and registered before the controller
+exists; server stubs are generated from it. A specification derived from a
+running controller documents whatever the controller happens to do, including the
+parts nobody meant to promise.
+
+## The tests
+
+Acceptance tests through the port with the adapters stubbed, then a thin ring of
+`@SpringBootTest` slices for the wiring itself. Testcontainers for the datastore,
+consumer-driven contract tests for the calls that leave the service.
+
+## The patterns
+
+[Ports and adapters](/doc/code-design/architecture-patterns/) with the domain in a
+module that has no Spring dependency at all — enforced by an ArchUnit rule, not by
+good intentions. [Use case classes](/doc/code-design/usecase-patterns/) as the
+application boundary; the controller only translates.
+
+## The delivery
+
+Build once, promote the same artefact, configure per environment. Health,
+readiness and metrics endpoints wired from the start, and observability treated
+as part of the definition of done.
+
+## Testing tools
+
+| Job | What to use |
+|-----|-------------|
+| Acceptance, at the use case port | [Cucumber-JVM](/doc/testing-tools/cucumber/) |
+| Contract conformance | [Microcks](/doc/testing-tools/microcks/), against the deployed provider |
+| Consumer contract | pact-jvm |
+| Provider mock in development | [Microcks](/doc/testing-tools/microcks/) |
+| Integration dependencies | Testcontainers |
+| Architecture rules | ArchUnit |
+| Test quality | PIT mutation testing |
+
+Why each one, and what it costs: [testing tools](/doc/testing-tools/).
+
+## Where it stands
+
+**Starter project:** `arch-blueprint-java` · `arch-blueprint-kotlin` — two sibling
+repositories in the same workspace already carry this shape, one per language.
+
+The best-supported stack here: the blueprint repositories exist. What is missing
+is this page walking through them.

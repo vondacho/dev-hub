@@ -97,11 +97,11 @@ kubectl -n dev-hub port-forward svc/dev-portal 4321:4321
 ```
 
 `helm test` fetches one URL per thing that can independently fail — `/healthz`,
-`/`, `/catalog`, `/catalog/stacks/ios`, `/doc/` and `/doc/practices/bdd/`. A
-bare health check passes while every rendered page is broken, `/catalog` is the
-page that reads the outbound addresses from the ConfigMap, `/catalog/stacks/ios`
-proves the dynamic route resolves, and the two `/doc/` URLs prove the
-prerendered Starlight output shipped in the image.
+`/`, `/catalog`, `/doc/`, `/doc/practices/bdd/` and `/doc/stacks/ios/`. A bare
+health check passes while every rendered page is broken, `/catalog` is the page
+that reads the outbound addresses from the ConfigMap, and the three `/doc/` URLs
+prove the prerendered Starlight output shipped in the image — including
+`/doc/stacks/`, the section the stacks moved into from `/catalog/stacks`.
 
 ## Remove
 

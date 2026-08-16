@@ -28,15 +28,15 @@ npm start          # serve the build
 |-------|------------|
 | `/` | Home. Testimonials, then the four areas: Documentation, Catalog, MCP, Academy. |
 | `/catalog` | The eight subcatalogs: API, C4, Events, Components, Practices, Code design, Testing tools, Stacks. |
-| `/catalog/stacks` | The six stacks: iOS, Android, Angular, Spring Boot, Quarkus, EAP. |
-| `/catalog/stacks/[slug]` | One stack, answering the same four questions each time. |
 | `/academy` | Seven learning paths. Curriculum published, lessons not written. |
-| `/doc/*` | Starlight. Overview, Attitudes, Practices, Testing tools, MCP, Code design. |
+| `/doc/*` | Starlight. Overview, The process, Attitudes, Practices, Stacks, Testing tools, MCP, Code design. |
+| `/catalog/stacks*` | 301 to `/doc/stacks/`. The stacks moved into the documentation. |
 | `/go/[target]` | Request-time redirect to a neighbouring hub. See below. |
 | `/healthz` | `{"status":"UP"}` — probe target for a Helm chart. |
 
-All three panel grids render the same `SectionPanels` component, which takes its
-panels as a prop. `Hero` is props-driven for the same reason.
+Both panel grids — the home page's areas and `/catalog` — render the same
+`SectionPanels` component, which takes its panels as a prop. `Hero` is
+props-driven for the same reason.
 
 Each panel carries a `status`:
 
@@ -52,7 +52,6 @@ it must not drift:
 | File | Feeds |
 |------|-------|
 | `src/lib/catalog.ts` | `/catalog` |
-| `src/lib/stacks.ts` | `/catalog/stacks` and every stack page |
 | `src/lib/academy.ts` | `/academy` |
 | `src/lib/links.ts` | Every address that is configuration rather than a route |
 

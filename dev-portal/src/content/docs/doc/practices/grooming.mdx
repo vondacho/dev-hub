@@ -1,0 +1,140 @@
+---
+title: Grooming and estimation
+description: The recurring session that keeps the backlog ready, and why size in story points forecasts better than duration in man-days.
+---
+
+A recurring, timeboxed session — an hour a week is typical — in which the team
+looks at the items likely to enter the next iterations and makes them ready. It
+is not planning, and it is not a status meeting. It is the maintenance of the
+backlog as an instrument.
+
+## What the session does
+
+1. **Check readiness.** An item is ready when it has scenarios, no unanswered
+   [red cards](/doc/practices/example-mapping/), and no unnamed dependency. An
+   item that is not ready is not estimated — it is sent back with an owner and a
+   question.
+2. **Split what is too big.** By whole scenarios, along the vertical, exactly as
+   in [ticket emission](/doc/practices/story-tickets/).
+3. **Size it.** In points, relative to items already sized. See below.
+4. **Order it.** Against value, risk and dependency — the product owner decides
+   the order, the team decides the size, and neither overrules the other.
+5. **Delete what has died.** A backlog nobody prunes becomes an archive, and an
+   archive is not something you can plan from.
+
+The output is a small number of items at the top of the backlog that are ready,
+sized and ordered — enough for roughly two iterations. Grooming the whole backlog
+is waste: most of it will change or be dropped before anyone reaches it.
+
+## Why not man-days
+
+A man-day estimate answers "how long will this take you?" — and that question has
+three defects at once.
+
+**It embeds the person.** The same work is two days for the one who wrote the
+module and six for the one who has never opened it. So the estimate is only valid
+if the assignment is fixed, which means assigning work before planning it and
+losing the ability to let anyone pick up the next item.
+
+**It embeds the calendar.** Interruptions, reviews, meetings, support duty, a
+public holiday. A day of work is not a day of elapsed time, and everybody knows
+it, so estimates get quietly inflated to cover a variance that belongs somewhere
+else entirely.
+
+**It is heard as a commitment.** "Three days" leaves the room as a date. When it
+slips, the conversation is about the promise rather than about what was
+discovered — and the lesson the team learns is to pad the next one.
+
+Underneath all three: humans forecast absolute durations badly and compare sizes
+well. Estimation in man-days uses the weak skill; estimation in points uses the
+strong one.
+
+## What a point measures
+
+**Size, not duration.** Complexity, volume, uncertainty and risk, relative to
+other items the team has already sized. A point has no unit and no conversion
+rate, and it deliberately cannot be checked against a clock.
+
+The properties that follow are the whole reason for the change:
+
+- **It does not change when the person changes.** Size is a property of the work.
+- **It does not change when the calendar does.** Holidays affect how much gets
+  done, not how big the thing is — and that difference is exactly what velocity
+  is for.
+- **It is the team's, not an individual's.** Which is what makes any member able
+  to take the next ticket.
+- **It cannot be read as a promise**, because it is not a date.
+
+## How the number is produced
+
+**A modified Fibonacci scale** — 1, 2, 3, 5, 8, 13, 20, 40, 100. The gaps widen
+because precision at size is fiction: the difference between 1 and 2 is real,
+between 20 and 21 is imaginary, and a scale with a 21 on it invites an argument
+that produces nothing.
+
+**A reference item.** Pick a small, well-understood, finished item and call it a
+2. Everything else is estimated against it. Recalibrate rarely and consciously —
+a scale that drifts silently makes historical velocity meaningless.
+
+**Simultaneous reveal.** Everyone shows a number at the same time, so nobody
+anchors on the senior developer's guess. Then discuss only the outliers, and only
+until the spread closes.
+
+**The discussion is the deliverable.** When one person says 2 and another says
+13, they are not disagreeing about arithmetic — one of them knows something the
+other does not. Finding out what, in ninety seconds, is worth more than the
+estimate that comes out of it.
+
+## From points to a date
+
+You never convert. Velocity does it for you, in retrospect.
+
+Measure how many points the team completes per iteration, keep the last few
+figures, and use the range — not the average alone — to forecast: *at 30 to 40
+points an iteration, these 160 points are four to six iterations away.* The
+conversion factor is **observed**, specific to this team, and comes with a spread
+that honestly represents what is not known.
+
+That is the whole mechanism, and it is why the two rules below are not
+bureaucratic fussiness.
+
+**Never agree a conversion in advance.** "A point is half a day" reintroduces
+every defect of man-days and adds a layer of ceremony on top.
+
+**Never compare velocity between teams.** A point is a local unit, calibrated
+against one team's reference item. Comparing velocities makes the number a
+performance measure, and a performance measure made of self-reported units
+inflates — reliably, and within about two iterations. The instrument is destroyed
+and the forecast with it.
+
+## Reading the numbers
+
+- **13 or higher** — not an estimate, a signal. Split it.
+- **20 or higher** — it has not been understood. Send it back to
+  [example mapping](/doc/practices/example-mapping/).
+- **A wide spread that will not close** — the disagreement is about scope, not
+  size. There is a rule nobody wrote down.
+- **Uncertainty rather than size driving the number** — do not pad it. Cut a
+  timeboxed spike, learn the missing thing, and estimate afterwards.
+- **Everything estimated at 3** — the scale has collapsed and the numbers have
+  stopped carrying information. Recalibrate against the reference item.
+
+## What this is for
+
+Grooming is where both halves of
+[the process](/doc/process/) are checked at once. *Is this still the most
+valuable thing to build next?* is doing the right thing. *Is this item small
+enough and clear enough to be built well?* is doing the thing right — because an
+item nobody can size is an item nobody can implement cleanly, and it is where
+technical debt gets committed to before a line is written.
+
+## What it is not
+
+Not a commitment ceremony, and not a productivity measurement. Velocity is a
+forecasting input; the moment it becomes a target, it stops measuring anything —
+the team inflates estimates, the number rises, and nothing about the delivered
+software changes.
+
+If you want to know whether the team is getting better, look at cycle time, at
+how often the forecast holds, and at what the next change costs. Not at the
+points.

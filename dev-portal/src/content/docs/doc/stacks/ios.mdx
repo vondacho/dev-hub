@@ -1,0 +1,60 @@
+---
+title: iOS
+description: Swift and SwiftUI, where the release cadence is set by someone else — so the feedback you get before submitting is the only feedback that is cheap.
+---
+
+**Swift · SwiftUI · Xcode**
+
+*How does effective development look on a platform that ships through review?*
+
+Swift and SwiftUI, where the release cadence is set by someone else — so the
+feedback you get before submitting is the only feedback that is cheap.
+
+## The contract
+
+The app is a consumer, never a publisher: its backend contracts come from the
+[API catalogue](/go/api), and the client is generated from them rather than
+hand-rolled around a `URLSession`. A contract change should break the build, not
+a screen in production.
+
+## The tests
+
+Acceptance scenarios drive XCUITest against a stubbed contract; the domain sits
+in a plain Swift module with no UIKit or SwiftUI import, so its tests run in a
+second. Snapshot tests cover what a view looks like, not what it decides.
+
+## The patterns
+
+Composition over inheritance, unidirectional state, and a strict boundary between
+view and model. Value types by default — the pattern that pays most on this stack
+is the one that removes a class of concurrency bug rather than the one that adds
+a layer.
+
+## The delivery
+
+Trunk-based, with the store release decoupled from the merge by a feature flag.
+Review latency is a fact of the platform, so everything upstream of submission
+has to be fast enough to absorb it.
+
+## Testing tools
+
+| Job | What to use |
+|-----|-------------|
+| Acceptance, at the domain port | Quick + Nimble |
+| Consumer contract | PactSwift |
+| Provider mock in development | [Microcks](/doc/testing-tools/microcks/) |
+| Local HTTP stubbing | `URLProtocol` stub |
+| UI tests | XCUITest |
+| End-to-end journeys | Maestro |
+| Visual regression | swift-snapshot-testing |
+
+Why each one, and what it costs: [testing tools](/doc/testing-tools/), and the
+[mobile analysis](/doc/testing-tools/mobile/) in particular.
+
+## Where it stands
+
+Outline only. The guidance above is agreed; the worked examples and the starter
+project are not written yet.
+
+A stack page earns its detail from a project that actually ran this way. Until
+then it states the intent and admits the gap.

@@ -1,20 +1,25 @@
 ---
 title: Practices
-description: The eight practices that connect specialists — BDD, example mapping, three amigos, event storming, ATDD, API-first, contract-first and all-in-one testing.
+description: The eleven practices that connect specialists — from event storming and story mapping through example mapping, ticket emission and grooming to BDD, ATDD, API-first, contract-first and all-in-one testing.
 ---
 
-Effective development is connected before it is anything else. These eight
+Effective development is connected before it is anything else. These eleven
 practices are how that connection is made concrete: each one is a named ritual,
 with named participants, that produces an artefact the next step needs.
 
 They are listed in roughly the order a feature passes through them, though in
 practice several run in the same room on the same afternoon.
+[The process](/doc/process/) is where the whole chain is followed end to end,
+from inception to a running cluster.
 
 | Practice | Who is in the room | What comes out |
 |----------|--------------------|----------------|
 | [Event storming](/doc/practices/event-storming/) | Domain experts, developers, architects, product owner | A shared map of what happens in the domain, and where its seams are |
+| [Story mapping](/doc/practices/story-mapping/) | Product owner, UX designer, developers, quality engineer, a user | The journey along a backbone, cut into releases that each cross it |
 | [Three amigos](/doc/practices/three-amigos/) | Product owner, developer, quality engineer | A story whose ambiguities have been found before it is estimated |
 | [Example mapping](/doc/practices/example-mapping/) | The three amigos, plus a domain expert when needed | Rules, examples and — the valuable part — open questions |
+| [From examples to tickets](/doc/practices/story-tickets/) | Product owner, developer | Story tickets carrying whole scenarios, and a machine-checkable "done" |
+| [Grooming and estimation](/doc/practices/grooming/) | Product owner, the whole team | A ready, sized, ordered backlog and a forecast with a range |
 | [BDD](/doc/practices/bdd/) | Everyone above | Behaviour specified in the language of the business |
 | [ATDD](/doc/practices/atdd/) | Developer, quality engineer | An executable acceptance test that defines "done" |
 | [API-first](/doc/practices/api-first/) | Consumer team, provider team, architect | An interface agreed before it is built |
@@ -56,7 +61,7 @@ something fails when they are breached. That tooling has its own section:
 ## What they are not
 
 They are not a process to adopt wholesale. A team running two of them well is
-better off than a team running eight of them as ceremony. Start with the one
+better off than a team running eleven of them as ceremony. Start with the one
 that addresses the failure your team actually has — usually
 [example mapping](/doc/practices/example-mapping/), because "we built the wrong
 thing" is the most common and the most expensive.

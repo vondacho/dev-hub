@@ -1,0 +1,110 @@
+---
+title: From examples to tickets
+description: Turning the green cards of an example mapping session into Jira Story tickets, where the scenario is the smallest business-valuable unit of delivery.
+---
+
+An example mapping session ends with a wall of cards. A sprint board needs
+tickets. The step between them is mechanical if one rule is respected, and a
+source of permanent confusion if it is not:
+
+> **A story tells one or more scenarios. A Story ticket delivers a subset of
+> them. A scenario is never split.**
+
+The scenario is the **smallest business-valuable unit of delivery** — the
+smallest thing that can be finished, demonstrated and used. Half a scenario is
+not half the value; it is nothing anyone can be shown.
+
+## The chain
+
+Every step consumes the previous one's output verbatim. Nothing is rephrased on
+the way, because every rephrasing is an opportunity for the meaning to drift.
+
+| Step | Produced by | Form |
+|------|-------------|------|
+| Cell | [Story mapping](/doc/practices/story-mapping/) | A position in the journey |
+| Story | The cell, opened | One yellow card |
+| Rule | [Example mapping](/doc/practices/example-mapping/) | A blue card |
+| Example | Example mapping | A green card, with real values |
+| Scenario | [BDD](/doc/practices/bdd/) | `Given / When / Then` |
+| **Ticket** | This step | A subset of scenarios, deliverable whole |
+| Acceptance test | [ATDD](/doc/practices/atdd/) | The same scenario, executable |
+
+The last two lines are what makes the ticket honest. Its acceptance criteria are
+its scenarios, its scenarios are its acceptance tests, and "done" is those tests
+green — not a judgement anyone has to make in a review meeting.
+
+## What lands in which field
+
+| Card | Where it goes |
+|------|---------------|
+| **Story** (yellow) | The ticket summary, in the user's language, one per story |
+| **Rule** (blue) | A heading in the description, grouping the scenarios it governs |
+| **Example** (green) | One `Given / When / Then` scenario in the description, and one acceptance test |
+| **Question** (red) | Not a ticket. A blocker on the story until it is answered |
+
+A red card that becomes a ticket has been converted from "we do not know" into
+"someone will decide later, alone, under time pressure". That is the exact
+failure [example mapping](/doc/practices/example-mapping/) exists to prevent, so
+the rule is absolute: **no ticket is emitted from a story that still carries red
+cards.**
+
+## How many tickets for one story
+
+As many as it takes for each to be finishable within one iteration, and never so
+few that one of them cannot be demonstrated.
+
+A story with three rules and nine scenarios might emit two tickets: the four
+scenarios that make the feature usable at all, then the five that handle the
+variations. Both are demonstrable. Both are shippable. The second may never be
+built, and the first is still worth having — which is the test of a good split.
+
+**Split by whole scenarios, along the vertical.** Never by layer:
+
+- *`Payment API endpoint`* and *`Payment screen`* — two tickets that each close
+  with nothing delivered. The board shows progress; the user has none.
+- *`Pay with a saved card`* and *`Pay with a new card`* — two tickets that each
+  close with a person able to do something they could not do before.
+
+The first pair is a work breakdown wearing a story's clothes. If a ticket's
+completion cannot be described in the user's words, it is a task, not a Story.
+
+## Technical tickets
+
+Some work carries no scenario: a version upgrade, an index, a refactoring, a
+spike. These are legitimate, and they get a different issue type — never a Story
+with an invented scenario wrapped around it to make it look valuable.
+
+The distinction is worth defending, because the moment technical work is
+disguised as a Story, two numbers stop meaning anything at once: the amount of
+delivered value, and the amount of technical work the team is actually carrying.
+Both are things somebody needs to be able to see. This is the accounting boundary
+between [doing the right thing and doing the thing right](/doc/process/).
+
+## Traceability, for free
+
+The scenario name is the same string on the wall, in the ticket, in the feature
+file and in the pipeline report. That is not tidiness — it is what allows the
+question "is this ticket done?" to be answered by a build rather than by a
+person, and the question "why does this test exist?" to be answered by pointing
+at a rule someone agreed to.
+
+It also survives the ticket. Six months later the ticket is closed and unread,
+and the scenario is still executing on every commit — the requirement outlives
+the tracker entry, which is the right way round.
+
+## What this does to the tracker
+
+The tracker stops being where requirements are written and becomes where they are
+*scheduled*. The requirement was written on a wall by three people and lives in a
+feature file under version control; the ticket is a scheduling artefact that
+points at it.
+
+Teams that get this backwards write the specification into the ticket
+description, where it is read once, never versioned, and contradicted by the code
+within a sprint.
+
+## Where it leads
+
+The emitted tickets go to [grooming](/doc/practices/grooming/) to be sized and
+ordered, and their scenarios go to [ATDD](/doc/practices/atdd/) to become the
+failing test that starts the work.
