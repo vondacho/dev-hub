@@ -1,0 +1,48 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Hero from '../../../components/home/Hero.astro';
+import SectionPanels, { type Panel } from '../../../components/home/SectionPanels.astro';
+import SiteFooter from '../../../components/home/SiteFooter.astro';
+import { stacks } from '../../../lib/stacks';
+
+/*
+ * The six stacks. Every panel goes to a page in this portal — unlike the
+ * catalogs above it, a stack has no external home to link to.
+ *
+ * All six are `soon`: the pages exist and say something real, but they are
+ * outlines rather than worked guides. That is stated on each page too, in the
+ * "Where it stands" block, because a status badge on a card is easy to miss.
+ */
+const panels: readonly Panel[] = stacks.map((stack) => ({
+	title: stack.title,
+	description: stack.description,
+	href: `/catalog/stacks/${stack.slug}`,
+	cta: `Open the ${stack.title} stack`,
+	status: stack.status,
+	icon: stack.icon,
+}));
+---
+
+<Layout
+	title="Stacks — Dev Hub"
+	description="Effective software development expressed per technology stack: iOS, Android, Angular, Spring Boot, Quarkus and JBoss EAP."
+>
+	<main id="main">
+		<Hero
+			kicker="Stacks"
+			title="Where the general advice has to name a framework."
+			lead="Practices and patterns are written to be true regardless of technology, which is
+				exactly what makes them easy to agree with and hard to act on. Each stack below
+				answers the same four questions in its own terms: what the contract is, how it is
+				tested, which patterns pay, and what delivery looks like — so two stacks can be
+				compared rather than merely both described."
+			parent={{ label: 'Catalog', href: '/catalog' }}
+			actions={[
+				{ label: 'Back to the catalogs', href: '/catalog' },
+				{ label: 'The practices behind them', href: '/doc/practices/' },
+			]}
+		/>
+		<SectionPanels panels={panels} label="Stacks" />
+	</main>
+	<SiteFooter />
+</Layout>

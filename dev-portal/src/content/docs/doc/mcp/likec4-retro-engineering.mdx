@@ -1,0 +1,51 @@
+---
+title: LikeC4 retro-engineering
+description: Deriving a C4 model from a codebase that has none, and keeping the difference between the two models visible.
+---
+
+A server that reads an existing codebase and produces a
+[LikeC4](https://likec4.dev) model of what is actually there: the modules, the
+things they call, the datastores they open, the queues they publish to.
+
+## The problem it addresses
+
+The systems that most need an architecture model are the ones least likely to
+have one — large, old, still in production, and understood in fragments by people
+who have each seen a different part. Asking that team to draw the current
+architecture from memory produces a drawing of the architecture they intended.
+
+Deriving it from the code produces a drawing of the architecture they have. That
+is less flattering and considerably more useful.
+
+## What it would read
+
+- **Static structure**: modules, packages, dependency edges, and the boundaries
+  that build configuration already defines.
+- **Outbound calls**: HTTP clients, message producers, datastore connections —
+  the edges that leave the process, which are the ones a container diagram is
+  about.
+- **Runtime evidence** where it exists: [AppMap traces](/go/components) show what
+  actually ran, which is the only source that can distinguish a call that exists
+  from a call that happens.
+
+## What it would not do
+
+It does not name bounded contexts. A derived model shows structure, and structure
+is not domain — two modules that call each other constantly might be one context
+or two badly-drawn ones, and only a person who knows the business can say which.
+
+It also does not overwrite a curated model. The output is a **second** model,
+kept alongside the hand-written one.
+
+## The valuable output is the diff
+
+Running this against a codebase that already has a
+[scaffolded model](/doc/mcp/likec4-scaffolding/) produces the one artefact no
+diagram can give you on its own: the difference between the architecture as
+described and the architecture as built. That gap is where drift lives, and it is
+invisible until two models exist to compare.
+
+## Status
+
+Not built. This is the most technically demanding of the five, and the one whose
+output most needs a human to interpret.

@@ -1,0 +1,70 @@
+---
+title: Use case patterns
+description: The shape of one unit of business work at the application boundary — where the acceptance test attaches and the transaction begins.
+---
+
+A use case is one thing the system does for someone. It sits at the application
+boundary: outside it is delivery mechanism — HTTP, a queue consumer, a scheduled
+job — and inside it is the domain.
+
+This is the smallest catalogue here and the most load-bearing, because the use
+case is where three other things attach: the
+[acceptance test](/doc/practices/atdd/), the transaction, and the authorisation
+check.
+
+## The shape
+
+```
+inbound adapter  →  use case  →  domain
+                       ↓
+                 outbound ports
+```
+
+A use case class per operation, with one public method. Not a `UserService` with
+eleven methods sharing six dependencies, four of which any given method does not
+use — that class is a namespace, and its tests need every dependency stubbed
+whatever they exercise.
+
+## The entries
+
+**Command / query separation.** A use case either changes something and returns
+little, or changes nothing and returns a projection. Mixing the two produces
+operations that cannot be cached, cannot be retried, and cannot be reasoned
+about.
+
+**Input and output boundary.** The use case takes a request object it defines and
+returns a response object it defines — neither is an HTTP type and neither is a
+domain entity. That is what stops the delivery mechanism leaking inwards and the
+domain leaking outwards.
+
+**Interactor with injected ports.** Every external effect goes through a port the
+use case declares. Stubbing those ports is how the acceptance test runs without a
+database.
+
+**Transaction boundary at the use case.** One use case, one transaction. Below it
+the domain knows nothing about transactions; above it the adapter does not open
+one. Anything spanning two use cases is a [saga](/doc/code-design/integration-patterns/),
+not a transaction.
+
+**Authorisation at the boundary.** The check belongs where the intent is known —
+in the use case, which knows *what* is being attempted, rather than in the
+controller, which only knows which URL was hit.
+
+**Result rather than exception for expected failures.** "Payment declined" is an
+outcome, not an exceptional condition. Modelling it as a return value keeps it in
+the signature where a caller has to handle it.
+
+## Why this shape pays
+
+The acceptance test attaches to the use case port, so it exercises real business
+behaviour without a running deployment — which is what makes
+[all-in-one testing](/doc/practices/all-in-one-testing/) affordable. And the list
+of use case classes in a codebase is a readable inventory of what the system
+does, which no controller layer has ever provided.
+
+## Status
+
+Outline. The worked examples per [stack](/catalog/stacks) are not written yet;
+the [Spring Boot](/catalog/stacks/spring-boot) and
+[Quarkus](/catalog/stacks/quarkus) blueprint repositories already carry this
+shape in code.

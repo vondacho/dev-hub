@@ -1,0 +1,196 @@
+---
+/*
+ * Testimonial carousel, matching api-portal's and arch-portal's so the three
+ * hubs read as one platform: same section chrome, same slide markup, same
+ * controls, same autoplay behaviour.
+ *
+ * The quotes are attributed by role rather than by name, and the roles are the
+ * ones effective development is supposed to connect — an end-user, a UX
+ * designer, a domain expert, a quality engineer, an operations engineer, a
+ * product owner, a developer. That is the argument the section is making: each
+ * one describes the same shift from a different seat.
+ *
+ * Scrolling is native: the track is a snap container, and the script only moves
+ * scrollLeft. That keeps it working with the keyboard and with a trackpad even
+ * if the script never runs.
+ */
+
+interface Testimonial {
+	quote: string;
+	attribution: string;
+}
+
+const testimonials: readonly Testimonial[] = [
+	{
+		quote:
+			'They showed me the journey before anything was built, and I told them the second screen was wrong. That conversation cost an afternoon. Finding out after release would have cost a quarter.',
+		attribution: 'End-user',
+	},
+	{
+		quote:
+			'I stopped handing over mockups and started sitting in the same session where the examples were written. The design questions and the domain questions turned out to be the same questions.',
+		attribution: 'UX designer',
+	},
+	{
+		quote:
+			'Example mapping was the first time anyone asked me for the rules rather than for a sign-off. We found three cases nobody had considered before a single line was written.',
+		attribution: 'Domain expert',
+	},
+	{
+		quote:
+			'When the acceptance criteria are the acceptance tests, I stop being the last gate before release and start being part of the conversation that shapes the thing.',
+		attribution: 'Quality engineer',
+	},
+	{
+		quote:
+			'Contract-first is what let the two teams stop coordinating releases. They agreed the interface, generated both sides from it, and the build fails now instead of the integration.',
+		attribution: 'Software architect',
+	},
+	{
+		quote:
+			'The AI writes a great deal of it now. What makes that safe is that the tests and the contract were already there to say whether what it wrote was right.',
+		attribution: 'Software developer',
+	},
+	{
+		quote:
+			'The honest measure is what the next change costs. Two years in, ours has not gone up — which is the only evidence I trust that the design was sustainable.',
+		attribution: 'Product owner',
+	},
+] as const;
+---
+
+<section
+	aria-labelledby="testimonials-title"
+	class="border-y border-slate-200 bg-slate-50 py-16 sm:py-20 dark:border-slate-800 dark:bg-night-raised"
+>
+	<div class="mx-auto w-full max-w-5xl px-6">
+		<h2 id="testimonials-title" class="text-2xl font-bold tracking-tight sm:text-3xl">
+			The same shift, from seven different seats
+		</h2>
+		<p class="mt-2 max-w-2xl text-ink-muted dark:text-slate-400">
+			Effective development is not a developer practice. It is what changes for everyone
+			who touches the product once the specialists are connected rather than sequenced.
+		</p>
+
+		<div class="group relative mt-10" data-carousel>
+			<ul
+				data-carousel-track
+				tabindex="0"
+				aria-label="Testimonials"
+				class="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto"
+			>
+				{
+					testimonials.map(({ quote, attribution }, index) => (
+						<li
+							data-carousel-slide
+							aria-roledescription="slide"
+							aria-label={`${index + 1} of ${testimonials.length}`}
+							class="w-full shrink-0 snap-center"
+						>
+							<figure class="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10 dark:border-slate-700 dark:bg-night">
+								<blockquote class="text-lg text-balance sm:text-xl">
+									<p>&ldquo;{quote}&rdquo;</p>
+								</blockquote>
+								<figcaption class="mt-6 text-sm font-semibold tracking-wide text-ink-muted uppercase dark:text-slate-400">
+									{attribution}
+								</figcaption>
+							</figure>
+						</li>
+					))
+				}
+			</ul>
+
+			<div class="mt-6 flex items-center justify-between gap-4">
+				<div class="flex gap-2" data-carousel-dots role="tablist" aria-label="Choose testimonial">
+					{
+						testimonials.map((_, index) => (
+							<button
+								type="button"
+								role="tab"
+								data-carousel-dot={index}
+								aria-label={`Testimonial ${index + 1}`}
+								aria-selected={index === 0 ? 'true' : 'false'}
+								class="h-2.5 w-2.5 rounded-full bg-slate-300 transition aria-selected:w-6 aria-selected:bg-brand dark:bg-slate-600 dark:aria-selected:bg-sky-400"
+							/>
+						))
+					}
+				</div>
+
+				<div class="flex gap-2">
+					<button
+						type="button"
+						data-carousel-prev
+						aria-label="Previous testimonial"
+						class="rounded-full border border-slate-300 p-2 transition hover:bg-white disabled:opacity-40 dark:border-slate-600 dark:hover:bg-night"
+					>
+						<svg viewBox="0 0 20 20" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<path d="M12.5 4 7 10l5.5 6" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+					</button>
+					<button
+						type="button"
+						data-carousel-next
+						aria-label="Next testimonial"
+						class="rounded-full border border-slate-300 p-2 transition hover:bg-white disabled:opacity-40 dark:border-slate-600 dark:hover:bg-night"
+					>
+						<svg viewBox="0 0 20 20" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<path d="M7.5 4 13 10l-5.5 6" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	const carousel = document.querySelector<HTMLElement>('[data-carousel]');
+	const track = carousel?.querySelector<HTMLElement>('[data-carousel-track]');
+
+	if (carousel && track) {
+		const slides = [...track.querySelectorAll<HTMLElement>('[data-carousel-slide]')];
+		const dots = [...carousel.querySelectorAll<HTMLElement>('[data-carousel-dot]')];
+		const prev = carousel.querySelector<HTMLElement>('[data-carousel-prev]');
+		const next = carousel.querySelector<HTMLElement>('[data-carousel-next]');
+
+		const current = () => Math.round(track.scrollLeft / track.clientWidth);
+		const goTo = (index: number) => {
+			// Wraps, so the arrows never dead-end on the first or last slide.
+			const target = (index + slides.length) % slides.length;
+			track.scrollTo({ left: target * track.clientWidth });
+		};
+		const syncDots = () => {
+			const active = current();
+			dots.forEach((dot, index) => dot.setAttribute('aria-selected', String(index === active)));
+		};
+
+		prev?.addEventListener('click', () => goTo(current() - 1));
+		next?.addEventListener('click', () => goTo(current() + 1));
+		dots.forEach((dot, index) => dot.addEventListener('click', () => goTo(index)));
+		track.addEventListener('scroll', () => requestAnimationFrame(syncDots), { passive: true });
+		window.addEventListener('resize', syncDots);
+		syncDots();
+
+		// Autoplay, but never against the reader: it stops while the pointer or
+		// focus is inside the carousel, while the tab is hidden, and entirely when
+		// the reader has asked for reduced motion.
+		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+		let timer: number | undefined;
+		const stop = () => {
+			if (timer) clearInterval(timer);
+			timer = undefined;
+		};
+		const start = () => {
+			if (timer || reduced.matches || document.hidden) return;
+			timer = window.setInterval(() => goTo(current() + 1), 7000);
+		};
+
+		carousel.addEventListener('pointerenter', stop);
+		carousel.addEventListener('pointerleave', start);
+		carousel.addEventListener('focusin', stop);
+		carousel.addEventListener('focusout', start);
+		reduced.addEventListener('change', () => (reduced.matches ? stop() : start()));
+		document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+		start();
+	}
+</script>

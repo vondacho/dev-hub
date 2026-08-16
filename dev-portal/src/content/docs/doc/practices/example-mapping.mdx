@@ -1,0 +1,53 @@
+---
+title: Example mapping
+description: Turning a story into rules, examples and open questions in twenty-five minutes, using four colours of card.
+---
+
+A timeboxed conversation that takes one story and breaks it into four kinds of
+card. It is the most mechanical of the practices here and the one that most
+reliably pays for itself on the first attempt.
+
+## The four colours
+
+| Card | Colour | What it holds |
+|------|--------|---------------|
+| **Story** | Yellow | The one under discussion. There is exactly one. |
+| **Rule** | Blue | A constraint or acceptance criterion. |
+| **Example** | Green | A concrete case illustrating a rule — real values, not "some input". |
+| **Question** | Red | Something nobody in the room can answer. |
+
+## How it runs
+
+Twenty-five minutes, no longer. The [three amigos](/doc/practices/three-amigos/)
+plus a domain expert when the domain is where the doubt is.
+
+Write the story. Write the rules under it. Under each rule, write examples until
+everyone agrees the rule is understood. Whenever someone says "it depends" or
+"I'd have to check", that is a **red card** — write it and move on rather than
+speculating.
+
+## Reading the map
+
+The shape of the finished map tells you what to do next, before anyone discusses
+it:
+
+- **Many red cards** — the story is not ready. Do not estimate it.
+- **Many blue cards** — the story is too big. Split it along the rules.
+- **A rule with no green cards** — nobody actually understands that rule yet.
+- **Many green cards under one rule** — the rule is more complicated than it
+  looks, and is often two rules.
+- **Few cards, quick agreement** — the story is ready. This is the good outcome
+  and it takes ten minutes.
+
+## What it produces
+
+The green cards are the raw material for [BDD](/doc/practices/bdd/) scenarios and
+then for the [acceptance tests](/doc/practices/atdd/). Nothing is retyped: the
+examples written on the wall are the ones that become `Given / When / Then`.
+
+## Why the red cards matter most
+
+Every red card is a question that would otherwise have been answered by an
+assumption, silently, by whoever hit it first — usually a developer at 4pm on the
+last day of the sprint. Making the question visible costs seconds. Discovering
+the wrong assumption after release costs a release.

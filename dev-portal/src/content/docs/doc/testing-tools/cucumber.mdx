@@ -1,0 +1,62 @@
+---
+title: Cucumber
+description: Executable specifications in the language of the business — what it is genuinely good at, and the two ways teams reliably ruin it.
+---
+
+Cucumber executes [Gherkin scenarios](/doc/practices/bdd/) against the system,
+which makes the agreed specification and the regression suite the same artefact.
+
+It exists in every stack this hub covers — Cucumber-JVM for
+[Spring Boot](/catalog/stacks/spring-boot), [Quarkus](/catalog/stacks/quarkus),
+[EAP](/catalog/stacks/eap) and the [Android](/catalog/stacks/android) domain
+module; cucumber-js for [Angular](/catalog/stacks/angular) and Node.
+
+## Where to attach it
+
+**At the use case port.** Not at the browser, not at the HTTP controller, not at
+the database.
+
+That single decision is what separates a Cucumber suite people keep from one they
+delete in year two. Attached to the port:
+
+- the scenario exercises real business behaviour, with the adapters stubbed;
+- it runs in milliseconds, so it can run on every push;
+- it does not break when a button moves, because it never knew about the button.
+
+The stubs behind those ports come from [Microcks](/doc/testing-tools/microcks/)
+where the dependency is an API, so the scenario runs against the contract rather
+than against someone's idea of it.
+
+## The two ways teams ruin it
+
+**Writing the scenarios alone.** Gherkin written by one analyst after the
+conversation is transcription with a runtime cost. The scenarios have to come out
+of [example mapping](/doc/practices/example-mapping/), where the room agreed on
+the examples — otherwise the collaboration benefit, which is the whole return, is
+never collected and only the maintenance burden arrives.
+
+**Driving the UI with it.** `Given I click the button with id submit-btn` is a
+UI test wearing a costume. It is unreadable to the business, brittle for the
+developers, and slow for everyone. If a journey needs driving through the
+browser, that is [Playwright's](/doc/testing-tools/playwright/) job and it does
+not need Gherkin to do it.
+
+## Step reuse, and its limit
+
+Reusing step definitions is good until a step grows its fourth optional
+parameter and a regular expression nobody can read. At that point the step
+library has become a private DSL with no documentation, and writing a new
+scenario requires archaeology.
+
+The usable rule: steps are reused when the *domain concept* is the same, not when
+the sentence looks similar.
+
+## When not to use it
+
+If nobody outside the development team ever opens the scenarios, Cucumber is
+costing a step-definition layer and buying nothing. Write the same examples as
+plain [acceptance tests](/doc/practices/atdd/) in the team's own test framework
+and keep the conversation that produced them — the conversation was always the
+valuable half.
+
+This is a real and common outcome, and choosing it is not a failure.

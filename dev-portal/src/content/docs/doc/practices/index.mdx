@@ -1,0 +1,62 @@
+---
+title: Practices
+description: The eight practices that connect specialists — BDD, example mapping, three amigos, event storming, ATDD, API-first, contract-first and all-in-one testing.
+---
+
+Effective development is connected before it is anything else. These eight
+practices are how that connection is made concrete: each one is a named ritual,
+with named participants, that produces an artefact the next step needs.
+
+They are listed in roughly the order a feature passes through them, though in
+practice several run in the same room on the same afternoon.
+
+| Practice | Who is in the room | What comes out |
+|----------|--------------------|----------------|
+| [Event storming](/doc/practices/event-storming/) | Domain experts, developers, architects, product owner | A shared map of what happens in the domain, and where its seams are |
+| [Three amigos](/doc/practices/three-amigos/) | Product owner, developer, quality engineer | A story whose ambiguities have been found before it is estimated |
+| [Example mapping](/doc/practices/example-mapping/) | The three amigos, plus a domain expert when needed | Rules, examples and — the valuable part — open questions |
+| [BDD](/doc/practices/bdd/) | Everyone above | Behaviour specified in the language of the business |
+| [ATDD](/doc/practices/atdd/) | Developer, quality engineer | An executable acceptance test that defines "done" |
+| [API-first](/doc/practices/api-first/) | Consumer team, provider team, architect | An interface agreed before it is built |
+| [Contract-first](/doc/practices/contract-first/) | Both sides of any boundary | A machine-checkable agreement, and the tests that enforce it |
+| [All-in-one testing](/doc/practices/all-in-one-testing/) | Developer, quality engineer | One suite covering several levels without duplicating intent |
+
+## What they are run with
+
+A ritual produces something only if the people in it bring the two
+[attitudes](/doc/attitudes/) — [test-first](/doc/attitudes/test-first/) and
+[user-first](/doc/attitudes/user-first/). Example mapping run by people not
+thinking about the user produces rules nobody needed; ATDD run by people not
+thinking about design produces tests pinned to an implementation. Same ritual,
+missing disposition.
+
+## What they have in common
+
+**A defined output.** A ritual with no artefact is a meeting. Each of these ends
+with something the next step consumes — a map, a set of examples, a contract, a
+failing test.
+
+**A mixed room.** Every one of them puts at least two specialisms together.
+That is the point: the expensive defects are not coding errors, they are
+misunderstandings that survived a handover because nobody in the second room was
+in the first one.
+
+**A cheap failure mode.** These practices are all attempts to move the moment of
+discovery earlier. An open question raised in example mapping costs an hour; the
+same question discovered in production costs a release.
+
+## What enforces them
+
+Three of these — [ATDD](/doc/practices/atdd/),
+[API-first](/doc/practices/api-first/) and
+[contract-first](/doc/practices/contract-first/) — are only worth the words if
+something fails when they are breached. That tooling has its own section:
+[testing tools](/doc/testing-tools/).
+
+## What they are not
+
+They are not a process to adopt wholesale. A team running two of them well is
+better off than a team running eight of them as ceremony. Start with the one
+that addresses the failure your team actually has — usually
+[example mapping](/doc/practices/example-mapping/), because "we built the wrong
+thing" is the most common and the most expensive.

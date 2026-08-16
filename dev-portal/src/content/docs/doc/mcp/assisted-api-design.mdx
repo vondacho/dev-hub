@@ -1,0 +1,53 @@
+---
+title: Assisted API design
+description: The model drafts the specification, the guidelines check it, and the two teams still have to agree it.
+---
+
+A server that turns a described use case into a draft OpenAPI document, then
+checks that draft against the design guidelines before a human ever reads it.
+
+## Why drafting is the right thing to automate
+
+The blank-page cost of [API-first](/doc/practices/api-first/) is real. Writing a
+specification before the implementation means producing several hundred lines of
+YAML describing something that does not exist yet, and the tedium of that is a
+large part of why teams quietly extract the spec afterwards instead.
+
+Drafting removes the tedium without removing the decision. A generated draft is
+something to **argue with**, and arguing with a draft is far more productive than
+staring at an empty file — particularly in a room with the consumer team.
+
+## What it would do
+
+- **Draft** paths, operations, schemas and error responses from a use case
+  description and the domain vocabulary already in the
+  [event catalogue](/go/events).
+- **Check** the draft against the organisation's API design guidelines — naming,
+  pagination, error shape, versioning — the same rules
+  [api-hub](/go/api) scores a submitted contract against.
+- **Explain each finding** rather than silently rewriting, so the developer
+  learns the guideline instead of learning to accept a fix.
+- **Report the score** the contract would receive if submitted today.
+
+## What it would not do
+
+It does not agree the contract. A contract is an agreement between two teams, and
+a model cannot be a party to one — it has no stake in the consumer's use case and
+cannot be held to the promise. The draft goes into the
+[API-first](/doc/practices/api-first/) conversation; it does not replace it.
+
+Nor does it register the revision. Registration is the moment the promise becomes
+real, and it stays a deliberate human act.
+
+## The failure mode to watch
+
+A draft that scores well is not a good API. Guidelines catch the mechanical half
+— consistent naming, sane errors, correct pagination — and are silent on the half
+that matters, which is whether the operations match what a caller actually needs.
+A high score on a wrong resource model is the specific danger this tool
+introduces, and the reason the consumer review stays mandatory.
+
+## Status
+
+Not built. The guidelines and the scoring it would call already exist in
+[api-hub](/go/api).

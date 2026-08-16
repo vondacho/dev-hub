@@ -1,0 +1,61 @@
+---
+title: Contract-first
+description: Every boundary written down and machine-checked, so a breach is a build failure rather than an incident.
+---
+
+A contract is an agreement about a boundary that **a machine can check**. That
+last clause is what separates this practice from documentation.
+
+[API-first](/doc/practices/api-first/) is this practice applied to a network
+interface. Contract-first is the general case: it applies to events, message
+schemas, database interfaces, module boundaries, and the seams inside one
+codebase.
+
+## The three properties
+
+**Explicit.** The agreement exists as an artefact — an OpenAPI document, an
+AsyncAPI document, a JSON Schema, an interface with no implementation. Not as a
+shared understanding, which is another name for two different understandings.
+
+**Agreed.** Both sides reviewed it before it existed in code. A contract
+published unilaterally is a notification.
+
+**Enforced.** Something fails when it is breached: a schema validation, a
+contract test, a registry check on submission. Without this, a contract is a
+comment.
+
+## Consumer-driven contracts
+
+The strongest form. Each consumer publishes what it actually uses from a
+provider; the provider's build runs every consumer's expectations against it.
+The provider then knows precisely what it may change safely — which is usually
+far more than it feared, because most fields a provider is afraid to touch turn
+out to have no consumers at all.
+
+## Versioning without breaking people
+
+The point of a contract is not that it never changes. It is that a change is
+visible and negotiable:
+
+- **Additive changes** are safe by default, if consumers are tolerant readers.
+- **Breaking changes** require a new version and an overlap period during which
+  both are served.
+- **Deprecation** is announced through the contract itself, with a date, and the
+  registry knows who is still calling the old one.
+
+## What it buys
+
+Two teams stop coordinating releases. The upstream team refactors freely because
+the contract says what it may not change; the downstream team stops finding out
+about changes from a failing integration at 2am. That decoupling is the whole
+return, and it only arrives once the enforcement is real.
+
+## Where it is enforced here
+
+Contracts are registered and scored in [api-hub](/go/api); event schemas live in
+the [event catalogue](/go/events). Both are catalogues you look things up in —
+see [Catalog](/catalog).
+
+The enforcement itself is [Microcks](/doc/testing-tools/microcks/) for
+conformance against the published contract and Pact for the consumer-driven
+direction — see [testing tools](/doc/testing-tools/).

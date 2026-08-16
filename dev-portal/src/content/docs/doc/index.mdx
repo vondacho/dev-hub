@@ -1,0 +1,96 @@
+---
+title: Overview
+description: What effective software development is — connected, contract-first, semi-automated and agile — and how this hub is organised around it.
+---
+
+Effective software development is **connected**, **contract-first**,
+**semi-automated** and **agile**. It embodies both a UX-first and a test-first
+attitude, and a patterns-oriented design. It uses techniques and rituals that
+connect various specialists — end-users, UX designers, domain experts, software
+developers, architects, quality engineers, product owners and operations
+engineers. Ultimately, AI serves as a booster and an enabler of automation.
+
+High-quality software is essential for sustainable design, low maintenance
+costs, fast delivery, and a positive developer experience.
+
+Software craftsmanship makes us question the relevance of a line of code, its
+purpose, its location, its testability and its durability. On a larger scale, it
+guides us towards a sustainable and easily extensible design without technical
+debt.
+
+**This hub is where that development takes place.**
+
+## The four properties
+
+Each is a claim about how the work is organised, not about how it feels.
+
+| Property | What it means here |
+|----------|--------------------|
+| **Connected** | The specialists talk to each other during the work, not through documents produced after it. That is what the [practices](/doc/practices/) are: named, repeatable conversations with a defined output. |
+| **Contract-first** | Every boundary is written down and agreed before it is implemented, and the agreement is machine-checkable. See [API-first](/doc/practices/api-first/) and [contract-first](/doc/practices/contract-first/). |
+| **Semi-automated** | Everything mechanical is generated, scaffolded or retro-engineered. Everything that requires a decision stays human. See [MCP](/doc/mcp/). |
+| **Agile** | Short cycles with real feedback at the end of each one — which only works if the previous three properties hold, because otherwise the feedback arrives too late to act on. |
+
+*Semi*-automated is the deliberate word. Full automation of a design activity
+produces plausible output with nobody accountable for it; no automation wastes
+people on work a machine does better. The line between them is the thing worth
+arguing about, and it is drawn per task rather than once.
+
+## The two attitudes
+
+Both have a page of their own under [attitudes](/doc/attitudes/). They are
+separated from the practices because a practice is a ritual with participants and
+an output, while an attitude is what someone brings to it — and is what decides
+whether the ritual produces anything.
+
+**[User-first](/doc/attitudes/user-first/)** (UX-first) means the journey of the
+person using the software is the first artefact, ahead of the architecture, and
+is still first-class while the thing is being built. It is the cheapest moment to
+find out that what is being built is the wrong thing.
+
+**[Test-first](/doc/attitudes/test-first/)** means deciding how a component could
+be shown to be wrong before deciding what it looks like. Not to catch bugs, which
+is a side effect — the test is the code's first caller, so if it is painful to
+write, the design is telling you something while it is still cheap to listen.
+Testing is a design method, and an under-evaluated one.
+
+## Patterns-oriented design
+
+A pattern is a shared vocabulary for a problem you already have. It is not a
+shelf to shop from, and reaching for one before you have the problem is how
+codebases acquire layers nobody can justify. The [code design](/doc/code-design/)
+section carries the four catalogues — GoF, architecture, integration and use
+case — each with the forces that make it the right answer, and the cost of
+choosing it when it is not.
+
+## Where AI sits
+
+Last, and on purpose. AI multiplies whatever discipline it finds: a codebase
+with contracts and tests gets faster, and a codebase without them gets a larger
+mess sooner. Its place here is scaffolding from known patterns, generating and
+retro-engineering models, and drafting an API design that a human then decides
+on — the [MCP](/doc/mcp/) section is exactly that list.
+
+## How this hub is organised
+
+- **[Attitudes](/doc/attitudes/)** — test-first and user-first, the two
+  dispositions the practices express.
+- **[Practices](/doc/practices/)** — the eight rituals that connect specialists.
+- **[Code design](/doc/code-design/)** — the four pattern catalogues.
+- **[Testing tools](/doc/testing-tools/)** — what enforces contract-first,
+  API-first and ATDD, rather than merely describing them.
+- **[MCP](/doc/mcp/)** — the five model-driven tools that carry the automated half.
+- **[Catalog](/catalog)** — everything to look up rather than read: APIs, C4
+  models, events, components, and the six technology stacks.
+- **[Academy](/academy)** — seven learning paths through all of it.
+
+## What is here today
+
+This portal is a scaffold. The documentation sections above are written; the
+[MCP](/doc/mcp/) servers they describe are not built, the [Academy](/academy)
+lessons are not recorded, and the [stack pages](/catalog/stacks) are outlines
+rather than worked guides — each says so on its own page.
+
+Four catalogues are real, because they are not built here: the API catalogue is
+[api-hub](/go/api), and the C4, event and component catalogues are
+[arch-hub](/go/arch) modules.

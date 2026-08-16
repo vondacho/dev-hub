@@ -1,0 +1,81 @@
+---
+title: Microcks
+description: Mocks and conformance tests generated from the contract itself, so a stub cannot drift from the specification it claims to implement.
+---
+
+Microcks turns an API contract into two things at once: a **running mock** that
+consumers can develop against before the provider exists, and a **conformance
+test** that checks a real endpoint still matches what it promised.
+
+Both are generated from the same artefact. That is the entire argument for it.
+
+## Why generated rather than hand-written
+
+A hand-written stub is a second implementation of the contract, maintained by
+whoever needed it, diverging from the specification the moment either changes.
+When it drifts, it does not fail — it keeps passing while describing a provider
+that no longer exists. The consumer team finds out at integration.
+
+A mock generated from the registered contract cannot drift, because there is
+nothing to drift *from*. Update the contract and the mock follows.
+
+## What it consumes
+
+OpenAPI and Postman collections for REST, AsyncAPI for events, plus gRPC,
+GraphQL and SOAP/WSDL. The AsyncAPI support matters here: it is one of the few
+tools that treats an [event contract](/doc/practices/contract-first/) as a
+first-class citizen rather than an afterthought.
+
+Examples defined in the specification become the mock's responses, so enriching
+the examples improves the mock — which gives a team a reason to write good
+examples that survives the first sprint.
+
+## The two jobs
+
+**Mocking.** Point a consumer at the Microcks endpoint instead of the provider.
+The [Angular](/catalog/stacks/angular) app, the [iOS](/catalog/stacks/ios) app
+and the downstream service all do this the same way, because the mock is an HTTP
+endpoint and cares nothing about what is calling it. This is what makes Microcks
+useful to *every* stack in this hub, not only the JVM ones.
+
+**Conformance testing.** Point Microcks at a deployed provider and it replays the
+contract's examples against it, reporting where the implementation and the
+specification disagree. Run in the pipeline, this is what makes API-first a gate
+rather than an intention.
+
+## Its relationship to Pact
+
+They solve adjacent problems and teams often think they must choose:
+
+- **Microcks** verifies a provider against **its own published contract**. The
+  question is "does this service still do what it said it does".
+- **Pact** verifies a provider against **what its consumers actually use**. The
+  question is "can I change this field, or is someone depending on it".
+
+The second is not derivable from the first. A provider can be perfectly
+conformant and still break a consumer that depended on an undocumented ordering.
+Running both is normal, and neither is redundant.
+
+## In the pipeline
+
+```
+contract registered in api-hub
+        ↓
+Microcks imports it
+        ↓
+consumers develop and test against the mock   ← no provider needed
+        ↓
+provider deploys
+        ↓
+Microcks conformance test runs against it     ← fails the build on divergence
+```
+
+Microcks Testcontainers support means the mock can also run inside a single test
+run, which is usually the right choice for a [component test](/doc/practices/all-in-one-testing/)
+and the wrong one for local development, where a shared instance is less friction.
+
+## Where the contracts come from
+
+[api-hub](/go/api). Contracts are parsed, validated, scored and registered there;
+Microcks imports from that source rather than from a copy in a repository, so
+there is one place where a contract is true.

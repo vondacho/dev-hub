@@ -1,0 +1,52 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/home/Hero.astro';
+import SectionPanels, { type Panel } from '../../components/home/SectionPanels.astro';
+import SiteFooter from '../../components/home/SiteFooter.astro';
+import { subcatalogs } from '../../lib/catalog';
+
+/*
+ * The seven subcatalogs. Definitions live in src/lib/catalog.ts so the panel
+ * copy has exactly one home.
+ *
+ * Four of them link *out*. API is api-hub; C4, Events and Components are
+ * arch-hub modules — each is its own deployment with its own ingress host, and
+ * reimplementing any of them here would only produce a staler second view over
+ * the same source. Their addresses are read per request from the environment,
+ * which is safe because this page is server-rendered; the prerendered /doc/*
+ * pages have to go through /go/ instead.
+ *
+ * `href` is a function exactly when the address is configuration rather than a
+ * route, which is why it is resolved here rather than in the data.
+ */
+const panels: readonly Panel[] = subcatalogs.map((subcatalog) => ({
+	title: subcatalog.title,
+	description: subcatalog.description,
+	href: typeof subcatalog.href === 'function' ? subcatalog.href() : subcatalog.href,
+	cta: subcatalog.cta,
+	status: subcatalog.status,
+	icon: subcatalog.icon,
+	...(subcatalog.external ? { external: true } : {}),
+}));
+---
+
+<Layout
+	title="Catalog — Dev Hub"
+	description="Seven catalogues for effective software development: APIs, C4 models, events, components, practices, code design and technology stacks."
+>
+	<main id="main">
+		<Hero
+			kicker="Catalog"
+			title="Seven things to look up, rather than seven things to read."
+			lead="Nothing here is meant to be read front to back. A catalogue answers a question you
+				already have — what does this service promise, what listens to this event, how is
+				this run in our team, which pattern fits this problem, what does any of it look
+				like on Quarkus. Four of them already exist in the neighbouring hubs and are linked
+				rather than copied."
+			parent={{ label: 'Home', href: '/' }}
+			actions={[{ label: 'How the catalogs fit together', href: '/doc/' }]}
+		/>
+		<SectionPanels panels={panels} label="Catalogs" />
+	</main>
+	<SiteFooter />
+</Layout>

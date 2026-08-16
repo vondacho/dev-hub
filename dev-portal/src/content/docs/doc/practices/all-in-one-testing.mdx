@@ -1,0 +1,58 @@
+---
+title: All-in-one testing
+description: One suite covering several levels without duplicating intent — and without a separate team owning the slow half.
+---
+
+Most codebases carry several test suites that were built by different people at
+different times, run on different triggers, and overlap without anyone knowing
+where. All-in-one testing is the practice of keeping **one suite** in which every
+level is present, every test has a distinct reason to exist, and the whole thing
+runs on every change.
+
+## One suite, several levels
+
+| Level | What it pins | Roughly |
+|-------|--------------|---------|
+| Unit | A decision, in isolation | Milliseconds, thousands of them |
+| Component | A module through its own port, adapters stubbed | Fast, hundreds |
+| Acceptance | A [use case end to end](/doc/practices/atdd/) through the port | Seconds, dozens |
+| Contract | That a boundary still matches its [agreement](/doc/practices/contract-first/) | Fast, one per consumer |
+| End-to-end | That the deployment is wired together at all | Slow, a handful |
+
+The counts matter as much as the levels. An end-to-end suite with three hundred
+scenarios is a component suite that took the wrong door.
+
+## No duplicated intent
+
+The rule that does the work: **each behaviour is verified at exactly one level**,
+the cheapest one that can see it.
+
+If an acceptance test and a unit test both fail when the same rule changes, one
+of them is telling you something you already knew, and it will be the one nobody
+updates. Duplicated intent is why suites rot — not slowness, which is a symptom.
+
+## Owned by the team, not by a department
+
+A separate quality department owning the slow half of the tests produces a feedback
+loop measured in days. The quality engineer belongs in
+[three amigos](/doc/practices/three-amigos/) and in the design of the suite —
+their expertise is *what could go wrong*, which is worth far more upstream than
+it is as a gate at the end.
+
+## Runs on every change
+
+A suite that runs nightly is a suite whose failures arrive detached from their
+cause. If the full suite is too slow to run on every push, that is a design
+problem in the suite — usually too many tests at too high a level — and it is
+worth fixing before it is worth working around.
+
+## What fills each level
+
+Named per stack on the [stack pages](/catalog/stacks), and argued in
+[testing tools](/doc/testing-tools/).
+
+## The relationship to test-first
+
+Writing tests first is what produces a suite shaped like this. Tests added
+afterwards cluster at whatever level is easiest to bolt on to the finished code,
+which is almost never the cheapest level that can see the behaviour.

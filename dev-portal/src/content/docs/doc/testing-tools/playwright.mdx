@@ -1,0 +1,67 @@
+---
+title: Playwright
+description: Driving the browser the user actually has — and keeping the suite small enough that it stays trustworthy.
+---
+
+Playwright drives Chromium, Firefox and WebKit through one API, which makes it
+the tool for the one thing no other layer can verify: that the journey works in a
+real browser, against a real deployment.
+
+## What earns its place in the suite
+
+A small number of journeys. Ten to thirty for most products, not three hundred.
+
+Everything a Playwright test can check, a faster test can usually check better —
+except integration with the browser itself: rendering, navigation, focus
+management, storage, real network behaviour, and the assembled deployment. Those
+are what it is for. Business rules belong in
+[Cucumber scenarios at the port](/doc/testing-tools/cucumber/) or in unit tests.
+
+A suite that grows past that point stops being trusted, and an end-to-end suite
+nobody trusts is worse than none: it produces failures people rerun rather than
+read.
+
+## What makes it good at the job
+
+**Auto-waiting.** Actions wait for the element to be actionable rather than for a
+duration. Most flakiness in older browser suites was sleep-based timing, and this
+removes the category rather than mitigating it.
+
+**Locators over selectors.** `getByRole`, `getByLabel`, `getByText` — resolved at
+use rather than at creation, and expressed the way an assistive technology sees
+the page. A test written this way fails when the *accessible* structure breaks,
+which is a defect worth failing on, and survives a CSS class rename, which is
+not.
+
+**The trace viewer.** A failed run in CI records DOM snapshots, network activity
+and console output per step. This is the difference between diagnosing a flaky
+failure and rerunning the job.
+
+**API requests in the same run.** The `request` fixture calls the backend
+directly, so a test can arrange state over HTTP and then exercise only the
+journey in the browser — rather than clicking through five screens of setup.
+
+## Against a contract-driven backend
+
+Playwright pairs with [Microcks](/doc/testing-tools/microcks/) in a way worth
+stating explicitly, because it is what makes UX-first affordable:
+
+Point the [Angular](/catalog/stacks/angular) app at a Microcks mock, and the
+journeys run with no backend deployed, deterministically, from the first day of
+the feature — while the provider is still being built. The same specs then run
+against the real deployment as the end-to-end layer.
+
+The contract is the thing that makes those two runs meaningfully the same test.
+
+## Accessibility in the same pass
+
+An accessibility scan per journey costs almost nothing on top of a test that has
+already navigated there. That is the difference between accessibility as a design
+constraint and accessibility as a late audit — see the
+[Angular stack](/catalog/stacks/angular).
+
+## What it does not cover
+
+Native mobile apps. Playwright can emulate mobile viewports and drive mobile
+*web*, which is genuinely useful, but an iOS or Android application is a
+different tool's problem — see [mobile testing tools](/doc/testing-tools/mobile/).

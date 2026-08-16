@@ -1,0 +1,49 @@
+---
+title: Code patterns
+description: Recognising a pattern in existing code, naming it, and saying what is missing from the implementation.
+---
+
+A server that reads code and answers questions about its **pattern vocabulary**:
+which pattern this class is attempting, whether it is complete, and what the
+codebase's own convention for it looks like.
+
+## What it would do
+
+- **Identify.** "This is a Strategy, but the context holds a `switch` on the
+  strategy type as well — which is the thing Strategy exists to remove."
+- **Compare with the local convention.** Patterns are implemented differently in
+  different codebases, and a server that knows *this* codebase's convention is
+  worth more than one that knows the textbook.
+- **Name what is missing.** A Repository with no aggregate boundary, an
+  anti-corruption layer that lets a foreign type through, a Builder whose
+  `build()` can return an invalid object.
+- **Point at the reference.** Every answer links to the entry in
+  [code design](/doc/code-design/) so the reader can decide rather than comply.
+
+## What it would not do
+
+It does not apply the pattern. Recognising that code is halfway to a Strategy is
+useful; deciding whether it *should* be one requires knowing what is going to
+change next, which is not in the file.
+
+That is the boundary this server keeps: **it describes, the developer decides.**
+
+## Why it is worth building
+
+Pattern knowledge is the least evenly distributed thing on a team. A senior
+developer reads a class and sees a half-built Observer; a junior reads the same
+class and sees code that works. This server makes the first reading available to
+everyone, in the editor, at the moment it is relevant — which is a teaching tool
+as much as a productivity one.
+
+## What it would take
+
+A pattern catalogue expressed in a form a model can match against, per language;
+the codebase's own conventions extracted from its existing code; and a way to
+express "the pattern is present but incomplete", which is the interesting case
+and the hardest to encode.
+
+## Status
+
+Not built. The [code design](/doc/code-design/) catalogue this server would read
+from is itself still an outline.

@@ -1,0 +1,57 @@
+---
+title: MCP
+description: The five model-driven tools that carry the automated half — code patterns, code scaffolding, LikeC4 scaffolding, LikeC4 retro-engineering and assisted API design.
+---
+
+Effective software development is **semi**-automated. This section is the
+automated half: five tools, exposed over the Model Context Protocol, that an AI
+agent in the developer's editor can call.
+
+MCP is the mechanism rather than the point. What matters is which work is handed
+over and which is kept:
+
+| Handed to the machine | Kept human |
+|-----------------------|------------|
+| Applying a known pattern to known code | Deciding that the pattern is the right one |
+| Generating a module from a blueprint | Deciding the module should exist |
+| Drawing a model from a codebase | Deciding whether the drawing is the architecture we wanted |
+| Drafting a specification from a description | Agreeing the contract with the consumer |
+
+The line is the same in every row: **mechanical work goes, decisions stay.** A
+model that decides is a model nobody is accountable for.
+
+## The five servers
+
+- **[Code patterns](/doc/mcp/code-patterns/)** — recognise a pattern in existing
+  code, and name what is missing from it.
+- **[Code scaffolding](/doc/mcp/code-scaffolding/)** — generate a module in the
+  team's shape, from the team's blueprints.
+- **[LikeC4 scaffolding](/doc/mcp/likec4-scaffolding/)** — generate a C4 model
+  skeleton from a described system.
+- **[LikeC4 retro-engineering](/doc/mcp/likec4-retro-engineering/)** — derive a
+  C4 model from a codebase that has none.
+- **[Assisted API design](/doc/mcp/assisted-api-design/)** — draft an OpenAPI
+  document from a use case, then check it against the guidelines.
+
+## Why this order
+
+The first two work inside a file. The next two work at the scale of a system. The
+last one works at a boundary between teams — and is therefore the one where the
+machine's output is least final, because a contract is an agreement between
+people and a model cannot be a party to it.
+
+## AI multiplies what it finds
+
+A codebase with contracts, tests and a pattern vocabulary gets faster with these
+tools, because there is something concrete to generate against and something
+concrete to check the output with. A codebase without them gets a larger mess
+sooner.
+
+That is why this section sits after [practices](/doc/practices/) and
+[code design](/doc/code-design/) rather than before them.
+
+## Status
+
+**None of the five is built.** The pages below describe what each one is for and
+where its boundary sits, which is the part worth reviewing before any of it
+exists. Each page says what it would take to build it.

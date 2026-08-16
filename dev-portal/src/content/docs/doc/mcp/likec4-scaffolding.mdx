@@ -1,0 +1,48 @@
+---
+title: LikeC4 scaffolding
+description: Generating a C4 model skeleton from a described system, so the first version of the model costs a conversation rather than an afternoon.
+---
+
+A server that turns a description of a system — spoken in a design session,
+or the output of an [event storming](/doc/practices/event-storming/) wall — into
+a [LikeC4](https://likec4.dev) model skeleton: elements, relations and the views
+that make them readable.
+
+## Why the first version is the expensive one
+
+Nobody resists keeping a C4 model up to date. They resist *starting* one, because
+the first version means naming forty things at once with no feedback until it
+renders. That cost is where most architecture-as-code initiatives die.
+
+Generating the skeleton removes exactly that cost and nothing else. Editing forty
+generated element names is work anyone will do; typing them from nothing is work
+that gets postponed indefinitely.
+
+## What it would generate
+
+- **Elements** at the context and container levels, with the descriptions taken
+  from how they were described rather than left blank.
+- **Relations**, including the ones implied by the description but not stated —
+  flagged as guesses rather than asserted.
+- **Views**: a system context view, a container view per system, and a starting
+  set of dynamic views for the use cases that were named.
+- **A model that renders.** A skeleton that does not compile is worse than none.
+
+## What it would not do
+
+It does not decide the boundaries. A model generated from a description
+faithfully reproduces the boundaries in that description, including the wrong
+ones — which is the correct behaviour, because arguing with the boundaries is the
+architect's job and the argument is easier with something on screen.
+
+## Its relationship to retro-engineering
+
+This server starts from **what people say the system is**.
+[Retro-engineering](/doc/mcp/likec4-retro-engineering/) starts from **what the
+code says it is**. Running both and comparing the two is considerably more
+interesting than either one alone: the gap between them is the drift.
+
+## Status
+
+Not built. The rendered C4 models live in arch-hub's `arch-c4` module — see the
+[C4 catalogue](/go/c4).

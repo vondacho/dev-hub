@@ -1,0 +1,76 @@
+---
+title: Testing tools
+description: The tools that turn contract-first, API-first and ATDD into something a build can fail on — Microcks, Cucumber, Playwright, and what exists for mobile.
+---
+
+Three of the [practices](/doc/practices/) in this hub are only worth the words if
+something enforces them. A contract nobody validates is a comment; an acceptance
+criterion nobody executes is a wish. This section is the tooling that closes that
+gap.
+
+## What each tool is for
+
+| Tool | Practice it enforces | What it turns into a build failure |
+|------|---------------------|-------------------------------------|
+| [Microcks](/doc/testing-tools/microcks/) | [Contract-first](/doc/practices/contract-first/), [API-first](/doc/practices/api-first/) | A provider that no longer matches its own specification; a consumer built against a contract that never existed |
+| [Cucumber](/doc/testing-tools/cucumber/) | [BDD](/doc/practices/bdd/), [ATDD](/doc/practices/atdd/) | A scenario the business agreed to that the system does not satisfy |
+| [Playwright](/doc/testing-tools/playwright/) | [ATDD](/doc/practices/atdd/) in the browser | A user journey that broke, in the browser the user actually has |
+| Pact | [Contract-first](/doc/practices/contract-first/), consumer-driven | A provider change that breaks a consumer nobody remembered |
+| Storybook | [User-first](/doc/attitudes/user-first/), design-system contract | A component that no longer renders or behaves as the design system says |
+
+Two of those have no page of their own here. **Pact** is the consumer-driven half
+of contract testing rather than a fourth pillar, but it appears throughout —
+it is what makes the [mobile](/doc/testing-tools/mobile/) story work at all.
+**Storybook** is covered under [user-first](/doc/attitudes/user-first/), because
+its testing value follows from what it is first: the place where a design system
+stops being a folder of pictures and becomes a contract.
+
+## The three roles a tool can play
+
+Worth separating, because a single tool rarely does more than one well and teams
+routinely buy the wrong one:
+
+**Stub the thing you depend on.** So a test can run without the other team's
+service being up. Microcks does this from the contract itself, which is the part
+that matters — a hand-written stub drifts from the contract and then lies to you
+in the most expensive way possible: silently, in a passing test.
+
+**Verify the thing you provide.** So the implementation cannot quietly diverge
+from what it promised. Microcks calls this conformance testing; Pact calls it
+provider verification. Both answer the same question from different directions.
+
+**Drive the thing you built.** So an agreed scenario actually executes. Cucumber
+at the domain boundary, Playwright at the browser.
+
+## Where they sit in the suite
+
+They map onto the levels in [all-in-one testing](/doc/practices/all-in-one-testing/),
+and the mapping is the point — each tool belongs at exactly one level, and using
+it at another is how suites get slow:
+
+```
+acceptance   Cucumber scenarios through the use case port
+             ↑ stubs supplied by Microcks
+contract     Microcks conformance / Pact provider verification
+             ↑ one per registered contract
+end-to-end   Playwright, a handful of journeys, real deployment
+```
+
+Playwright below Cucumber rather than above it is deliberate. The temptation is
+to drive every Gherkin scenario through the browser, which produces an acceptance
+suite that takes forty minutes and fails for reasons unrelated to the behaviour
+being specified.
+
+## The mobile question
+
+The web and JVM story above is mature. **Mobile is not**, and pretending
+otherwise would be the most useful thing this section could get wrong. The
+[mobile testing tools](/doc/testing-tools/mobile/) page sets out what genuinely
+exists for iOS and Android, what is unmaintained, and the arrangement that works
+in practice — which is not a Gherkin layer over the UI.
+
+## Status
+
+The tool pages are written and the recommendations are settled. What does not
+exist yet is a worked example per [stack](/catalog/stacks) — the Testing tools
+line on each stack page names what to use; it does not yet show it running.

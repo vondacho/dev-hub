@@ -1,0 +1,114 @@
+---
+title: Mobile testing tools
+description: What genuinely exists for BDD and contract-driven testing on iOS and Android — and the arrangement that works, which is not Gherkin over the UI.
+---
+
+The honest starting point: **mobile has no equivalent of the
+Cucumber-plus-Playwright-plus-Microcks arrangement that works on the web and the
+JVM.** The Gherkin tooling is thin and partly unmaintained, and the UI test
+frameworks are platform-specific by construction.
+
+That is a real gap, not a gap in this page. What follows is what exists, what to
+avoid, and the arrangement that works despite it.
+
+## The arrangement that works
+
+**Push the acceptance tests below the UI.** Both stacks in this hub already put
+their domain in a module with no platform import — pure Kotlin on
+[Android](/catalog/stacks/android), plain Swift on [iOS](/catalog/stacks/ios).
+That module is where acceptance tests belong, and it is precisely where the
+tooling is good:
+
+- On Android it is an ordinary JVM module, so **Cucumber-JVM** works exactly as
+  it does on [Spring Boot](/catalog/stacks/spring-boot) — no emulator, no
+  Robolectric, milliseconds per scenario.
+- On iOS it is a plain Swift target, so **Quick and Nimble** give
+  `describe/context/it` specs. Not Gherkin, but BDD-structured and readable by
+  anyone who read the [example map](/doc/practices/example-mapping/).
+
+**Keep the UI layer thin and native.** Espresso and Compose UI test on Android,
+XCTest and XCUITest on iOS. These are for what the domain tests cannot see:
+rendering, navigation, focus, permissions.
+
+**Get the contract half from the server side.** This is the part teams miss, and
+it is why the mobile gap is narrower than it looks — see below.
+
+## Contract-driven testing does work on mobile
+
+[Microcks](/doc/testing-tools/microcks/) is a **server**. It serves an HTTP
+endpoint generated from the registered contract, and it does not know or care
+what is calling it. So an iOS or Android app points its base URL at a Microcks
+instance and develops against the contract before the provider exists, exactly as
+the [Angular](/catalog/stacks/angular) app does.
+
+Nothing about that is web-specific. The mobile client gets the full benefit of
+[contract-first](/doc/practices/contract-first/) with no mobile-specific tooling
+at all.
+
+For the consumer-driven direction, **Pact** has real mobile support:
+
+| Stack | Library |
+|-------|---------|
+| Android | `pact-jvm` consumer DSL, in the JVM test module |
+| iOS | `PactSwift` — a Swift-native consumer DSL |
+
+A mobile app is a consumer that is *installed for years after you stop shipping
+it*, which makes it the single most valuable consumer to have in a provider's
+Pact verification. If you adopt one thing from this page, adopt this.
+
+## The Gherkin-on-mobile situation
+
+State it plainly, because both of the obvious answers have problems:
+
+- **`cucumber-android`** — the Android-specific Cucumber runner is archived and
+  should not be started with. Use Cucumber-JVM on the domain module instead,
+  which is better placed anyway.
+- **Cucumberish** — the Gherkin runner for iOS over XCTest. It works and it is
+  the only real option, but it has been quiet for a long time. Verify its
+  maintenance status before committing a suite to it.
+
+If Gherkin over the mobile UI is a requirement — usually because a non-technical
+stakeholder genuinely reads the scenarios — **Appium** driven from Cucumber-JVM
+is the arrangement that has the most life in it, at the cost of a slow suite. It
+is a real option, and it is not the default recommendation.
+
+## Maestro is worth a serious look
+
+**Maestro** declares UI flows in YAML, runs on both iOS and Android from one
+file, and tolerates the timing problems that make mobile UI tests flaky. It is
+not Gherkin and does not pretend to be, but its flows are legible to a product
+owner, which is most of what teams actually wanted from Gherkin on the UI.
+
+For the thin end-to-end layer above the domain tests, it is usually the better
+answer than either Cucumberish or Appium.
+
+## Kaspresso, for Android UI tests worth reading
+
+**Kaspresso** wraps Espresso and UI Automator in a Kotlin DSL with explicit
+`step("...")` sections, so a UI test reads as a sequence of named steps rather
+than a wall of view matchers. It also fixes a category of Espresso flakiness on
+its own. If Android UI tests are being written at all, they should be written
+this way.
+
+## The recommendation
+
+| Layer | Android | iOS |
+|-------|---------|-----|
+| Acceptance, at the domain port | Cucumber-JVM | Quick + Nimble |
+| Consumer contract | pact-jvm | PactSwift |
+| Provider mock in development | Microcks | Microcks |
+| Local HTTP stubbing in tests | MockWebServer / WireMock | URLProtocol stub |
+| UI tests | Compose UI test + Kaspresso | XCUITest |
+| End-to-end journeys | Maestro | Maestro |
+| Visual regression | Paparazzi / screenshot tests | swift-snapshot-testing |
+
+The shape to notice: **the rows that carry the most value are the ones that are
+not mobile-specific.** Contract-first and test-first survive the move to mobile
+essentially intact. It is only the Gherkin-over-the-UI layer that has no good
+answer — and that layer was the least valuable one on the web too.
+
+## Status
+
+Recommendation, not a worked example. Nothing on this page is running in a
+repository here yet; the [iOS](/catalog/stacks/ios) and
+[Android](/catalog/stacks/android) stack pages carry the same caveat.

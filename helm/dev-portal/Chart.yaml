@@ -1,0 +1,22 @@
+apiVersion: v2
+name: dev-portal
+description: Development hub web frontend — effective software development, its practices, catalogs and patterns
+type: application
+
+# Chart version. Bump on every change to the chart itself.
+version: 0.1.0
+
+# Version of dev-portal shipped by default. Matches "version" in
+# dev-portal/package.json and is used as the default image tag.
+appVersion: "0.0.1"
+
+keywords:
+  - astro
+  - starlight
+  - software-development
+  - craftsmanship
+home: https://github.com/vondacho/dev-hub
+sources:
+  - https://github.com/vondacho/dev-hub/tree/main/dev-portal
+maintainers:
+  - name: Olivier von Dach

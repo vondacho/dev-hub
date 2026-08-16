@@ -1,0 +1,49 @@
+---
+title: Code scaffolding
+description: Generating a module in the team's shape, from the team's blueprints, instead of from a blank file or a stale template.
+---
+
+A server that generates the skeleton of a new module — a use case, an adapter, a
+service — in the shape this team already uses, with its test structure, its
+package layout and its contract wiring in place.
+
+## Why not a project template
+
+Templates go stale the moment the codebase moves past them, and nobody notices
+because a template is only read when a new module is created — which is rarely,
+and always by whoever is least equipped to spot the drift.
+
+This server generates from the **blueprint repositories** that are themselves
+maintained and built: `arch-blueprint-java`, `arch-blueprint-kotlin`,
+`arch-blueprint-quarkus`. If the blueprint compiles and its tests pass, the shape
+being propagated is a shape that currently works.
+
+## What it would generate
+
+- The **ports and adapters** skeleton for a new use case: the port interface, the
+  application service, the inbound adapter, the outbound adapter stub.
+- The **test skeleton alongside it** — an acceptance test through the port,
+  failing, because a scaffold that generates code without its test has generated
+  half the work and the less important half.
+- The **contract wiring**: the generated client or server stub from the
+  registered [API contract](/go/api), rather than a hand-written HTTP call.
+
+## What it would not do
+
+It does not decide that the module should exist, what it is called, or where the
+boundary around it sits. Those come out of
+[event storming](/doc/practices/event-storming/) and the design conversation.
+Scaffolding starts *after* the decision.
+
+## The failure mode to avoid
+
+A scaffolder that generates a lot is a scaffolder whose output nobody reads. The
+target is the smallest skeleton that removes the tedium and leaves every
+interesting choice visible — not a working feature with the business logic
+missing.
+
+## Status
+
+Not built. The blueprint repositories exist; the server that reads them does not.
+See the [Spring Boot](/catalog/stacks/spring-boot) and
+[Quarkus](/catalog/stacks/quarkus) stack pages.

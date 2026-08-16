@@ -1,0 +1,64 @@
+---
+title: GoF patterns
+description: The twenty-three classic patterns, thirty years on — which still earn their keep, which the language absorbed, and which were always a workaround.
+---
+
+The *Design Patterns* catalogue is still the common vocabulary of object-oriented
+design. It is also thirty years old, written against languages without first-class
+functions, and parts of it have been absorbed into the languages themselves.
+
+Both facts matter. Teaching the catalogue uncritically produces developers who
+write a Strategy where a lambda would do; ignoring it produces developers who
+cannot name what they are looking at.
+
+## The three families
+
+**Creational** — how objects come to exist. Factory Method, Abstract Factory,
+Builder, Prototype, Singleton.
+
+**Structural** — how objects compose. Adapter, Bridge, Composite, Decorator,
+Facade, Flyweight, Proxy.
+
+**Behavioural** — how objects collaborate. Chain of Responsibility, Command,
+Interpreter, Iterator, Mediator, Memento, Observer, State, Strategy, Template
+Method, Visitor.
+
+## Which still earn their keep
+
+- **Adapter** and **Facade** — the everyday patterns of any boundary. An
+  anti-corruption layer is an Adapter with a domain motive.
+- **Composite** — whenever a tree has to be treated uniformly.
+- **Decorator** — the pattern behind most middleware, and the reason it composes.
+- **Builder** — where a constructor has too many parameters and half of them are
+  optional. Its real value is making an invalid object unconstructable.
+- **State** and **Strategy** — still the right answer when the variation is real
+  and named. Not when it is one branch.
+
+## Which the language absorbed
+
+**Iterator** is a language feature everywhere now. **Command** and much of
+**Strategy** are a function value in any language with first-class functions.
+**Template Method** is usually better expressed as composition — the inheritance
+it requires costs more than the reuse it provides.
+
+Recognising these is not pedantry: implementing a lambda as a five-class Strategy
+hierarchy is exactly the over-application this catalogue is prone to.
+
+## Singleton
+
+Kept separate because it is the one that is usually a mistake. It couples every
+caller to a global, it makes the dependency invisible in the signature, and it
+makes the code untestable in parallel. What people want from it is *one instance*,
+which is a lifecycle question their dependency injection container already
+answers.
+
+## How to use this catalogue
+
+Read it to **name** what you are looking at, not to decide what to build. The
+question is never "which pattern should I use here" — it is "what varies, what
+stays, and what does the code need to say to the next person who reads it".
+
+## Status
+
+Outline. The per-pattern pages, each with a worked example per
+[stack](/catalog/stacks), are not written yet.

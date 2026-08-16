@@ -1,0 +1,146 @@
+---
+title: User-first
+description: The end user's experience and needs as first-class citizens through inception and development — and how Figma and Storybook make a design system into an enforceable contract.
+---
+
+User-first puts the end user's experience and needs among the first-class inputs
+to a feature: present at inception, and still present while it is being built.
+
+Also called UX-first. The two halves are equally important and the second is the
+one that gets dropped.
+
+## First-class, and what that actually means
+
+A concern is first-class when it can **change the decision**. By that standard,
+most projects that describe themselves as user-centred are not: the user
+appears as a persona slide at kickoff and as a satisfaction survey after release,
+and in between, every decision that shaped the experience was made on other
+grounds.
+
+First-class means the user's need is one of the things that can send a story
+back, alongside feasibility and cost — and that somebody in the room is
+accountable for it.
+
+## At inception
+
+The user's journey is the first artefact, ahead of the architecture. Before the
+system is described, describe:
+
+- **who** has to live with this, in the plural — the primary user, and the people
+  downstream of them who never chose the software;
+- **what they are trying to accomplish**, in their words, not as a feature name;
+- **what it costs them when it goes wrong** — the actual cost, in time, money,
+  embarrassment or risk, which is what tells you how much to invest;
+- **what they do today instead**, which is the thing you are really competing
+  with and is almost never nothing.
+
+This is the cheapest moment to discover you are building the wrong thing, and it
+is the only moment when that discovery costs a conversation. It feeds directly
+into [example mapping](/doc/practices/example-mapping/), where those needs become
+rules and concrete examples.
+
+The end user is one of the specialists this hub's [practices](/doc/practices/)
+exist to connect — the first one listed, and the one most often represented by a
+proxy rather than present.
+
+## During development
+
+This is the half that gets dropped, and dropping it quietly undoes the first
+half. A journey agreed at inception and not revisited for six weeks is an
+assumption, not a requirement.
+
+Keeping it first-class during development means:
+
+- the running thing is **reviewable by a designer and a user before it is done**
+  — preview deployments per pull request, not a demo at the end of the sprint;
+- **accessibility is a design constraint**, checked in the acceptance suite
+  rather than audited late, when the only affordable fixes are cosmetic;
+- the UX designer is a **participant rather than a supplier** — in the same
+  session where the examples are written, not upstream of it handing over
+  mockups.
+
+## Figma and Storybook
+
+UX tooling is usually filed under design. It belongs here, because these two
+tools do three things that are squarely development concerns.
+
+### 1. The design system is a contract
+
+A design system is not a folder of pictures. It is an **agreement between design
+and code about what the interface is made of** — and that makes it the same kind
+of artefact as an OpenAPI document, subject to the same rules from
+[contract-first](/doc/practices/contract-first/).
+
+| Contract property | In an API | In a design system |
+|-------------------|-----------|--------------------|
+| **Explicit** | OpenAPI document | Figma component library and design tokens |
+| **Agreed** | Provider and consumer reviewed it | Design and engineering reviewed it |
+| **Enforced** | Schema validation, contract tests | Tokens generated not retyped, visual regression, lint rules against raw values |
+
+The third row is where design systems usually fail. Tokens copied by hand into
+CSS are a second implementation of the contract, and they drift exactly the way a
+hand-written API stub drifts — silently, while continuing to look correct.
+
+Tokens **exported from Figma and consumed as code** are the design-system
+equivalent of generating a client from a specification: one direction of flow,
+and a hand-edit downstream is a bug in the source.
+
+### 2. Contract-driven testing and development
+
+Storybook makes a component's states **explicit, named and reproducible**. Each
+story is a fixture, and that single property is what turns a design tool into a
+testing one:
+
+- **Interaction tests** run against a story, exercising the component in a known
+  state without assembling a page around it.
+- **Accessibility scans** run per story, so a violation is attributed to a
+  component rather than to a screen.
+- **Visual regression** compares renders of the same stories across commits,
+  catching the class of change that no assertion is ever written for.
+- **The stories are the review surface** — a designer reviews the real rendered
+  component in every state, not a screenshot of the happy path.
+
+It changes development too, in the same way a mocked API contract does. Building
+a component *in Storybook* means building it against its declared states before
+it is wired into a page or connected to data — the UI analogue of building
+against a [Microcks](/doc/testing-tools/microcks/) mock instead of waiting for the
+provider. Both remove a dependency on something that is not ready yet, and both
+do it by working against the contract.
+
+### 3. Pattern-driven development
+
+A Storybook is a **catalogue of the interface's pattern vocabulary**, playing the
+same role for the UI that the [code design](/doc/code-design/) catalogues play
+for structure: it gives the team a shared name for a solved problem.
+
+Its value is mostly in what it prevents. Without a catalogue, the fifth developer
+needing a button writes a fifth button, because finding the existing one costs
+more than rewriting it. With one, reuse is the path of least resistance — which
+is the only way reuse ever actually happens.
+
+Figma's component library is the same catalogue on the design side, and the
+interesting question is always whether the two catalogues still agree. That
+question has an answer only if something checks it, which is point 1 again.
+
+## The honest caveat
+
+Every claim above depends on enforcement. A design system nobody generates from,
+a Storybook nobody runs tests against, and a Figma library that has diverged from
+production are all common, and all three are worse than not having them — they
+carry the maintenance cost and the appearance of rigour without the property that
+made them worth adopting.
+
+Before adopting the tools, decide what fails the build when the contract is
+breached. If the answer is nothing, you are buying pictures.
+
+## Where it connects
+
+- [Example mapping](/doc/practices/example-mapping/) and
+  [three amigos](/doc/practices/three-amigos/) are where user needs become rules
+  and examples.
+- [Contract-first](/doc/practices/contract-first/) is the general form of the
+  design-system argument above.
+- [Playwright](/doc/testing-tools/playwright/) runs the journeys, with the
+  accessibility scan in the same pass.
+- The [Angular stack](/catalog/stacks/angular) is where this lands most
+  concretely today.

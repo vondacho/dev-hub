@@ -1,0 +1,53 @@
+---
+title: Code design
+description: The four pattern catalogues — GoF, architecture, integration and use case — as a shared vocabulary rather than a shelf to shop from.
+---
+
+Patterns-oriented design is one of the three attitudes this hub is built on. This
+section is its vocabulary.
+
+A pattern is a **named solution to a recurring problem, together with the forces
+that make it the right answer**. The name is doing most of the work: it lets two
+developers discuss a design in five words instead of fifty, and it lets a
+codebase be read by someone who did not write it.
+
+## The four catalogues
+
+| Catalogue | Scale | The question it answers |
+|-----------|-------|-------------------------|
+| [GoF patterns](/doc/code-design/gof-patterns/) | Within a module | How should these classes relate? |
+| [Architecture patterns](/doc/code-design/architecture-patterns/) | Within a system | Where do the boundaries go, and what may cross them? |
+| [Integration patterns](/doc/code-design/integration-patterns/) | Between systems | How do two things that fail independently talk? |
+| [Use case patterns](/doc/code-design/usecase-patterns/) | At the application boundary | What shape does one unit of business work take? |
+
+## Vocabulary, not a shopping list
+
+The failure mode is universal and worth naming: a developer learns the catalogue,
+then goes looking for places to apply it. The result is a codebase with a factory
+producing one type, a strategy with one implementation, and an observer with one
+listener — layers of indirection paid for in advance against flexibility that
+never arrives.
+
+The rule that avoids it: **have the problem first.** A pattern applied to a
+problem you do not yet have is not preparation, it is speculative complexity, and
+it costs the same as the real thing while buying nothing.
+
+## Each entry carries its cost
+
+Every pattern page here states what the pattern buys, what it costs, and when
+*not* to use it. A catalogue that only lists benefits teaches developers to
+over-apply, which is precisely how patterns acquired their bad reputation in the
+first place.
+
+## The connection to craftsmanship
+
+Software craftsmanship makes us question the relevance of a line of code, its
+purpose, its location, its testability and its durability. Patterns are how those
+questions get answered at the level of structure rather than the level of the
+line — and how the answer is communicated to whoever reads the code next.
+
+## Status
+
+Outline. The four catalogue pages state their scope, their selection principle
+and their main entries; the per-pattern pages with worked examples per
+[stack](/catalog/stacks) are not written yet.

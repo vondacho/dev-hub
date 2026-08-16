@@ -1,0 +1,35 @@
+---
+title: Attitudes
+description: The two dispositions the practices express — test-first and user-first — and why each is a design method rather than a phase.
+---
+
+Effective software development embodies two attitudes. They are not steps in a
+process and they do not appear on a board: they are the dispositions that decide
+*how* every [practice](/doc/practices/) in the next section gets run.
+
+| Attitude | The question it puts first | What it is really a method for |
+|----------|---------------------------|--------------------------------|
+| [Test-first](/doc/attitudes/test-first/) | How would I know this is wrong? | Designing a component, before it exists |
+| [User-first](/doc/attitudes/user-first/) | Who has to live with this, and what does it cost them? | Deciding what is worth building at all |
+
+## Why they are separated from the practices
+
+A practice is a named ritual, with named participants, that produces an artefact.
+An attitude has none of those things — it is what a person brings *to* the
+ritual, and it is what determines whether the ritual produces something or
+becomes ceremony.
+
+[Example mapping](/doc/practices/example-mapping/) run by people who are not
+thinking about the user produces rules nobody needed.
+[ATDD](/doc/practices/atdd/) run by people who are not thinking about design
+produces a test suite pinned to an implementation. The ritual is the same in both
+cases; the attitude is what was missing.
+
+## What they have in common
+
+Both are **design methods disguised as verification activities**, and both are
+routinely mistaken for a phase owned by somebody else — testing for the quality
+department, user experience for the design department.
+
+That mistake is expensive in the same way in both cases: it moves the cheapest
+moment to discover a problem to a point after the decisions have been made.

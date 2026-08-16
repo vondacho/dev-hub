@@ -1,0 +1,66 @@
+---
+title: BDD
+description: Specifying behaviour in the language of the business, so the specification and the test are the same artefact.
+---
+
+Behaviour-Driven Development is the practice of describing what software should
+do in the vocabulary of the people who asked for it — and then executing that
+description.
+
+It is a **collaboration technique that happens to produce tests**, not a testing
+technique that happens to involve the business. Teams that get this backwards end
+up with `Given I click the button with id submit-btn`, which is a test with a
+costume on.
+
+## The shape
+
+```gherkin
+Feature: Overdraft protection
+
+  Scenario: A payment that would exceed the agreed overdraft is declined
+    Given an account with a balance of -450 CHF
+    And an agreed overdraft limit of 500 CHF
+    When a payment of 80 CHF is presented
+    Then the payment is declined
+    And the account balance is unchanged
+```
+
+Three things to notice. The steps name **domain concepts**, not UI elements or
+database tables. The values are **concrete** — they came from a green card in
+[example mapping](/doc/practices/example-mapping/). And the scenario would still
+make sense read aloud to someone from the business who has never seen the
+codebase.
+
+## The ubiquitous language
+
+The vocabulary in these scenarios is the same vocabulary used in the code, in the
+[event catalogue](/go/events) and in the [C4 model](/go/c4). When a scenario
+needs a word the code does not have, one of the two is wrong, and that is worth
+finding out.
+
+## Where the scenarios come from
+
+Not from a analyst writing them alone. They come out of
+[example mapping](/doc/practices/example-mapping/), where the room agreed on the
+examples. Writing them afterwards is transcription; writing them *instead of*
+having the conversation is the anti-pattern that gives BDD its bad reputation.
+
+## Where they go
+
+Straight into [ATDD](/doc/practices/atdd/): the scenario becomes the failing
+acceptance test that drives the implementation, and stays as the regression net
+afterwards.
+
+## What executes them
+
+[Cucumber](/doc/testing-tools/cucumber/), attached at the use case port rather
+than at the browser — the single decision that most determines whether the suite
+survives.
+
+## The honest caveat
+
+Gherkin has a real cost — a step definition layer to maintain, and a temptation
+to reuse steps until they grow parameters nobody understands. It earns that cost
+only when non-developers actually read the scenarios. If nobody outside the team
+ever opens them, write the same examples as plain
+[acceptance tests](/doc/practices/atdd/) and keep the conversation.

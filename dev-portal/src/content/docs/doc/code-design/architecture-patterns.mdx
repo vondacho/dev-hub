@@ -1,0 +1,68 @@
+---
+title: Architecture patterns
+description: Where the boundaries go inside one system, what may cross them, and what each arrangement costs.
+---
+
+Architecture patterns operate one level above [GoF](/doc/code-design/gof-patterns/):
+not how classes relate, but where the boundaries inside a system are drawn and
+which direction dependencies are allowed to point.
+
+They matter more than the class-level catalogue because they are far harder to
+change later. A misplaced boundary is not a refactoring, it is a project.
+
+## The main entries
+
+**Layered.** The default, and the one most often applied without a decision.
+Works when the layers genuinely differ in rate of change; degrades into a
+pass-through when they do not — three layers where every change touches all
+three is one layer with extra typing.
+
+**Ports and adapters (hexagonal).** The domain in the middle, with no dependency
+on anything technical. Everything outside — HTTP, database, queue — is an adapter
+plugged into a port the domain defines. The property that pays: the domain's
+tests need no framework and run in milliseconds.
+
+**Clean / onion.** The same dependency rule, expressed with more prescribed
+rings. Whether the extra rings earn their names is a real question and depends on
+the size of the system.
+
+**Modular monolith.** One deployable, hard internal boundaries. Frequently the
+right answer, and almost always the right *first* answer — it keeps the boundary
+question open while the cost of getting it wrong is a package move rather than a
+distributed migration.
+
+**Microservices.** Independent deployability bought with distributed-system
+costs: network failure, eventual consistency, versioned contracts, distributed
+tracing. Worth it when teams need to release independently. Not worth it as a
+default, and never worth it before the boundaries are known.
+
+**Event-driven.** Components react to what happened instead of being called.
+Decouples the producer from the consumers; makes the overall flow harder to
+follow — the [event catalogue](/go/events) exists precisely to make it followable
+again.
+
+**CQRS and event sourcing.** Separate the write model from the read models; store
+the events rather than the state. Powerful, expensive, and specific. The honest
+default is that most systems do not need either.
+
+## The dependency rule underneath
+
+Most of these are one idea in different clothing: **dependencies point inwards,
+towards the thing that changes least.** The domain does not know about the
+database. The use case does not know about HTTP. Where an outer thing must be
+called, the inner one declares an interface and the outer one implements it.
+
+That rule is what makes a system testable, and what
+[contract-first](/doc/practices/contract-first/) enforces at the boundaries
+between systems.
+
+## Choosing one
+
+The choice is driven by what has to change independently, not by what is modern.
+Write the decision down with its alternatives and its cost — the choice is
+expensive to reverse, and in two years nobody will remember why it was made.
+
+## Status
+
+Outline. The per-pattern pages, each with a worked example per
+[stack](/catalog/stacks), are not written yet.

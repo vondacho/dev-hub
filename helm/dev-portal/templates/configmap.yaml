@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dev-portal.fullname" . }}
+  labels:
+    {{- include "dev-portal.labels" . | nindent 4 }}
+data:
+  # All read by src/lib/links.ts through process.env at call time — by the
+  # server-rendered /catalog page and the footer, and by the /go/[target]
+  # redirects that the prerendered docs under /doc/* link through.
+  API_PORTAL_URL: {{ .Values.app.apiPortalUrl | quote }}
+  ARCH_PORTAL_URL: {{ .Values.app.archPortalUrl | quote }}
+  ARCH_C4_URL: {{ .Values.app.archC4Url | quote }}
+  ARCH_EVENTCATALOG_URL: {{ .Values.app.archEventcatalogUrl | quote }}
+  ARCH_APPMAP_URL: {{ .Values.app.archAppmapUrl | quote }}
+  {{- range $key, $value := .Values.app.extraConfig }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}

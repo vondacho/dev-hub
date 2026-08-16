@@ -1,0 +1,72 @@
+---
+title: Integration patterns
+description: How two things that fail independently talk to each other — messaging, routing, transformation, and the failure modes underneath all of them.
+---
+
+Once a call leaves the process, everything changes: it can be slow, it can be
+lost, it can arrive twice, and it can succeed while the caller believes it
+failed. Integration patterns are the vocabulary for dealing with that, and they
+are only comprehensible against the failures they exist to absorb.
+
+## Start with the fallacies
+
+The eight fallacies of distributed computing are the reason this catalogue
+exists. The network is *not* reliable, latency is *not* zero, bandwidth is *not*
+infinite, the network is *not* secure, topology *does* change, there is *not* one
+administrator, transport cost is *not* zero, and the network is *not*
+homogeneous.
+
+Every pattern below is a response to one of those.
+
+## Message construction and channels
+
+**Document message, command message, event message** — three different intents,
+and confusing them is how a system ends up with events that are secretly
+commands, coupling the publisher to a consumer it should not know about.
+
+**Point-to-point vs publish-subscribe** — whether one consumer handles a message
+or all of them do. A decision that is very hard to change once consumers exist.
+
+**Dead letter channel** — where a message goes when it cannot be processed.
+Without one, failure is silent, and silent failure in a queue is the worst
+failure mode in this catalogue.
+
+## Routing and transformation
+
+**Content-based router**, **splitter**, **aggregator**, **scatter-gather** — the
+routing vocabulary. Each has a state and timeout problem that is easy to miss
+when drawn on a whiteboard.
+
+**Message translator** and **canonical data model** — the transformation
+vocabulary. A canonical model shared by every system is a coupling point disguised
+as a decoupling one; per-boundary translation is usually the safer choice.
+
+## Reliability
+
+**Idempotent receiver.** The single most important pattern here. At-least-once
+delivery is what you get in practice, so every consumer must tolerate seeing the
+same message twice.
+
+**Transactional outbox.** Writing to the database and publishing a message are not
+one atomic act. The outbox makes them one, and its absence is the most common
+source of "the data says one thing and the downstream system says another".
+
+**Saga.** A business transaction across services, with a compensating action per
+step because there is no distributed rollback. Expensive and sometimes
+unavoidable — the cost is that every step needs a defined way to be undone.
+
+**Circuit breaker, retry with backoff, bulkhead, timeout.** The resilience set. A
+retry without a timeout and a backoff is an amplifier for an outage, not a
+mitigation.
+
+## Where the contracts live
+
+Every one of these boundaries is a [contract](/doc/practices/contract-first/).
+Message schemas belong in the [event catalogue](/go/events); synchronous
+interfaces belong in the [API catalogue](/go/api). An integration whose message
+shape exists only in code is an integration nobody can change safely.
+
+## Status
+
+Outline. The per-pattern pages, each with a worked example per
+[stack](/catalog/stacks), are not written yet.

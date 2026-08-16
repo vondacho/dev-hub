@@ -1,0 +1,55 @@
+---
+title: ATDD
+description: The acceptance test written first, agreed by three people, and used as the definition of done.
+---
+
+Acceptance Test-Driven Development: before the feature is implemented, the team
+writes the test that will say whether it is finished — and agrees on it.
+
+"Done" then stops being a judgement call. It is a test that was red and is now
+green, and it was red for the right reason.
+
+## The cycle
+
+1. **Agree the test.** From the examples produced in
+   [example mapping](/doc/practices/example-mapping/), written as a
+   [BDD scenario](/doc/practices/bdd/) or as a plain test in the team's language.
+2. **Watch it fail.** For the right reason — a missing behaviour, not a missing
+   import. A test that has never failed has proved nothing.
+3. **Drive inwards.** The failing acceptance test is the outer loop. Inside it,
+   the usual unit-level red-green-refactor cycle builds what it needs.
+4. **Green, then refactor.** The third step is the one that gets skipped, and
+   skipping it is what makes people believe test-first slows them down.
+
+## Outside-in, and why
+
+Starting from the acceptance test means the first design decision is *what the
+system does for someone*, and the internals are discovered by working inwards
+from that. Starting from the inside produces components that are individually
+tested and collectively wrong.
+
+It also means the test is written against a **port**, not against an
+implementation detail. That is what lets the implementation be replaced later
+without rewriting the suite.
+
+## What it does to estimation
+
+A story whose acceptance test cannot be agreed is a story nobody understands
+well enough to estimate. Trying to write the test *is* the readiness check —
+which is why this practice belongs upstream of the sprint board rather than
+downstream of it.
+
+## What runs the tests
+
+[Cucumber](/doc/testing-tools/cucumber/) at the use case port, with the ports
+stubbed from the contract by [Microcks](/doc/testing-tools/microcks/), and
+[Playwright](/doc/testing-tools/playwright/) for the handful of journeys that
+genuinely need a browser. See [testing tools](/doc/testing-tools/).
+
+## What it does not replace
+
+Unit tests still exist, and there are far more of them. The acceptance test says
+the feature works; the unit tests say why each piece behaves as it does and make
+the failure diagnosable. See
+[all-in-one testing](/doc/practices/all-in-one-testing/) for how the levels fit
+together without duplicating intent.

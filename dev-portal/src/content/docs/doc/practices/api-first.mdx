@@ -1,0 +1,54 @@
+---
+title: API-first
+description: The interface is the deliverable; the implementation behind it is an internal detail.
+---
+
+A component's API is what everyone else depends on. Design it first, agree it
+with the people who will call it, and treat the implementation behind it as
+replaceable.
+
+## What it means in practice
+
+- **The specification is written before the code**, and reviewed by the consumer
+  team — not extracted from an implementation that already shipped.
+- **Generated code flows one way.** Clients and server stubs come *from* the
+  specification. A hand-edit to generated output is a bug in the spec.
+- **The interface outlives its implementation.** If rewriting a service forces
+  its callers to change, the boundary was drawn in the wrong place.
+
+## Why first, and not eventually
+
+An API extracted after the fact describes whatever the implementation happens to
+do, including the parts nobody meant to promise — a field that is always present
+by accident, an error code that leaks a library. Once a caller depends on it, the
+accident is load-bearing.
+
+Writing the contract first is the cheapest moment to notice that the boundary is
+wrong, and the only moment when changing it costs a conversation rather than a
+migration.
+
+## The conversation it forces
+
+Designing an interface before implementing it means the provider has to ask the
+consumer what they actually need, and the consumer has to answer before there is
+something to react to. That conversation is uncomfortable and it is the entire
+point: it is where a request-shaped-like-our-database becomes a
+request-shaped-like-your-use-case.
+
+## Where it is enforced
+
+In [api-hub](/go/api): contracts are parsed, validated and scored on submission,
+and a revision is registered only once it passes. That makes API-first a gate
+rather than a good intention.
+
+[Microcks](/doc/testing-tools/microcks/) closes the other half: it serves a mock
+generated from the registered contract, so consumers can build against the
+interface before the provider exists, and it replays the contract against the
+deployed provider to catch divergence.
+
+## Its relationship to contract-first
+
+API-first is [contract-first](/doc/practices/contract-first/) applied to one
+specific boundary — a network interface between two teams. The broader practice
+covers every boundary: events, schemas, module interfaces, and the seams inside a
+single codebase.

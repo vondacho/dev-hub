@@ -1,0 +1,153 @@
+---
+title: Test-first
+description: Testability considered before the design exists, SRP as its most direct lever, and test-thinking as the design method nobody credits as one.
+---
+
+Test-first is not about testing. It is a way of designing a component, and the
+tests are what it leaves behind.
+
+That claim sounds like a slogan, so here is the concrete form of it: **decide how
+a component could be shown to be wrong before deciding what the component looks
+like.** Everything else on this page follows from taking that literally.
+
+## The TDD mindset
+
+Red, green, refactor. Written down it looks like a testing procedure, and read
+that way it is a waste of time — a slower path to code you could have written
+directly.
+
+What is actually happening is a design loop:
+
+1. **Red.** Writing the test forces you to name the unit, decide what it is
+   responsible for, and choose its interface — while none of it exists and all
+   of it is free to change.
+2. **Green.** The simplest thing that works. This step is deliberately
+   unambitious; its only job is to prove the design from step 1 can be satisfied.
+3. **Refactor.** Now that the behaviour is pinned, improve the structure. This is
+   the step people skip, and skipping it is why teams conclude that test-first
+   produces bad code — it produces the *first draft* of the code, and the third
+   step is where the draft becomes a design.
+
+The test is the first caller of your code. If writing it is painful, you have
+learned something about your design at the cheapest possible moment, and the pain
+is the deliverable.
+
+## Testability as a design input
+
+The usual question is *"can I test this?"*, asked after the component exists.
+That question has only two answers — yes, or a week of rework — and by the time
+it is asked the answer is already fixed.
+
+The test-first question is asked one step earlier: *"what shape does this have to
+take to be testable?"* Now it is an input to the design rather than a verdict on
+it. Concretely, before writing a component, decide:
+
+- What is the **seam** — the point where I can substitute a collaborator?
+- What is the **observable outcome** — a return value, an emitted event, a call
+  on a port? If the only evidence is a side effect deep in another object, the
+  boundary is wrong.
+- What must be **injected** rather than reached for? Anything constructed inside
+  the component is something a test cannot replace.
+- What is the **fixture** — how much has to exist before the component can be
+  exercised at all? A large answer here is the earliest warning of a design
+  problem, and the one most often ignored.
+
+None of those questions is about testing. They are all questions about coupling,
+boundaries and dependency direction — which is to say, they are
+[design questions](/doc/code-design/architecture-patterns/) that testing happens
+to ask more precisely than a design review does.
+
+## SRP is the lever
+
+Of all the principles that contribute to testability, the **Single Responsibility
+Principle** contributes most directly, and the mechanism is worth spelling out
+rather than asserting.
+
+A component with one reason to change has:
+
+- **one reason to fail**, so a red test names the defect instead of narrowing it;
+- **few collaborators**, so the test needs few substitutes;
+- **a small fixture**, so the test is short enough to read as documentation;
+- **a nameable behaviour**, so the test has an honest name.
+
+That last one is the practical test, and it is nearly free to apply. If you
+cannot name the test without the word "and", the unit does more than one thing.
+The naming difficulty is not a vocabulary problem — it is the design reporting
+itself.
+
+The relationship runs in both directions, which is what makes it useful:
+
+| The test looks like this | The design is telling you |
+|--------------------------|---------------------------|
+| Five stubs to exercise one behaviour | Five collaborators; the responsibilities are not separated |
+| Long, branching setup | Hidden dependencies, or a component that needs the world to exist |
+| Asserting on a private field | The behaviour has no observable outcome; the boundary is in the wrong place |
+| One change breaks thirty tests | Something is depended upon by everything — probably a shared mutable model |
+| The name needs "and" | More than one responsibility |
+
+**A painful test is almost never a testing problem.** It is a design problem
+being reported by the only mechanism that reports design problems automatically.
+Teams that read it as a testing problem respond by building more elaborate test
+infrastructure, which silences the signal while leaving the cause — and that is
+how a codebase acquires a mocking framework configuration nobody can explain.
+
+## Test-thinking is an under-evaluated design method
+
+This is the part that deserves more credit than it gets.
+
+Software design has several established methods: diagrams, design reviews,
+architecture decision records, pattern catalogues, modelling workshops. All of
+them are valuable and all of them share one weakness — **none is executable.** A
+diagram cannot tell you it is wrong. A design review surfaces exactly as much as
+the reviewers happened to think of that morning. An ADR records a decision
+without checking it.
+
+Test-thinking is the only design method in common use that is:
+
+- **Falsifiable.** The design makes a claim, and running the test either supports
+  it or does not. Everything else in the list is an opinion held with varying
+  confidence.
+- **Cheap and immediate.** The feedback arrives in seconds, from the person
+  already holding the problem, without scheduling anyone.
+- **Cumulative.** The design conversation leaves an artefact that keeps working.
+  A whiteboard photo decays; a test suite keeps asking the same question of every
+  future change.
+- **Honest about cost.** It surfaces the price of a design — in setup, in
+  substitutes, in fixture — as a number you can feel, before the design is paid
+  for.
+
+And it asks the one question the other methods systematically avoid:
+**"how would we find out we were wrong?"** A design nobody can refute is not a
+strong design; it is an unfalsifiable one, and the difference is not visible
+until it is expensive.
+
+So the honest framing of test-first is not "write tests earlier". It is: *use
+testing as the design method it already is, at the point where design decisions
+are actually being made.*
+
+## The nuance worth stating
+
+You do not have to literally write the test first, every time, to get the benefit
+— and pretending otherwise is what makes test-first sound like dogma to people
+who have shipped software successfully without it.
+
+What you do have to do is **answer the testability question first**. A developer
+who thinks through the seam, the observable outcome and the fixture before
+writing the component, and then writes the test immediately after, has done
+test-first design. A developer who writes the component, then bolts on a test
+that reaches into its internals, has not — regardless of how many tests exist at
+the end.
+
+The order of typing is a useful discipline for learning the habit. The habit is
+the point.
+
+## Where it connects
+
+- [ATDD](/doc/practices/atdd/) is this attitude at the outer loop: the acceptance
+  test is agreed before the feature, and it drives inwards.
+- [All-in-one testing](/doc/practices/all-in-one-testing/) is what a suite
+  produced this way looks like — each behaviour verified at the cheapest level
+  that can see it, because the design allowed it.
+- [Use case patterns](/doc/code-design/usecase-patterns/) describe the shape that
+  makes an acceptance test attachable without a running deployment.
+- [Testing tools](/doc/testing-tools/) is what executes any of it.

@@ -1,0 +1,47 @@
+---
+title: Three amigos
+description: The smallest conversation that prevents rework — product owner, developer and quality engineer looking at one story together.
+---
+
+Three people, one story, before it is estimated: the **product owner** who knows
+what it is for, the **developer** who knows what it will cost, and the
+**quality engineer** who knows how it will be judged.
+
+## Why exactly these three
+
+Because they fail in different directions. Left alone, the product owner
+specifies an outcome without a mechanism, the developer builds a mechanism
+without checking the outcome, and the quality engineer discovers the gap between
+them after both have moved on.
+
+Each of the three asks a question the other two do not naturally ask:
+
+- *What is this for?* — the business intent, and what happens if it is missing.
+- *What does this cost?* — the implementation, its edge cases, what it touches.
+- *How would we know it works?* — the observable behaviour, including the
+  unhappy paths nobody wrote down.
+
+## How it runs
+
+Fifteen to thirty minutes per story. Someone reads the story aloud. The other two
+interrogate it. The output is not a document — it is a story that has either
+become clear or become visibly ambiguous.
+
+An ambiguous story does not get estimated. It gets an open question and an owner.
+
+## The output
+
+Either the story is ready for [example mapping](/doc/practices/example-mapping/)
+and then [ATDD](/doc/practices/atdd/), or it has a list of questions that must be
+answered first. Both outcomes are successes; only "we discussed it and everyone
+nodded" is a failure.
+
+## Common failure modes
+
+- **Four amigos, then six.** Once it is a meeting with a distribution list, it
+  stops being a conversation. Add a domain expert when the domain is the
+  uncertainty — and only then.
+- **The developer presenting.** If one person explains and two listen, it is a
+  handover with extra steps.
+- **Running it after estimation.** The purpose is to make the estimate
+  meaningful. Afterwards there is nothing left to change.

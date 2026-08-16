@@ -1,0 +1,49 @@
+# Overrides for a locally built image on a single-node cluster
+# (Rancher Desktop / Docker Desktop).
+#
+#   ./helm/dev-portal/deploy.sh
+#
+# or by hand:
+#
+#   cd dev-portal && docker build -t dev-portal:dev .
+#   helm upgrade --install dev-portal helm/dev-portal \
+#     -n dev-hub --create-namespace \
+#     -f helm/dev-portal/values-local.yaml
+#   kubectl rollout restart deployment/dev-portal -n dev-hub
+
+image:
+  repository: dev-portal
+  tag: dev
+  # The image is built straight into the node's image store, never pulled.
+  pullPolicy: Never
+
+# Rancher Desktop runs Traefik as the default IngressClass and *.localhost
+# resolves to 127.0.0.1, so the portal is reachable from the host browser
+# without a port-forward. Named explicitly here rather than relying on the
+# cluster default.
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+    - host: dev-portal.localhost
+      paths:
+        - path: /
+          pathType: Prefix
+
+# api-hub and arch-hub are separate repos and separate releases, in their own
+# namespaces. These are the ingress hosts their own values-local.yaml files
+# enable on this cluster — reachable from the browser whether or not those
+# releases are installed, and dead links when they are not.
+app:
+  apiPortalUrl: http://api-portal.localhost
+  archPortalUrl: http://arch-portal.localhost
+  archC4Url: http://arch-c4.localhost
+  archEventcatalogUrl: http://arch-eventcatalog.localhost
+  archAppmapUrl: http://arch-appmap.localhost
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 256Mi

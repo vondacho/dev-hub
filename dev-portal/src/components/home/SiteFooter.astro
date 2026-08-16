@@ -1,0 +1,86 @@
+---
+/*
+ * Contact details are PLACEHOLDERS on the reserved example.org domain — replace
+ * them with real addresses (or drop the column) before this goes anywhere public.
+ * An address that looks real but is not is worse than an obvious stand-in.
+ */
+import { apiPortalUrl, archPortalUrl } from '../../lib/links';
+
+const year = new Date().getFullYear();
+
+const columns = [
+	{
+		title: 'Documentation',
+		links: [
+			{ label: 'Overview', href: '/doc/' },
+			{ label: 'Attitudes', href: '/doc/attitudes/' },
+			{ label: 'Practices', href: '/doc/practices/' },
+			{ label: 'Code design', href: '/doc/code-design/' },
+			{ label: 'Testing tools', href: '/doc/testing-tools/' },
+			{ label: 'MCP', href: '/doc/mcp/' },
+		],
+	},
+	{
+		title: 'Catalog',
+		links: [
+			{ label: 'All catalogs', href: '/catalog' },
+			{ label: 'Practices', href: '/doc/practices/' },
+			{ label: 'Code design', href: '/doc/code-design/' },
+			{ label: 'Testing tools', href: '/doc/testing-tools/' },
+			{ label: 'Stacks', href: '/catalog/stacks' },
+		],
+	},
+	{
+		title: 'Platform',
+		links: [
+			{ label: 'Academy', href: '/academy' },
+			{ label: 'API portal', href: apiPortalUrl() },
+			{ label: 'Architecture portal', href: archPortalUrl() },
+			{ label: 'Service health', href: '/healthz' },
+		],
+	},
+	{
+		title: 'Contact',
+		links: [
+			{ label: 'Development team', href: 'mailto:dev-hub@example.org' },
+			{ label: 'Report an issue', href: 'mailto:dev-hub-support@example.org' },
+		],
+	},
+];
+---
+
+<footer class="border-t border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-night-raised">
+	<div class="mx-auto w-full max-w-5xl px-6 py-14">
+		<div class="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+			{
+				columns.map(({ title, links }) => (
+					<nav aria-labelledby={`footer-${title.toLowerCase()}`}>
+						<h2
+							id={`footer-${title.toLowerCase()}`}
+							class="text-xs font-semibold tracking-[0.14em] uppercase"
+						>
+							{title}
+						</h2>
+						<ul class="mt-4 space-y-2 text-sm">
+							{links.map(({ label, href }) => (
+								<li>
+									<a
+										href={href}
+										class="text-ink-muted underline-offset-4 hover:text-brand hover:underline dark:text-slate-400 dark:hover:text-sky-400"
+									>
+										{label}
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				))
+			}
+		</div>
+
+		<div class="mt-12 flex flex-col gap-2 border-t border-slate-200 pt-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:text-slate-400">
+			<p>© {year} Dev Hub. All rights reserved.</p>
+			<p>Effective software development — connected, contract-first, semi-automated, agile.</p>
+		</div>
+	</div>
+</footer>
