@@ -1,0 +1,187 @@
+---
+title: API-first
+description: The interface treated as the product rather than a by-product — where contract-first meets user-first, because the person on the other side of an API is a developer trying to get something done.
+---
+
+API-first is not "write the OpenAPI document before the code". That is the
+[practice](/doc/practices/api-first/), and a team can follow it exactly while
+still shipping a bad interface.
+
+The attitude underneath it is a claim about **what is being designed**:
+
+> The interface is the product. The implementation behind it is the replaceable
+> part.
+
+Everything below follows from taking that seriously, and most of it has nothing
+to do with which file gets written first.
+
+## Why it is not just contract-first
+
+[Contract-first](/doc/attitudes/contract-first/) asks whether the boundary is
+explicit, agreed and enforced. Every one of those can be true of an interface
+that is a projection of somebody's database.
+
+| | [Contract-first](/doc/attitudes/contract-first/) | API-first *(this page)* |
+|---|---|---|
+| **Asks** | Is the boundary agreed before either side is built? | Is the interface designed for the people who call it? |
+| **Satisfied by** | A schema, agreed and enforced | A schema that a consumer can use without asking you anything |
+| **Fails as** | An unwritten agreement | A rigorously versioned, registered, conformance-tested interface nobody can figure out |
+| **Scope** | Every seam, five kinds of contract | The seams where the other side is a person writing code |
+
+The failure mode in the third row is worth dwelling on, because it is invisible
+to every check a pipeline can run. A perfectly governed API — versioned, scored,
+mocked, monitored — can still be one that forces four calls to answer a question
+the consumer asks constantly, and names its fields after columns. It passes
+contract-first. It fails the only test that matters to the person using it.
+
+## The question it puts first
+
+> **"Who calls this, and what are they trying to get done?"**
+
+Not "what does this service have to expose". The difference between those two
+questions is the difference between an interface shaped like a use case and one
+shaped like a schema, and it is decided before a line of the specification
+exists.
+
+## Where the attitudes meet
+
+This is the point of having this page, and it is the reason it sits directly
+after contract-first rather than inside it.
+
+**An API's user is a developer**, and
+[user-first](/doc/attitudes/user-first/) applies to them exactly as written:
+the person who has to live with this, and what it costs them when it is wrong.
+Developer experience is not a softer version of user experience — it is user
+experience, with a smaller and better-documented user base.
+
+So the standard from [user-first](/doc/attitudes/user-first/) transfers without
+modification. A concern is **first-class when it can change the decision**. By
+that measure, most organisations that describe themselves as API-first are not:
+the consumer appears as a review comment after the design is settled, and every
+decision that shaped the interface was made on other grounds — usually the shape
+of the provider's storage.
+
+The things that decide whether an API is pleasant are, without exception, UX
+decisions:
+
+- **Naming**, in the consumer's language rather than the provider's internals —
+  which is the [ubiquitous language](/doc/practices/ddd/) question again.
+- **Granularity.** One call for one intent. Chattiness is a design defect that
+  the consumer pays for in latency and in code.
+- **Errors.** A message that says what went wrong, which value caused it, and
+  what to do about it. Error design is the most-skipped and most-used part of an
+  interface.
+- **Defaults.** What happens when a caller omits everything optional should be
+  the sensible case, not an empty result or a validation failure.
+- **Predictability.** Pagination, filtering, dates, identifiers and errors work
+  the same way across every endpoint, so knowledge transfers from the first call
+  to the rest.
+- **Idempotency**, so a retry after a timeout is safe. The caller *will* retry;
+  the only question is whether you decided what happens.
+- **Time to first successful call.** The single best proxy metric for the whole
+  list, and the easiest to measure: sit a developer down and watch.
+
+## What an interface reports about the design
+
+The same diagnostic as everywhere else on this site — the artefact is telling you
+something about the design, and the temptation is to fix the artefact.
+
+| The interface looks like this | The design is telling you |
+|---|---|
+| Endpoints map one-to-one onto tables | It is CRUD over a schema; no use case was ever identified |
+| One user intent takes three or four calls | The granularity is the provider's, not the consumer's |
+| Every response wraps a payload in `status` and `data` | HTTP is being reimplemented inside the body, and the transport is now decorative |
+| Field names match the columns | The interface speaks the implementation's dialect, and the implementation is now unchangeable |
+| Every new feature needs a breaking change | Internals were exposed as promises |
+| A tutorial is required before the first call | The design assumes knowledge only the provider's team has |
+| Consumers all build the same wrapper | The missing abstraction is one you should have shipped |
+
+The last row is the most useful signal in the table and the easiest to collect:
+**look at what every consumer wrote around your API.** That code is the interface
+they wanted, written at their own expense.
+
+## Every API has consumers you did not plan for
+
+The internal-versus-public distinction is softer than it looks. An interface
+inside one organisation acquires callers who were not in the original
+conversation — another team, a script, a report, an integration built during an
+incident and never removed.
+
+That is not an argument for treating every endpoint as a public product. It is an
+argument for one specific habit: **decide who the audience is, and say so.** An
+interface that never declares its audience gets the widest one by default, and
+then the constraints of a public API arrive without the design that should have
+preceded them.
+
+## The nuance worth stating
+
+API-first is not a six-week specification phase, and it is not design by
+committee. Both are what people picture when they resist it, and both are real
+failure modes — a specification negotiated by eight people converges on the union
+of everyone's requirements, which is the worst interface available.
+
+What the attitude actually requires is smaller:
+
+- **One consumer in the room**, early, with the ability to say "that does not
+  work for us" and be listened to.
+- **A sketch before a specification.** The first artefact is a handful of example
+  requests and responses for real use cases, not a complete document. Most bad
+  interfaces are visible in five examples.
+- **Formality proportional to reach**, exactly as in
+  [contract-first](/doc/attitudes/contract-first/): a public API earns the full
+  ritual; an endpoint between two of your own modules earns a conversation and a
+  type.
+
+What does not scale down is the question. A developer who asks who calls this and
+what they are trying to do — before designing the interface — has worked
+API-first, whether the output was a registered OpenAPI document or a paragraph in
+a pull request.
+
+## How the four attitudes relate
+
+API-first is not a fourth scale. It is the **intersection** of two of the others,
+at the boundary where they overlap:
+
+```text
+        user-first  ──────┐
+                          ├──▶  API-first
+    contract-first  ──────┘
+```
+
+From [contract-first](/doc/attitudes/contract-first/) it takes the discipline:
+agree the boundary before either side is built, and enforce it. From
+[user-first](/doc/attitudes/user-first/) it takes the standard: the person on the
+other side is a user, and their need is allowed to change the decision. Drop the
+first and you get a pleasant interface nobody can rely on; drop the second and
+you get a governed one nobody enjoys using — and the second is far more common,
+because only the first has a tool that reports it.
+
+[Test-first](/doc/attitudes/test-first/) then closes it, as always: the contract
+supplies the definition of wrong, and the conformance suite is what makes it
+fail.
+
+## Where it connects
+
+- [API-first, the practice](/doc/practices/api-first/) — the ritual: the
+  specification before the code, generation flowing one way, and the registry
+  that makes it a gate.
+- [Contract-first](/doc/attitudes/contract-first/) — the general attitude this
+  one specialises, and the other four kinds of contract.
+- [User-first](/doc/attitudes/user-first/) — the standard applied to a human
+  user, which is the same standard.
+- [Integration patterns](/doc/code-design/integration-patterns/) — what the
+  interface has to say about failure, retries and idempotency.
+- [DDD](/doc/practices/ddd/) — a published language at a context boundary is what
+  a well-named API is, and an anticorruption layer is what a consumer builds when
+  it does not get one.
+- [Microcks](/doc/testing-tools/microcks/) — the mock that lets a consumer use
+  the interface before it exists, which is also the cheapest usability test it
+  will ever get.
+
+## Status
+
+Written. The enforcement half is real — contracts are scored on submission in
+[api-hub](/go/api) and replayed against deployments by
+[Microcks](/doc/testing-tools/microcks/). The design half described here is a
+disposition, and the only instrument for it remains the one named above: watch a
+developer make their first call.

@@ -83,12 +83,15 @@ export const paths: readonly LearningPath[] = [
 		summary:
 			'Making the boundary between two parts explicit enough that either side can change without asking permission — and checkable enough that a breach is a build failure rather than a discovery in production.',
 		lessons: [
+			{ title: 'Where does the boundary go? Contract-first as a design method', video: true },
 			{ title: 'API-first: the interface is the deliverable', video: true },
 			{ title: 'What belongs in a contract, and what is an implementation detail' },
 			{ title: 'Consumer-driven contracts and the tests that come with them' },
 			{ title: 'Versioning and deprecation without breaking the people downstream', video: true },
 		],
-		readToday: { label: 'Contract-first', href: '/doc/practices/contract-first/' },
+		// The attitude, matching its two sibling paths — Test-first and
+		// User-first both open on the disposition rather than the ritual.
+		readToday: { label: 'Contract-first', href: '/doc/attitudes/contract-first/' },
 	},
 	{
 		level: 'Applied',

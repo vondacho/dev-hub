@@ -49,6 +49,13 @@ provider verification. Both answer the same question from different directions.
 **Drive the thing you built.** So an agreed scenario actually executes. Cucumber
 at the domain boundary, Playwright at the browser.
 
+The first two are the same artefact used in both directions, and that is the
+whole idea behind
+[contract-driven testing](/doc/attitudes/contract-first/): the document that
+stubs your dependency is the document that verifies its provider, so the two
+cannot disagree. A hand-written stub can — and it does so silently, inside a
+passing test.
+
 ## Where they sit in the suite
 
 They map onto the levels in [all-in-one testing](/doc/practices/all-in-one-testing/),

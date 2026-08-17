@@ -125,6 +125,45 @@ So the honest framing of test-first is not "write tests earlier". It is: *use
 testing as the design method it already is, at the point where design decisions
 are actually being made.*
 
+## Where the expectation comes from
+
+A test asserts that something *should* be true. Test-first is disciplined about
+*when* that assertion is written and silent about **where the expectation came
+from** — and that gap is where the other two attitudes attach.
+
+There are only two sources, and they produce artefacts that look identical:
+
+- **From the implementation.** The developer writes the code, observes what it
+  does, and encodes it. The test passes on the first run, which should be alarming
+  and rarely is. What exists now is a *change detector*: it will faithfully report
+  that behaviour changed, and it can never report that the behaviour was wrong,
+  because the behaviour is its definition of right.
+- **From an agreement.** The expectation comes from a
+  [contract](/doc/attitudes/contract-first/) — an agreed scenario, a schema, a
+  performance budget, a design system. Now the test can fail for the one reason
+  that matters: the code does something nobody promised.
+
+So **test-first supplies the question and contract-first supplies the definition
+of "wrong."** A red test is only meaningful if something other than the code
+under test decides what red means, and a suite built entirely on
+self-derived expectations is a very thorough record of one developer's
+assumptions on one afternoon.
+
+This is the practical form of the connection, per level:
+
+| The test | Its contract | Without one, it degrades to |
+|---|---|---|
+| Acceptance test | An agreed [Gherkin scenario](/doc/practices/digital-artefacts/) | A test asserting what the developer assumed the story meant |
+| Integration test | An [API contract](/doc/practices/contract-first/) or message schema | A test pinned to the provider's current behaviour, bugs included |
+| Component test | A [design system](/doc/attitudes/user-first/) story | A snapshot that is updated whenever it fails |
+| Performance test | A budget agreed in advance | A graph someone looks at after an incident |
+| Architecture test | A [dependency rule](/doc/code-design/architecture-patterns/) | A convention that erodes one import at a time |
+
+The right-hand column is not hypothetical; it is what most suites are made of.
+Each row costs the same to run as its middle column and buys strictly less,
+which is why "we have good coverage" and "we would notice if this broke a
+promise" turn out to be unrelated statements.
+
 ## The nuance worth stating
 
 You do not have to literally write the test first, every time, to get the benefit
@@ -143,6 +182,9 @@ the point.
 
 ## Where it connects
 
+- [Contract-first](/doc/attitudes/contract-first/) is where the expectation comes
+  from. This attitude asks how you would know you were wrong; that one is what
+  defines wrong, so a suite built without it can only detect change.
 - [ATDD](/doc/practices/atdd/) is this attitude at the outer loop: the acceptance
   test is agreed before the feature, and it drives inwards.
 - [All-in-one testing](/doc/practices/all-in-one-testing/) is what a suite

@@ -4,8 +4,9 @@ description: What effective software development is — connected, contract-firs
 ---
 
 Effective software development is **connected**, **contract-first**,
-**semi-automated** and **agile**. It embodies both a UX-first and a test-first
-attitude, and a patterns-oriented design. It uses techniques and rituals that
+**semi-automated** and **agile**. It embodies a UX-first, a test-first, a
+contract-first and an API-first attitude, and a patterns-oriented design. It uses
+techniques and rituals that
 connect various specialists — end-users, UX designers, domain experts, software
 developers, architects, quality engineers, product owners and operations
 engineers. Ultimately, AI serves as a booster and an enabler of automation.
@@ -47,7 +48,7 @@ Each is a claim about how the work is organised, not about how it feels.
 | Property | What it means here |
 |----------|--------------------|
 | **Connected** | The specialists talk to each other during the work, not through documents produced after it. That is what the [practices](/doc/practices/) are: named, repeatable conversations with a defined output. |
-| **Contract-first** | Every boundary is written down and agreed before it is implemented, and the agreement is machine-checkable. See [API-first](/doc/practices/api-first/) and [contract-first](/doc/practices/contract-first/). |
+| **Contract-first** | Every boundary is written down and agreed before it is implemented, and the agreement is machine-checkable. It is both a [disposition](/doc/attitudes/contract-first/) and a [practice](/doc/practices/contract-first/); see also [API-first](/doc/practices/api-first/). |
 | **Semi-automated** | Everything mechanical is generated, scaffolded or retro-engineered. Everything that requires a decision stays human. See [MCP](/doc/mcp/). |
 | **Agile** | Short cycles with real feedback at the end of each one — which only works if the previous three properties hold, because otherwise the feedback arrives too late to act on. |
 
@@ -56,12 +57,17 @@ produces plausible output with nobody accountable for it; no automation wastes
 people on work a machine does better. The line between them is the thing worth
 arguing about, and it is drawn per task rather than once.
 
-## The two attitudes
+## The four attitudes
 
-Both have a page of their own under [attitudes](/doc/attitudes/). They are
+Each has a page of its own under [attitudes](/doc/attitudes/). They are
 separated from the practices because a practice is a ritual with participants and
 an output, while an attitude is what someone brings to it — and is what decides
 whether the ritual produces anything.
+
+They are also a chain rather than a list, with contract-first as the hinge:
+**user-first produces contracts, test-first consumes them.** A need is
+discovered, the need becomes a promise, the promise becomes a failing build.
+API-first is where the first two overlap.
 
 **[User-first](/doc/attitudes/user-first/)** (UX-first) means the journey of the
 person using the software is the first artefact, ahead of the architecture, and
@@ -73,6 +79,25 @@ be shown to be wrong before deciding what it looks like. Not to catch bugs, whic
 is a side effect — the test is the code's first caller, so if it is painful to
 write, the design is telling you something while it is still cheap to listen.
 Testing is a design method, and an under-evaluated one.
+
+**[Contract-first](/doc/attitudes/contract-first/)** means deciding what each
+side of a boundary promises before either side is built. The question it puts
+first — *if I change this, who finds out, and when?* — is a design question about
+coupling and ownership, and a contract is the rare design artefact a machine can
+disagree with. It spans five kinds of agreement — UX, functional, non-functional,
+API and architecture — of which only the API one has an obvious file format, and
+written first each becomes an executable input: that is what makes
+contract-driven development and testing possible. It is the attitude behind the
+property of the same name two sections above: the property is the claim, this is
+the disposition that produces it, and
+[the practice](/doc/practices/contract-first/) is the ritual that enforces it.
+
+**[API-first](/doc/attitudes/api-first/)** is that attitude at the one boundary
+whose other side is a person: the interface is the product, and the
+implementation behind it is the replaceable part. It is where contract-first
+meets user-first, because an API's user is a developer — and a governed,
+versioned, conformance-tested interface nobody can figure out passes every check
+a pipeline runs while failing the only one its consumer applies.
 
 ## Patterns-oriented design
 
@@ -103,8 +128,8 @@ on — the [MCP](/doc/mcp/) section is exactly that list.
 
 - **[The process](/doc/process/)** — the two questions, and how the artefacts
   connect from inception to delivery on a cluster.
-- **[Attitudes](/doc/attitudes/)** — test-first and user-first, the two
-  dispositions the practices express.
+- **[Attitudes](/doc/attitudes/)** — test-first, user-first, contract-first and
+  API-first, the four dispositions the practices express.
 - **[Practices](/doc/practices/)** — the thirteen rituals that connect specialists.
 - **[Stacks](/doc/stacks/)** — the same practices and patterns expressed on the
   six technology stacks, where the advice has to name a framework.

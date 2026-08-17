@@ -1,0 +1,326 @@
+---
+title: Contract-first
+description: Boundaries treated as the design decision they are — the five kinds of contract (UX, functional, non-functional, API, architecture), why that is a design method rather than a documentation activity, and the contract-driven development and testing it enables.
+---
+
+Contract-first is not about documents. It is a way of **designing a boundary**,
+and the specifications are what it leaves behind.
+
+The concrete form of the claim: **decide what each side of a boundary promises
+before either side is built.** Everything on this page follows from taking that
+literally — including the parts that have no OpenAPI file anywhere near them,
+which turns out to be most of them: a contract is equally the design system, the
+agreed scenarios, the performance budget and the dependency rule.
+
+Written first, the agreement stops being a description and becomes an input —
+which is what makes [contract-driven development and
+testing](#what-it-enables-contract-driven-development-and-testing) possible, and
+is where the attitude actually pays.
+
+## The attitude and the practice
+
+There are two pages under this name and the split is deliberate, because the
+mistake this hub keeps trying to prevent is treating a disposition as a
+deliverable.
+
+| | The attitude *(this page)* | The [practice](/doc/practices/contract-first/) |
+|---|---|---|
+| **Asks** | Where is the boundary, what crosses it, and who breaks if it moves? | Is the agreement written down, agreed and enforced? |
+| **Applies to** | Every seam, including the ones inside one class | The seams worth formalising — APIs, events, schemas |
+| **Produces** | A better boundary | An OpenAPI or AsyncAPI document, and a test that fails |
+| **Owned by** | Whoever is about to write code across a seam | Both sides of the boundary, jointly |
+| **Fails as** | Interfaces shaped like whatever was implemented first | A specification nothing validates |
+
+A team can run the practice perfectly — registry, schemas, conformance tests —
+around boundaries drawn in the wrong places, and get a well-enforced description
+of a bad design. The attitude is what decides where the lines go; the practice is
+what stops them from moving without anyone noticing.
+
+## The question it puts first
+
+Not *"what does this component do?"* but:
+
+> **"If I change this, who finds out, and when?"**
+
+The three answers that matter are *nobody* (it is not a boundary), *the compiler*
+(it is a good one), and *a customer, in production, at 2am* (it is a boundary
+nobody agreed on). Most of the expensive incidents in a distributed system are
+the third answer to a question nobody asked.
+
+## Boundary-thinking as a design input
+
+[Test-first](/doc/attitudes/test-first/) asks the testability question one step
+before the component exists. This is the same move applied one level out: the
+usual question is *"how do I call that service?"*, asked once both sides exist,
+and by then the answer is fixed. Asked earlier it becomes an input rather than a
+verdict.
+
+Before writing anything that talks to anything else, decide:
+
+- **What actually crosses?** Not "what could we return" — what does the caller
+  need to do its job. A field nobody uses is a promise nobody asked for, and it
+  is load-bearing the moment it ships.
+- **Whose language is it in?** A request shaped like the provider's tables is a
+  boundary drawn around an implementation. A request shaped like the consumer's
+  use case is a boundary drawn around a purpose.
+- **What is allowed to change, and how would anyone know?** This is the whole of
+  versioning, decided while it is still free.
+- **What happens when the other side is absent, slow, or wrong?** A contract that
+  describes only the success case has specified the easy half.
+- **Who owns it?** A boundary with two owners has none. A boundary with no named
+  owner will be changed by whoever is in a hurry.
+
+None of those is a documentation question. They are questions about coupling,
+ownership and dependency direction — the same
+[design questions](/doc/code-design/architecture-patterns/) as ever, asked at the
+one moment they are cheap to answer.
+
+## Why it is a design method
+
+Like the other two attitudes, this one is routinely mistaken for a phase owned by
+somebody else — architecture, or an integration team, or whoever maintains the
+wiki. It has the same four properties that make
+[test-thinking](/doc/attitudes/test-first/) a design method rather than an
+opinion:
+
+- **Falsifiable.** A contract is the rare design artefact a machine can disagree
+  with. A diagram of two services cannot tell you the payload is wrong; a schema
+  can, on every build.
+- **Cheap and immediate.** Changing a boundary before either side exists costs a
+  conversation. Changing it afterwards costs a migration, coordinated across
+  teams that had other plans.
+- **Cumulative.** The agreement keeps working. It generates clients, mocks the
+  provider before it exists, and keeps asking the same question of every future
+  change.
+- **Honest about cost.** It makes coupling *visible*. An implicit dependency
+  feels free; the same dependency written down as a contract with a version and
+  an owner shows its actual price, which is the information needed to decide
+  whether to have it at all.
+
+And it forces the conversation that is otherwise deferred until it is expensive:
+the provider has to ask what the consumer needs, and the consumer has to answer
+before there is anything to react to. That conversation is uncomfortable, and it
+is where a request-shaped-like-our-database becomes a
+request-shaped-like-your-use-case.
+
+## What a contract reports about the design
+
+The diagnostic works the way a painful test does — the artefact is telling you
+something about the design, and the temptation is to fix the artefact instead.
+
+| The contract looks like this | The design is telling you |
+|---|---|
+| The payload mirrors the provider's tables | The boundary was drawn around the implementation, not around a purpose |
+| Every field is optional | Nobody agreed what is required; the schema is a union of hopes |
+| Consumers use three of forty fields | The provider is afraid to change things nobody depends on |
+| It was generated from the implementation | It documents accidents as promises, and the accidents are now load-bearing |
+| Two consumers need incompatible shapes | One boundary is doing two jobs, or one consumer is in the wrong context |
+| A breaking change ships and nobody can be told | There is no registry and no owner — the contract exists, the agreement does not |
+| It describes only the success case | The failure modes will be discovered by whoever is on call |
+
+**A contract that is hard to write is almost never a specification problem.** It
+is a boundary in the wrong place, reporting itself through the only mechanism
+that reports boundary problems before deployment.
+
+## The five kinds of contract
+
+The word "contract" pulls people towards HTTP, and that is the narrowest reading
+of it. An API contract is one of five, and it is neither the most expensive to
+get wrong nor the one most often left unwritten.
+
+| Kind | What is agreed | Written as | Enforced by |
+|---|---|---|---|
+| **UX** | How it looks, behaves and responds — components, states, tokens, accessible structure | A design system: Figma tokens, [Storybook](/doc/attitudes/user-first/) stories | Visual and interaction tests, accessibility scans |
+| **Functional** | What the system must do, in the language of the business | [Gherkin scenarios](/doc/practices/digital-artefacts/) from example mapping | [Cucumber](/doc/testing-tools/cucumber/), on every push |
+| **Non-functional** | How fast, how available, how safe — latency and throughput budgets, error budgets, authorisation rules, data classification | Budgets and thresholds in the pipeline; policy as code | Load tests with failing thresholds, security scans, policy checks |
+| **API** | What crosses a network boundary, and in what shape | OpenAPI, AsyncAPI, JSON Schema, Protobuf | [Microcks](/doc/testing-tools/microcks/) conformance, Pact, the [registry](/go/api) |
+| **Architecture** | What may depend on what, and which boundaries exist | Dependency rules, module declarations, the [C4 model](/go/c4) | Fitness functions — ArchUnit, module systems, lint rules |
+
+They share the three properties that make any of them a contract rather than a
+document: **explicit, agreed, enforced** — set out on
+[the practice page](/doc/practices/contract-first/). And they are scale-free in
+the same way: the port a use case
+[declares for its adapters](/doc/code-design/usecase-patterns/) is an
+architecture contract enforced by the compiler, and a
+[published language](/doc/practices/ddd/) between two bounded contexts is an API
+contract whether or not it ever travels over HTTP.
+
+**The API row is the one every organisation formalises, and the least often
+responsible for a disaster.** The other four are where the damage accumulates,
+precisely because they are usually held as opinions:
+
+- A **UX contract** that exists only in someone's head produces a product that is
+  correct and unusable, discovered by a person looking at a screen after it
+  shipped.
+- A **functional contract** left as a photograph of a wall is the knowledge loss
+  that [digital artefacts](/doc/practices/digital-artefacts/) exists to prevent.
+- A **non-functional contract** nobody wrote down means "fast enough" and "secure
+  enough" are settled after release, by an incident, and the number everyone
+  argues about was never agreed in the first place. A performance budget is a
+  contract in the full sense: two parties, an explicit promise, and a build that
+  fails when it is breached.
+- An **architecture contract** that lives in a diagram cannot fail. The
+  [dependency rule](/doc/code-design/architecture-patterns/) is only real when
+  something breaks the build for violating it — which is the difference between
+  having hexagonal architecture and describing it in a wiki.
+
+Naming all five as contracts is not a taxonomy exercise. It is what stops a team
+from applying the discipline to the one boundary that has a standard format, and
+leaving the other four to be discovered.
+
+## What it enables: contract-driven development and testing
+
+An agreement written first is not merely politeness — it is an **executable
+input**. That is where the return on this attitude actually arrives, and it
+arrives in two directions from the same artefact.
+
+**Contract-driven development.** The contract generates and constrains the code,
+so neither side waits for the other:
+
+- Clients, server stubs and types are generated *from* the specification; a
+  hand-edit to generated output is a bug in the spec, not a patch.
+- The provider is **mocked from its own contract** before it exists, so the
+  consumer team starts on day one. This is the single largest practical benefit —
+  two teams working in parallel against one agreement instead of one team
+  blocking on the other.
+- The Gherkin scenario becomes the failing [acceptance test](/doc/practices/atdd/)
+  that drives the implementation inwards.
+- The design system's components are the vocabulary the UI is assembled from,
+  rather than a reference someone consults.
+
+**Contract-driven testing.** The contract is the test oracle, so the tests are
+derived from the agreement instead of invented alongside it:
+
+| Kind | It drives | It verifies |
+|---|---|---|
+| UX | Components built from the design system | Rendering, interaction and accessibility against it |
+| Functional | The failing acceptance test | The behaviour the room agreed to, every push |
+| Non-functional | Budgets set before the work starts | A threshold that fails the build, not a graph someone reads |
+| API | Generated clients and provider stubs | Conformance, and consumer-driven expectations |
+| Architecture | The package and module structure | A fitness function on every build |
+
+The property that makes this more than a naming convention: **the artefact that
+stubs a dependency is the same artefact that verifies the provider.** A
+hand-written stub drifts from the contract and then lies to you in the most
+expensive way available — silently, inside a passing test. One source cannot
+drift from itself.
+
+And a test derived from a contract answers a question a hand-written assertion
+cannot: not "does this still do what it did yesterday?" but *"does this still do
+what we promised?"* Those differ exactly when it matters.
+
+## How the attitudes divide the work
+
+Three of the four sit at different scales, and each answers *"how would we find
+out we were wrong?"* at its own:
+
+| Attitude | Scale | The wrong thing it catches early |
+|---|---|---|
+| [User-first](/doc/attitudes/user-first/) | The product | Building something nobody needed |
+| **Contract-first** | The boundaries between the parts | Parts that were each correct and cannot work together |
+| [Test-first](/doc/attitudes/test-first/) | One component | A component that cannot be changed safely |
+
+They fail in characteristic ways when isolated. User-first alone produces a
+beloved design nobody can integrate. Test-first alone produces immaculate units
+behind interfaces that were never agreed. Contract-first alone produces
+beautifully specified boundaries around a product nobody wanted — which is the
+most expensive of the three, because the specifications make it look finished.
+
+### This one is the hinge
+
+The three are not parallel. The other two attach to this one from opposite
+sides, and seeing that is what stops contract-first from looking like
+bureaucracy:
+
+**[User-first](/doc/attitudes/user-first/) produces contracts.** The journey, the
+component states, the accessible structure, the design tokens — all findings
+about a person, and all advisory until they are written down as the **UX
+contract**. The same direction produces the **functional contract**: the room
+that runs [example mapping](/doc/practices/example-mapping/) is discovering what
+the user needs, and the [Gherkin file](/doc/practices/digital-artefacts/) is that
+finding made enforceable. Two of the five kinds arrive from this side.
+
+**[Test-first](/doc/attitudes/test-first/) consumes them.** A test needs an
+expectation, and there are only two places to get one. Taken from the
+implementation, the test is a change detector that can never report the behaviour
+was wrong, because the behaviour is its definition of right. Taken from a
+contract, it can fail for the reason that matters. **Test-first supplies the
+question — *how would I know this is wrong?* — and contract-first supplies the
+definition of wrong.**
+
+So the sequence reads: a need is discovered, the need becomes a promise, the
+promise becomes a failing build. Remove the middle step and the other two lose
+their connection to each other — the user's need never reaches the suite, and the
+suite is left asserting whatever the code already did.
+
+The fourth attitude, [API-first](/doc/attitudes/api-first/), is not a further
+step in that sequence. It is this attitude and user-first applied *at the same
+time*, to the one boundary whose other side is a person writing code — which is
+why it gets a page rather than a row in the table above.
+
+## The nuance worth stating
+
+Not every seam deserves a document, and pretending otherwise is what makes
+contract-first sound like bureaucracy to people who have shipped software without
+a registry.
+
+Formality should track the **cost of being wrong**, which is roughly the number
+of parties and the difficulty of changing them together:
+
+- **Two teams, or anyone outside the organisation** — a registered, versioned,
+  machine-checked contract. No exceptions; this is where the practice earns its
+  keep.
+- **Two modules owned by one team** — an interface and a test. The compiler is
+  the registry.
+- **Inside one module** — a named type and a conversation. A JSON Schema here is
+  ceremony.
+
+What does not scale down is the *question*. A developer who decides what crosses
+a seam, in whose language, and what may change — before writing either side — has
+worked contract-first, whether or not a document exists. A developer who
+implements first and extracts the interface afterwards has not, however many
+schemas end up in the registry.
+
+The order of typing is a useful discipline for learning the habit. The habit is
+the point.
+
+## Where it connects
+
+- [Contract-first, the practice](/doc/practices/contract-first/) — the three
+  properties, consumer-driven contracts, and versioning without breaking people.
+- [API-first](/doc/attitudes/api-first/) — this attitude specialised to the one
+  boundary whose other side is a person, and the place it meets user-first. Its
+  [ritual](/doc/practices/api-first/) is where it is most enforced.
+- [User-first](/doc/attitudes/user-first/) — where the **UX contract** lives:
+  Figma tokens and Storybook as the point where a design system stops being a
+  folder of pictures.
+- [Digital artefacts](/doc/practices/digital-artefacts/) — the **functional
+  contract** between the business and the delivery team, and the one most often
+  left as a photograph.
+- [Architecture patterns](/doc/code-design/architecture-patterns/) — the
+  dependency rule, and the fitness function that turns it from a convention into
+  an **architecture contract**.
+- [DDD](/doc/practices/ddd/) — context mapping is contract-thinking at the scale
+  of the organisation, and it names the political relationships honestly.
+- [Integration patterns](/doc/code-design/integration-patterns/) — what a
+  contract has to say about failure, which is the half usually missing.
+- [Microcks](/doc/testing-tools/microcks/) — the clearest instance of
+  contract-driven work: one artefact that both stubs the dependency and verifies
+  the provider.
+- [Testing tools](/doc/testing-tools/) — what turns any of it into a build
+  failure rather than an intention.
+
+## Status
+
+The attitude is general; the tooling behind it is uneven, and it is worth knowing
+which is which before promising a team five enforced contracts.
+
+Three of the five have enforcement written up in this hub: **API**
+([Microcks](/doc/testing-tools/microcks/), Pact), **functional**
+([Cucumber](/doc/testing-tools/cucumber/)) and **UX** (Storybook, under
+[user-first](/doc/attitudes/user-first/)). **Architecture** has its mechanism
+shown — an ArchUnit rule on the
+[architecture patterns page](/doc/code-design/architecture-patterns/) — but no
+page of its own. **Non-functional** has neither: performance budgets and security
+policy as pipeline gates are the right shape and there is no page here yet
+describing the tools that enforce them.

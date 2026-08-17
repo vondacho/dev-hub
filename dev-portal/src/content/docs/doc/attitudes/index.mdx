@@ -1,9 +1,9 @@
 ---
 title: Attitudes
-description: The two dispositions the practices express — test-first and user-first — and why each is a design method rather than a phase.
+description: The four dispositions the practices express — test-first, user-first, contract-first and API-first — and why each is a design method rather than a phase.
 ---
 
-Effective software development embodies two attitudes. They are not steps in a
+Effective software development embodies four attitudes. They are not steps in a
 process and they do not appear on a board: they are the dispositions that decide
 *how* every [practice](/doc/practices/) in the next section gets run.
 
@@ -11,6 +11,89 @@ process and they do not appear on a board: they are the dispositions that decide
 |----------|---------------------------|--------------------------------|
 | [Test-first](/doc/attitudes/test-first/) | How would I know this is wrong? | Designing a component, before it exists |
 | [User-first](/doc/attitudes/user-first/) | Who has to live with this, and what does it cost them? | Deciding what is worth building at all |
+| [Contract-first](/doc/attitudes/contract-first/) | If I change this, who finds out, and when? | Deciding where the boundaries go, before anything is built across them |
+| [API-first](/doc/attitudes/api-first/) | Who calls this, and what are they trying to get done? | Designing an interface as the product rather than as a by-product |
+
+Contract-first is the broadest, and the most often read too narrowly. It covers
+five kinds of agreement — **UX, functional, non-functional, API and
+architecture** — and only the fourth has an obvious file format. Written first,
+each becomes an executable input rather than a description, which is what
+[contract-driven development and testing](/doc/attitudes/contract-first/) means.
+
+[API-first](/doc/attitudes/api-first/) is that fourth kind given a page of its
+own, because it is where the discipline of contract-first meets the standard of
+user-first: **the person on the other side of an API is a developer**, and
+developer experience is user experience with a smaller, better-documented user
+base. A governed, versioned, conformance-tested interface that nobody can figure
+out passes contract-first and fails the only test its consumer applies.
+
+## The three scales
+
+The first three are not three opinions about the same thing. Each asks *"how
+would we find out we were wrong?"* at a different scale, and each catches a
+failure the other two are blind to:
+
+| Attitude | Scale | The wrong thing it catches early |
+|----------|-------|----------------------------------|
+| User-first | The product | Building something nobody needed |
+| Contract-first | The boundaries between the parts | Parts that were each correct and cannot work together |
+| Test-first | One component | A component that cannot be changed safely |
+
+Isolated, each fails in a recognisable way. User-first alone produces a beloved
+design nobody can integrate; test-first alone produces immaculate units behind
+interfaces that were never agreed; contract-first alone produces beautifully
+specified boundaries around a product nobody wanted.
+
+API-first is deliberately absent from that table: it is not a fourth scale but a
+**specialisation** occupying the same one as contract-first. It earns separate
+treatment because that boundary is the one whose other side is a person — which
+makes it the only contract that can be technically flawless and practically
+unusable.
+
+## How they interlock
+
+They are not three parallel concerns that happen to be listed together. They form
+a chain, and **contract-first is the hinge**:
+
+```text
+user-first  ──produces──▶  a contract  ──is tested by──▶  test-first
+   ▲                                                          │
+   └──────────────  feedback from running software  ◀──────────┘
+```
+
+**User-first produces contracts.** The journey, the states, the accessible
+structure and the design tokens are findings about a person — and they stay
+advisory, renegotiable by whoever implements them, until they are written down as
+[the UX contract](/doc/attitudes/user-first/) that something can fail on. That is
+one of the five kinds; the [functional contract](/doc/practices/digital-artefacts/)
+from example mapping is another, and it comes from the same direction.
+
+**Test-first consumes them.** A test asserts that something should be true, and
+test-first is disciplined about *when* that assertion is written while saying
+nothing about where the expectation came from. If it came from the
+implementation, the result is a change detector that can never report the
+behaviour was wrong. If it came from an agreement, it can.
+[Test-first supplies the question; contract-first supplies the definition of
+"wrong."](/doc/attitudes/test-first/)
+
+**And the loop closes.** The tests enforce the contracts, the contracts encode
+what the user needed, and running software is what produces the feedback that
+sends the next finding back to the top. Each attitude on its own is a habit; the
+three together are the mechanism by which a user need becomes something a build
+can fail on.
+
+**API-first is where two of them overlap** rather than a further link in the
+chain — it inherits the discipline from one side and the standard from the other:
+
+```text
+        user-first  ──────┐
+                          ├──▶  API-first
+    contract-first  ──────┘
+```
+
+Drop the contract half and you get a pleasant interface nobody can rely on; drop
+the user half and you get a governed one nobody enjoys using. The second is far
+more common, because only the first has a tool that reports it.
 
 ## Why they are separated from the practices
 
@@ -27,9 +110,21 @@ cases; the attitude is what was missing.
 
 ## What they have in common
 
-Both are **design methods disguised as verification activities**, and both are
-routinely mistaken for a phase owned by somebody else — testing for the quality
-department, user experience for the design department.
+All four are **design methods disguised as something else** — test-first as a
+verification activity, user-first as a research activity, contract-first as a
+documentation activity, API-first as a governance activity. And all four are
+routinely mistaken for a phase owned by somebody else: testing for the quality
+department, user experience for the design department, contracts for architecture
+or whoever maintains the wiki, APIs for the platform team.
 
-That mistake is expensive in the same way in both cases: it moves the cheapest
-moment to discover a problem to a point after the decisions have been made.
+That mistake is expensive in the same way in all four cases: it moves the
+cheapest moment to discover a problem to a point after the decisions have been
+made.
+
+There is a second thing they share, and it is the reason they are attitudes
+rather than practices: **each one is free at the moment it applies and expensive
+at every later moment.** Asking who the user is costs a conversation at
+inception and a rewrite after launch. Asking what crosses a boundary costs a
+conversation before either side exists and a coordinated migration afterwards.
+Asking how a component could be shown wrong costs nothing before it is written
+and a redesign once it has callers.

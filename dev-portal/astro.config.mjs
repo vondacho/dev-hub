@@ -61,6 +61,14 @@ export default defineConfig({
             { label: 'Overview', link: '/doc/attitudes/' },
             { label: 'Test-first', link: '/doc/attitudes/test-first/' },
             { label: 'User-first', link: '/doc/attitudes/user-first/' },
+            // The disposition, not the ritual. /doc/practices/contract-first/
+            // is the ritual, and each page points at the other — the split is
+            // the same one that separates this whole section from Practices.
+            { label: 'Contract-first', link: '/doc/attitudes/contract-first/' },
+            // Directly after contract-first: it is that attitude specialised to
+            // the boundary whose consumer is another developer, which is also
+            // where it meets user-first.
+            { label: 'API-first', link: '/doc/attitudes/api-first/' },
           ],
         },
         {

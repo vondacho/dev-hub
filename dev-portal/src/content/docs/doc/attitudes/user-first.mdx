@@ -69,7 +69,15 @@ tools do three things that are squarely development concerns.
 A design system is not a folder of pictures. It is an **agreement between design
 and code about what the interface is made of** — and that makes it the same kind
 of artefact as an OpenAPI document, subject to the same rules from
-[contract-first](/doc/practices/contract-first/).
+[contract-first](/doc/attitudes/contract-first/).
+
+This is the point where the two attitudes meet, and the direction is worth
+naming: **user-first is what produces the UX contract.** The journey, the states,
+the accessible structure and the tokens all start as findings about a person, and
+they stay advisory — renegotiable by whoever implements them, quietly, under
+deadline — until they are written down as something a build can fail on. One of
+the [five kinds of contract](/doc/attitudes/contract-first/) is this one, and it
+is the kind most often left as an opinion.
 
 | Contract property | In an API | In a design system |
 |-------------------|-----------|--------------------|
@@ -138,8 +146,9 @@ breached. If the answer is nothing, you are buying pictures.
 - [Example mapping](/doc/practices/example-mapping/) and
   [three amigos](/doc/practices/three-amigos/) are where user needs become rules
   and examples.
-- [Contract-first](/doc/practices/contract-first/) is the general form of the
-  design-system argument above.
+- [Contract-first](/doc/attitudes/contract-first/) is the general form of the
+  design-system argument above — this attitude produces the UX contract; that one
+  is what makes any contract enforceable.
 - [Playwright](/doc/testing-tools/playwright/) runs the journeys, with the
   accessibility scan in the same pass.
 - The [Angular stack](/doc/stacks/angular/) is where this lands most
