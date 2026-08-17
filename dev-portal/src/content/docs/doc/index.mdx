@@ -79,9 +79,17 @@ Testing is a design method, and an under-evaluated one.
 A pattern is a shared vocabulary for a problem you already have. It is not a
 shelf to shop from, and reaching for one before you have the problem is how
 codebases acquire layers nobody can justify. The [code design](/doc/code-design/)
-section carries the four catalogues — GoF, architecture, integration and use
-case — each with the forces that make it the right answer, and the cost of
-choosing it when it is not.
+section carries the five catalogues — GoF, tactical DDD, architecture,
+integration and use case — each with the forces that make it the right answer,
+and the cost of choosing it when it is not.
+
+One of them reaches further than the rest.
+[Domain-driven design](/doc/practices/ddd/) decides not only how the code is
+arranged but what it is *called*: the class names, the method names and the
+package tree come from the language the business already speaks. That is why it
+appears twice — as a practice, for the boundaries it draws, and as a
+[pattern catalogue](/doc/code-design/tactical-ddd-patterns/), for what a
+developer types because of them.
 
 ## Where AI sits
 
@@ -97,10 +105,10 @@ on — the [MCP](/doc/mcp/) section is exactly that list.
   connect from inception to delivery on a cluster.
 - **[Attitudes](/doc/attitudes/)** — test-first and user-first, the two
   dispositions the practices express.
-- **[Practices](/doc/practices/)** — the eleven rituals that connect specialists.
+- **[Practices](/doc/practices/)** — the twelve rituals that connect specialists.
 - **[Stacks](/doc/stacks/)** — the same practices and patterns expressed on the
   six technology stacks, where the advice has to name a framework.
-- **[Code design](/doc/code-design/)** — the four pattern catalogues.
+- **[Code design](/doc/code-design/)** — the five pattern catalogues.
 - **[Testing tools](/doc/testing-tools/)** — what enforces contract-first,
   API-first and ATDD, rather than merely describing them.
 - **[MCP](/doc/mcp/)** — the five model-driven tools that carry the automated half.

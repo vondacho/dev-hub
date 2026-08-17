@@ -54,6 +54,70 @@ controller, which only knows which URL was hit.
 outcome, not an exceptional condition. Modelling it as a return value keeps it in
 the signature where a caller has to handle it.
 
+## Worked example — the namespace, and the use case
+
+The shape almost every codebase starts with. Six dependencies, four
+responsibilities, and a test for cancellation that has to stub a payment gateway:
+
+```java title="A namespace with a Service suffix"
+@Service
+public class OrderService {
+    private final OrderRepository orders;
+    private final PaymentGateway payments;
+    private final ShipmentClient shipments;
+    private final EmailSender email;
+    private final PricingClient pricing;
+    private final AuditLog audit;
+
+    public OrderDto place(OrderRequest request) { /* ... */ }
+    public void cancel(Long id, String reason) { /* ... */ }
+    public void ship(Long id) { /* ... */ }
+    public List<OrderDto> search(String query, int page) { /* ... */ }
+    // ...seven more
+}
+```
+
+One class per operation, taking only what that operation needs:
+
+```java title="application/CancelOrder.java"
+public class CancelOrder {
+
+    private final Orders orders;                       // the only port it needs
+    private final DomainEventPublisher events;
+
+    public Result<CancelOrderResponse, CancellationRefused> cancel(CancelOrderRequest request) {
+        Order order = orders.withId(request.orderId())
+            .orElseThrow(() -> new OrderNotFoundException(request.orderId()));
+
+        if (!order.isCancellableBy(request.actor()))
+            return Result.failure(CancellationRefused.notPermitted(request.actor()));
+
+        order.cancel(request.reason());                // the decision lives in the domain
+        orders.save(order);                            // one aggregate, one transaction
+        events.publish(order.releaseEvents());
+        return Result.success(CancelOrderResponse.of(order.id(), order.status()));
+    }
+}
+```
+
+Four properties fall out, and only the first was the stated goal:
+
+- **The test stubs one port.** `CancelOrder` cannot be affected by the payment
+  gateway, because it cannot reach it.
+- **The authorisation check is where the intent is known.** `isCancellableBy`
+  runs against the loaded aggregate, not against a URL pattern in a filter.
+- **"Refused" is in the signature.** A caller that ignores
+  `CancellationRefused` does not compile, which is not true of an exception.
+- **`ls application/` is the feature list.** `PlaceOrder`, `CancelOrder`,
+  `ShipOrder`, `RedeemVoucher` — an inventory of what the system does, in the
+  [ubiquitous language](/doc/code-design/tactical-ddd-patterns/), that no
+  controller package has ever provided.
+
+The request and response types are the use case's own. Returning the `Order`
+aggregate directly is the shortcut that ends with an HTTP consumer depending on
+the shape of the domain model, at which point the boundary exists only in the
+package names.
+
 ## Why this shape pays
 
 The acceptance test attaches to the use case port, so it exercises real business
@@ -64,7 +128,7 @@ does, which no controller layer has ever provided.
 
 ## Status
 
-Outline. The worked examples per [stack](/doc/stacks/) are not written yet;
-the [Spring Boot](/doc/stacks/spring-boot/) and
-[Quarkus](/doc/stacks/quarkus/) blueprint repositories already carry this
-shape in code.
+Outline, with the use case shape worked through above. The renderings per
+[stack](/doc/stacks/) are not written yet; the
+[Spring Boot](/doc/stacks/spring-boot/) and [Quarkus](/doc/stacks/quarkus/)
+blueprint repositories already carry this shape in code.

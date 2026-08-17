@@ -56,6 +56,70 @@ That rule is what makes a system testable, and what
 [contract-first](/doc/practices/contract-first/) enforces at the boundaries
 between systems.
 
+## Worked example — the rule, in code
+
+The layered default has the domain call the database, so the arrow points
+outwards and everything inside it needs a database to be tested:
+
+```java title="Dependency pointing outwards — the domain knows about JPA"
+package com.acme.shop.ordering.domain;
+
+import com.acme.shop.infrastructure.jpa.OrderJpaRepository; // outwards
+
+public class OrderPricing {
+    private final OrderJpaRepository repository;            // a framework type
+
+    public Money quote(OrderId id) {
+        OrderEntity entity = repository.findById(id.value()).orElseThrow();
+        return new Money(entity.getTotal(), Currency.getInstance(entity.getCurrency()));
+    }
+}
+```
+
+Inverting it costs one interface, declared by the side that needs it and named in
+the domain's own words:
+
+```java title="ordering/domain/Orders.java — the port, owned by the domain"
+package com.acme.shop.ordering.domain;
+
+public interface Orders {
+    Optional<Order> withId(OrderId id);
+    void save(Order order);
+}
+```
+
+```java title="ordering/infrastructure/JpaOrders.java — the adapter, owned by the outside"
+package com.acme.shop.ordering.infrastructure;
+
+class JpaOrders implements Orders {          // package-private: nothing depends on it
+    private final OrderJpaRepository jpa;
+
+    public Optional<Order> withId(OrderId id) {
+        return jpa.findById(id.value()).map(OrderRecord::toDomain);
+    }
+}
+```
+
+The domain package now imports nothing from `infrastructure`, which is a rule a
+build can fail on:
+
+```java title="An ArchUnit test — the boundary becomes a gate rather than a convention"
+@ArchTest
+static final ArchRule domain_depends_on_nothing_technical =
+    noClasses().that().resideInAPackage("..ordering.domain..")
+        .should().dependOnClassesThat()
+        .resideInAnyPackage("..infrastructure..", "jakarta.persistence..", "org.springframework..");
+```
+
+That test is the difference between having hexagonal architecture and describing
+it in a wiki. Without it the first import under deadline pressure goes unnoticed,
+and after twenty of them the pattern is a directory naming convention.
+
+The names in `Orders` — `withId`, not `findByIdEquals` — come from the
+[tactical DDD](/doc/code-design/tactical-ddd-patterns/) rules, which is where the
+two catalogues meet: this one says which way the arrow points, that one says what
+the thing at each end is called.
+
 ## Choosing one
 
 The choice is driven by what has to change independently, not by what is modern.
@@ -64,5 +128,6 @@ expensive to reverse, and in two years nobody will remember why it was made.
 
 ## Status
 
-Outline. The per-pattern pages, each with a worked example per
+Outline, with the dependency rule worked through because it is the one idea the
+other entries are variations on. The per-pattern pages, each with a rendering per
 [stack](/doc/stacks/), are not written yet.

@@ -37,6 +37,10 @@ export default defineConfig({
       // refuses to enable search when prerendering is off. Only the Starlight
       // routes are affected; everything else stays on-demand.
       prerender: true,
+      // Starlight's own theme plus one file of additions. It is not the portal's
+      // global.css: that one imports Tailwind, whose preflight would reset the
+      // base styles Starlight relies on.
+      customCss: ['./src/styles/docs.css'],
       // Content lives under src/content/docs/doc/, so Starlight owns /doc/*
       // and leaves the site root to the portal's own home page.
       //
@@ -67,6 +71,11 @@ export default defineConfig({
           items: [
             { label: 'Overview', link: '/doc/practices/' },
             { label: 'Event storming', link: '/doc/practices/event-storming/' },
+            // Straight after event storming: that workshop finds the seams,
+            // this is what naming them and keeping the language intact is
+            // called. Its tactical half is a pattern catalogue and lives under
+            // Code design, not here.
+            { label: 'Domain-Driven Design', link: '/doc/practices/ddd/' },
             { label: 'Story mapping', link: '/doc/practices/story-mapping/' },
             { label: 'Three amigos', link: '/doc/practices/three-amigos/' },
             { label: 'Example mapping', link: '/doc/practices/example-mapping/' },
@@ -119,6 +128,10 @@ export default defineConfig({
           items: [
             { label: 'Overview', link: '/doc/code-design/' },
             { label: 'GoF patterns', link: '/doc/code-design/gof-patterns/' },
+            // The tactical half of the DDD practice. It is a pattern catalogue
+            // consumed while the code is written, so it belongs beside the
+            // other four rather than under Practices with its strategic half.
+            { label: 'Tactical DDD patterns', link: '/doc/code-design/tactical-ddd-patterns/' },
             { label: 'Architecture patterns', link: '/doc/code-design/architecture-patterns/' },
             { label: 'Integration patterns', link: '/doc/code-design/integration-patterns/' },
             { label: 'Use case patterns', link: '/doc/code-design/usecase-patterns/' },

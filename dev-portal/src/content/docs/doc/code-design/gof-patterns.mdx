@@ -52,6 +52,74 @@ makes the code untestable in parallel. What people want from it is *one instance
 which is a lifecycle question their dependency injection container already
 answers.
 
+## Worked example — Strategy, and when it is a lambda
+
+The over-application looks like this. Five files, one interface, one factory, and
+a `switch` that has merely moved:
+
+```java title="Strategy as ceremony"
+public interface DiscountStrategy { Money apply(Money total); }
+
+public class NoDiscount implements DiscountStrategy { /* ... */ }
+public class PercentageDiscount implements DiscountStrategy { /* ... */ }
+public class FixedDiscount implements DiscountStrategy { /* ... */ }
+
+public class DiscountStrategyFactory {
+    public DiscountStrategy forCode(String code) {
+        switch (code) {
+            case "NONE": return new NoDiscount();
+            case "PCT":  return new PercentageDiscount();
+            case "FIX":  return new FixedDiscount();
+            default: throw new IllegalArgumentException(code);
+        }
+    }
+}
+```
+
+When the variation is a single expression, it is a function value, and the
+catalogue's own advice — *encapsulate what varies* — is fully satisfied by one
+line:
+
+```java title="Strategy as a function value"
+Function<Money, Money> tenPercentOff = total -> total.minus(total.percentage(10));
+```
+
+And when the variation is *real* — several implementations, each with its own
+state, tested separately, named by the business — the five files were right all
+along. The deciding question is not "is Strategy a good pattern", it is **how
+many implementations will exist, and does each one deserve a name a domain expert
+would recognise**. If it does, you are usually looking at a
+[specification or a policy](/doc/code-design/tactical-ddd-patterns/) rather than
+a `Strategy`, and naming it that way says more.
+
+## Worked example — Builder, for the reason people forget
+
+Builder is normally taught as a cure for long parameter lists. Its real value is
+that it can refuse to build:
+
+```java title="An invalid object becomes unconstructable"
+public final class Shipment {
+    private Shipment(Address destination, Carrier carrier, Instant pickup) { /* ... */ }
+
+    public static Builder to(Address destination) { return new Builder(destination); }
+
+    public static final class Builder {
+        // ... destination captured, carrier and pickup optional-but-paired
+
+        public Shipment build() {
+            if (carrier == null ^ pickup == null)
+                throw new IllegalStateException("a carrier and a pickup time go together");
+            return new Shipment(destination, carrier, pickup);
+        }
+    }
+}
+```
+
+A constructor with seven nullable parameters can express that rule only in a
+comment. This is also the point where a builder and a
+[factory](/doc/code-design/tactical-ddd-patterns/) stop being distinguishable and
+it stops mattering: both exist so that nothing downstream has to check.
+
 ## How to use this catalogue
 
 Read it to **name** what you are looking at, not to decide what to build. The
@@ -60,5 +128,6 @@ stays, and what does the code need to say to the next person who reads it".
 
 ## Status
 
-Outline. The per-pattern pages, each with a worked example per
+Outline, with the two entries above worked through because they are the two most
+often over-applied. The remaining per-pattern pages, each with a rendering per
 [stack](/doc/stacks/), are not written yet.

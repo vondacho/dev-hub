@@ -1,0 +1,363 @@
+---
+title: Tactical DDD patterns
+description: The building blocks a developer actually types — value objects, entities, aggregates, domain events, repositories, domain services — and the naming and package rules that follow from them.
+---
+
+The [strategic half of DDD](/doc/practices/ddd/) decides where the models end.
+This page is the other half: **inside one bounded context, what shape does the
+code take?**
+
+It sits in this section rather than in [practices](/doc/practices/) because it is
+a pattern catalogue, consumed at the same moment as the other four — while the
+code is being written. It differs from them in one respect worth stating up
+front: the others change how code is *structured*, this one changes what the code
+is *called*. That makes it the catalogue with the widest blast radius, since a
+name is read every day and a structure is read at review time.
+
+## The building blocks
+
+| Block | What it is | The rule that makes it work |
+|-------|------------|-----------------------------|
+| **Value object** | A concept defined only by its values | Immutable, equal by value, validated at construction, no identity |
+| **Entity** | A concept with a thread of identity over time | Equal by id, behaviour before accessors |
+| **Aggregate** | A cluster of entities and values with one root and one invariant boundary | Reached only through the root; one aggregate per transaction |
+| **Domain event** | Something that happened in the domain, past tense | Immutable, named in the ubiquitous language, carries what a consumer needs |
+| **Repository** | A collection-like port for one aggregate | One per aggregate root, not per table; expressed in domain terms |
+| **Domain service** | Behaviour that belongs to no single object | Stateless, named as a domain activity, used sparingly |
+| **Factory** | Construction complicated enough to have its own rules | Returns a valid aggregate or fails; never a half-built one |
+| **Specification** | A predicate over the domain, named | Reusable in a check and in a query |
+| **Module** | A package inside the context | Named in the ubiquitous language, not after a layer |
+
+## Value objects — the highest return per line
+
+Most codebases model money as `BigDecimal`, an e-mail as `String` and a
+percentage as `int`. Every one of those is a rule that has nowhere to live, so it
+lives in each caller instead.
+
+```java title="Before — the rule has nowhere to live"
+public class Order {
+    private BigDecimal total;
+    private String currency;
+    private String customerEmail;
+
+    public void applyDiscount(BigDecimal amount) {
+        this.total = this.total.subtract(amount); // may go negative
+    }
+}
+```
+
+```java title="After — the rule has exactly one home"
+public record Money(BigDecimal amount, Currency currency) {
+    public Money {
+        requireNonNull(amount);
+        requireNonNull(currency);
+        if (amount.scale() > currency.getDefaultFractionDigits())
+            throw new IllegalArgumentException("more precision than " + currency);
+    }
+
+    public Money minus(Money other) {
+        requireSameCurrency(other);
+        return new Money(amount.subtract(other.amount), currency);
+    }
+
+    public boolean isGreaterThan(Money other) {
+        requireSameCurrency(other);
+        return amount.compareTo(other.amount) > 0;
+    }
+}
+```
+
+Three things changed, and only the first is obvious. The precision rule is
+enforced once. Adding euros to dollars stopped compiling into a silent wrong
+answer and became a failure at the point of the mistake. And `applyDiscount`
+below can now express its own rule in one readable line instead of three
+defensive ones.
+
+**What it costs.** A type per concept, and a mapping layer at the persistence
+boundary. **When not to.** A value with no rules and no risk of confusion —
+wrapping a `String` that is only ever displayed buys nothing.
+
+## Entities — behaviour before accessors
+
+```java title="Anaemic — a data holder plus a service that knows everything"
+public class Order {
+    private OrderStatus status;
+    public OrderStatus getStatus() { return status; }
+    public void setStatus(OrderStatus status) { this.status = status; }
+}
+
+public class OrderService {
+    public void ship(Order order) {
+        if (order.getStatus() != OrderStatus.PAID)
+            throw new IllegalStateException();
+        order.setStatus(OrderStatus.SHIPPED);
+    }
+}
+```
+
+Nothing stops a second service from calling `setStatus(SHIPPED)` without the
+check, and eventually one does. The invariant is not enforced, it is merely
+observed in one place.
+
+```java title="Rich — the rule cannot be bypassed"
+public class Order {
+    private OrderStatus status;
+
+    public void ship(TrackingNumber tracking) {
+        if (status != OrderStatus.PAID)
+            throw new OrderNotPayableException(id, status);
+        this.status = OrderStatus.SHIPPED;
+        this.tracking = tracking;
+        raise(new OrderShipped(id, tracking, clock.instant()));
+    }
+}
+```
+
+`ship` is a word the domain expert used. `setStatus` is a word the ORM used. That
+substitution is most of what tactical DDD is.
+
+## Aggregates — the consistency boundary
+
+An aggregate is the set of objects that must be consistent **at the same
+instant**. Its root is the only object the outside world holds a reference to.
+
+Four rules, and they are the difference between an aggregate and a large object
+graph that ruins your write throughput:
+
+1. **Protect true invariants only.** A rule that may be satisfied a second later
+   is not an invariant, and pulling it inside the boundary makes the aggregate
+   large for no benefit.
+2. **Design small aggregates.** Prefer the root plus its value objects. Large
+   aggregates lose optimistic-locking contests and load data nobody reads.
+3. **Reference other aggregates by identity.** Hold a `CustomerId`, not a
+   `Customer`. This is the rule that stops the graph from becoming the database.
+4. **Use eventual consistency outside the boundary.** One aggregate per
+   transaction; anything further is a [domain event](#domain-events--the-past-tense-part-of-the-model)
+   and, if it can fail, a [saga](/doc/code-design/integration-patterns/).
+
+```java title="Rule 3 in practice"
+public class Order {                       // aggregate root
+    private final OrderId id;
+    private final CustomerId customer;     // identity, not the Customer object
+    private final List<OrderLine> lines;   // inside the boundary
+    private Money total;
+
+    public void addLine(ProductId product, Quantity quantity, Money unitPrice) {
+        if (status != OrderStatus.DRAFT)
+            throw new OrderNotModifiableException(id, status);
+        lines.add(new OrderLine(product, quantity, unitPrice));
+        total = recomputeTotal();          // the invariant, restored before returning
+    }
+}
+```
+
+Holding a `Customer` instead of a `CustomerId` looks harmless and is the single
+most expensive mistake in this catalogue: it makes two aggregates load together,
+change together, and lock together — which is to say it deletes the boundary
+while leaving the class names in place.
+
+## Domain events — the past-tense part of the model
+
+```java
+public record OrderShipped(
+    OrderId order,
+    TrackingNumber tracking,
+    Instant occurredAt
+) implements DomainEvent {}
+```
+
+Named in the past tense, in the ubiquitous language, and — the part usually
+missed — carrying what a *consumer* needs rather than a copy of the aggregate.
+An event that ships the whole entity has recoupled the two contexts it was
+supposed to separate.
+
+These are the same events that go up on the wall in
+[event storming](/doc/practices/event-storming/) and, once they cross a context
+boundary, get registered in the [event catalogue](/go/events) with a schema. An
+internal domain event and a published integration event are usually not the same
+object: the first is free to change with the model, the second is a
+[contract](/doc/practices/contract-first/).
+
+## Repositories — one per aggregate, in domain words
+
+```java title="Not a repository — a table with a Java accent"
+public interface OrderRepository extends CrudRepository<OrderEntity, Long> {
+    List<OrderEntity> findByStatusAndCreatedAtBefore(int status, Timestamp t);
+}
+```
+
+```java title="A repository — a collection of aggregates"
+public interface Orders {
+    Optional<Order> withId(OrderId id);
+    List<Order> awaitingShipmentSince(Instant cutoff);
+    void save(Order order);
+}
+```
+
+The interface is declared by the domain and implemented by an adapter, which is
+the [dependency rule](/doc/code-design/architecture-patterns/) applied to
+persistence. `awaitingShipmentSince` is a domain question; `findByStatusAndCreatedAtBefore`
+is a `WHERE` clause with the answer already assumed.
+
+**One repository per aggregate root.** A repository for `OrderLine` is a
+declaration that `OrderLine` is not inside the `Order` boundary — usually
+accidental, and it silently disables every invariant `Order` was enforcing.
+
+## Domain services and specifications
+
+A **domain service** is for behaviour that genuinely belongs to no single object —
+a transfer between two accounts, a price calculated from several aggregates. It
+is stateless and named as an activity in the domain:
+`ExchangeRateConversion`, not `CurrencyUtils`. Reach for it *after* trying to
+place the behaviour on an entity or a value object, not before: it is the escape
+hatch that, over-used, reproduces the anaemic model exactly.
+
+A **specification** gives a predicate a name and lets it be used twice:
+
+```java
+public final class EligibleForFreeShipping implements Specification<Order> {
+    private final Money threshold;
+
+    public boolean isSatisfiedBy(Order order) {
+        return order.total().isGreaterThan(threshold)
+            && order.destination().isDomestic();
+    }
+}
+```
+
+The value is that "eligible for free shipping" appears once, is testable on its
+own, and is the phrase the business already uses — instead of the same two
+conditions inlined at four call sites, one of which is subtly different.
+
+## What DDD does to naming
+
+This is the part that changes code you would otherwise have written the same way
+regardless of architecture.
+
+| Instead of | Write | Because |
+|---|---|---|
+| `OrderManager`, `OrderHelper`, `OrderUtils` | `Order`, or a named domain service | `Manager` and `Helper` are what you call a class when you have not decided what it is |
+| `setStatus(2)` | `ship(tracking)`, `cancel(reason)` | The domain has a verb; the setter is the ORM's verb |
+| `OrderData`, `OrderInfo`, `OrderDTO` inside the domain | `Order` | Suffixes that mean "the real thing, but data" mark an anaemic model |
+| `process(order)`, `handle(order)` | `redeem(voucher)`, `reserve(stock)` | `process` is a word chosen to avoid choosing a word |
+| `flag`, `type`, `code` | `PaymentMethod`, `VoucherKind` | An `int` named `type` is a domain concept that was never modelled |
+| `OrderCreatedEventDTOv2` | `OrderPlaced` | Events are named by what happened, not by their transport |
+| `validate(order)` returning `boolean` | `EligibleForFreeShipping.isSatisfiedBy(order)` | Validity is always validity *for something* |
+
+Two rules generate the whole table:
+
+**Every name comes from the ubiquitous language.** If the word is not one a
+domain expert would use, either the domain expert has a better word, or you have
+found a concept nobody has named yet — which is worth ten minutes of their time.
+
+**A name that could apply to any domain is not a name.** `Manager`, `Processor`,
+`Handler`, `Info`, `Data`, `Util` fit every system ever written, which is exactly
+why they say nothing about this one.
+
+## What DDD does to structure
+
+The package tree is a second place the language shows, and the default one is
+organised by technical role:
+
+```text title="By layer — the tree describes the framework"
+com.acme.shop
+├── controller/    OrderController, VoucherController, ShipmentController
+├── service/       OrderService, VoucherService, ShipmentService
+├── repository/    OrderRepository, VoucherRepository, ShipmentRepository
+├── entity/        Order, Voucher, Shipment
+└── dto/           OrderDTO, VoucherDTO, ShipmentDTO
+```
+
+Every business change touches five packages, and no directory tells you what the
+system does. Compare:
+
+```text title="By context, then by role — the tree describes the domain"
+com.acme.shop
+├── ordering/                    ← bounded context
+│   ├── domain/                  Order, OrderLine, OrderId, Money,
+│   │                            OrderPlaced, Orders (the port)
+│   ├── application/             PlaceOrder, CancelOrder (use cases)
+│   └── infrastructure/          JpaOrders, OrderRestAdapter
+├── shipping/
+│   ├── domain/                  Shipment, TrackingNumber, ShipmentDispatched
+│   ├── application/             DispatchShipment
+│   └── infrastructure/          JpaShipments, CarrierClient
+└── pricing/
+    ├── domain/                  Voucher, Discount, EligibleForFreeShipping
+    ├── application/             RedeemVoucher
+    └── infrastructure/          JpaVouchers
+```
+
+Three properties follow from the second tree and none from the first:
+
+- **The top level reads as a domain.** Someone new can name what the system does
+  from `ls` alone.
+- **A business change is local.** Redeeming a voucher touches `pricing/`.
+- **The boundary is enforceable.** `ordering.domain` importing `shipping.domain`
+  is a rule a build can fail on — ArchUnit, Java modules, or the module system of
+  whichever [stack](/doc/stacks/) you are on. Under the first tree there is
+  nothing to enforce, because there is no boundary to state.
+
+Note what `domain/` does *not* contain: no framework annotations, no ORM types,
+no HTTP. That is the [ports and adapters](/doc/code-design/architecture-patterns/)
+rule, and it is what lets the domain's tests run in milliseconds without a
+container — which in turn is what makes
+[all-in-one testing](/doc/practices/all-in-one-testing/) affordable.
+
+## Putting it together
+
+One use case, showing where each block lands:
+
+```java title="application/RedeemVoucher.java"
+public class RedeemVoucher {                     // one use case, one public method
+
+    private final Orders orders;                 // ports, declared by the domain
+    private final Vouchers vouchers;
+    private final DomainEventPublisher events;
+
+    public RedeemVoucherResponse redeem(RedeemVoucherRequest request) {
+        Order order = orders.withId(request.orderId())
+            .orElseThrow(() -> new OrderNotFoundException(request.orderId()));
+        Voucher voucher = vouchers.withCode(request.code())
+            .orElseThrow(() -> new VoucherNotFoundException(request.code()));
+
+        Discount discount = voucher.discountFor(order);   // the domain decides
+        order.applyDiscount(discount);                    // the invariant is its own
+
+        orders.save(order);                               // one aggregate, one transaction
+        events.publish(order.releaseEvents());
+        return RedeemVoucherResponse.of(order.total(), discount);
+    }
+}
+```
+
+The use case orchestrates and does not decide: no `if` expressing a business
+rule, no arithmetic on a total. Every decision is inside `Voucher` or `Order`,
+where it can be tested without any of this. That division is the join between
+this catalogue and [use case patterns](/doc/code-design/usecase-patterns/).
+
+## How it goes wrong
+
+- **The anaemic domain model.** Entities of getters and setters, all behaviour in
+  services. The most common outcome, and it produces a procedural system with
+  object-oriented ceremony — strictly worse than either.
+- **The aggregate that is the whole schema.** Every relation mapped, everything
+  reachable from one root. It loads slowly, locks widely, and has no boundary
+  left to protect.
+- **Repositories per table.** A `CrudRepository` per entity re-exposes every
+  interior object, and the aggregate's rules become optional.
+- **Events used as remote procedure calls.** `SendConfirmationEmailRequested` is
+  a command wearing an event's clothes. The publisher now knows the consumer,
+  which is what publishing was meant to prevent.
+- **The tactical patterns without the language.** Value objects and aggregates
+  named `OrderDataVO` and `OrderAggregateManager`. The structure is right, the
+  code still cannot be read by the person who knows the domain — and the reading
+  was the point.
+
+## Status
+
+Written, with examples in Java because that is where most of the
+[stacks](/doc/stacks/) here land. The Kotlin, Swift and TypeScript renderings
+differ in syntax and not in substance — `data class`, `struct` and a branded type
+each carry a value object — and the per-stack pages are not written yet. The
+strategic half is on the [DDD practice page](/doc/practices/ddd/).

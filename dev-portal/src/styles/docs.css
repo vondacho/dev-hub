@@ -1,0 +1,43 @@
+/*
+ * Documentation theme. Loaded by the Starlight integration only — the portal's
+ * own pages are styled by src/styles/global.css and never see this file.
+ *
+ * It exists for one thing so far: the illustrated practice pages. Starlight has
+ * no opinion on <figure>, so the diagram and the credit under it would otherwise
+ * render as a bare image followed by a stray paragraph.
+ *
+ * The diagrams under /img/practices/ carry their own light background, so they
+ * read the same in both colour schemes. The frame below is what keeps that light
+ * card from looking like a hole punched in the dark theme.
+ */
+
+.sl-markdown-content figure {
+	margin: 1.75rem 0;
+}
+
+.sl-markdown-content figure img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.5rem;
+}
+
+.sl-markdown-content figcaption {
+	margin-top: 0.6rem;
+	font-size: var(--sl-text-sm);
+	line-height: 1.5;
+	color: var(--sl-color-gray-3);
+	text-align: center;
+	text-wrap: balance;
+}
+
+/*
+ * MDX wraps the caption text in a paragraph of its own, and Starlight gives
+ * every paragraph in the content area a top margin — which would push the
+ * credit away from the diagram it belongs to.
+ */
+.sl-markdown-content figcaption > p {
+	margin: 0;
+	font-size: inherit;
+}

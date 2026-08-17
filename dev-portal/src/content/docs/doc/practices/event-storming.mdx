@@ -7,6 +7,20 @@ A workshop where domain experts, developers, architects and the product owner
 build a shared picture of the domain by writing down everything that *happens*,
 in orange, in time order, on a wall long enough to make everyone uncomfortable.
 
+<figure>
+  <img
+    src="/img/practices/event-storming.svg"
+    alt="An event storming wall: orange domain events along a timeline, with blue commands, yellow actors and purple policies around them, a red hotspot marking an unsettled disagreement, and two dashed frames marking candidate bounded contexts."
+    width="820"
+    height="392"
+  />
+  <figcaption>
+    Event storming was created by <strong>Alberto Brandolini</strong>, who
+    described the format in <em>Introducing EventStorming</em>. The official site
+    is <a href="https://www.eventstorming.com/">eventstorming.com</a>.
+  </figcaption>
+</figure>
+
 ## How it runs
 
 1. **Chaotic exploration.** Everyone writes domain events — past tense, business
@@ -43,8 +57,20 @@ the setup cost only pays back at scale.
 ## Where it leads
 
 The seams found here become bounded contexts, and the events on the wall become
-the ones registered in the [event catalogue](/go/events). What the workshop does
-not produce is an order of work: for that, the same room runs
-[story mapping](/doc/practices/story-mapping/), which lays the user's journey out
-and cuts it into releases. The individual stories then go to
+the ones registered in the [event catalogue](/go/events). Naming those seams and
+keeping their language intact all the way into the code is
+[domain-driven design](/doc/practices/ddd/) — this workshop is the room its
+strategic half is usually discovered in.
+
+What the workshop does not produce is an order of work: for that, the same room
+runs [story mapping](/doc/practices/story-mapping/), which lays the user's
+journey out and cuts it into releases. The individual stories then go to
 [three amigos](/doc/practices/three-amigos/) next.
+
+## The official source
+
+[eventstorming.com](https://www.eventstorming.com/) is Alberto Brandolini's own
+site: the format's definition, the note colours, the workshop variants
+(big picture, process modelling, software design) and the book. Read it before
+facilitating one — this page is a summary of why we run it, not a facilitation
+guide.

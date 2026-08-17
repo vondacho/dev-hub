@@ -105,7 +105,7 @@ export const subcatalogs: readonly Subcatalog[] = [
 		title: 'Practices',
 		question: 'Which rituals connect the specialists, and how are they run?',
 		description:
-			'The eleven practices that keep a team connected, in the order a feature passes through them: event storming, story mapping, three amigos, example mapping, ticket emission, grooming, BDD, ATDD, API-first, contract-first and all-in-one testing.',
+			'The twelve practices that keep a team connected, in the order a feature passes through them: event storming, DDD, story mapping, three amigos, example mapping, ticket emission, grooming, BDD, ATDD, API-first, contract-first and all-in-one testing.',
 		icon: 'M8 7.5a3 3 0 1 1 0-.1ZM3 20v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1m3-13.5a3 3 0 1 1 0-.1ZM14 20v-1a4 4 0 0 1 4-4h.5a3 3 0 0 1 3 3v2',
 		href: '/doc/practices/',
 		cta: 'Read the practices',
@@ -116,7 +116,7 @@ export const subcatalogs: readonly Subcatalog[] = [
 		title: 'Code design',
 		question: 'What shape should this code take, and why that one?',
 		description:
-			'The pattern vocabulary a design conversation runs on: GoF, architecture, integration and use case patterns — each with the forces that make it the right answer.',
+			'The pattern vocabulary a design conversation runs on: GoF, tactical DDD, architecture, integration and use case patterns — each with the forces that make it the right answer.',
 		icon: 'M9 5 4 12l5 7m6-14 5 7-5 7M13.5 4 10.5 20',
 		href: '/doc/code-design/',
 		cta: 'Read the patterns',

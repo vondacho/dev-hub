@@ -1,9 +1,9 @@
 ---
 title: Practices
-description: The eleven practices that connect specialists — from event storming and story mapping through example mapping, ticket emission and grooming to BDD, ATDD, API-first, contract-first and all-in-one testing.
+description: The twelve practices that connect specialists — from event storming, DDD and story mapping through example mapping, ticket emission and grooming to BDD, ATDD, API-first, contract-first and all-in-one testing.
 ---
 
-Effective development is connected before it is anything else. These eleven
+Effective development is connected before it is anything else. These twelve
 practices are how that connection is made concrete: each one is a named ritual,
 with named participants, that produces an artefact the next step needs.
 
@@ -15,6 +15,7 @@ from inception to a running cluster.
 | Practice | Who is in the room | What comes out |
 |----------|--------------------|----------------|
 | [Event storming](/doc/practices/event-storming/) | Domain experts, developers, architects, product owner | A shared map of what happens in the domain, and where its seams are |
+| [Domain-Driven Design](/doc/practices/ddd/) | Domain experts, developers, architects — then developers alone | Bounded contexts, one ubiquitous language per context, and the code that speaks it |
 | [Story mapping](/doc/practices/story-mapping/) | Product owner, UX designer, developers, quality engineer, a user | The journey along a backbone, cut into releases that each cross it |
 | [Three amigos](/doc/practices/three-amigos/) | Product owner, developer, quality engineer | A story whose ambiguities have been found before it is estimated |
 | [Example mapping](/doc/practices/example-mapping/) | The three amigos, plus a domain expert when needed | Rules, examples and — the valuable part — open questions |
@@ -25,6 +26,13 @@ from inception to a running cluster.
 | [API-first](/doc/practices/api-first/) | Consumer team, provider team, architect | An interface agreed before it is built |
 | [Contract-first](/doc/practices/contract-first/) | Both sides of any boundary | A machine-checkable agreement, and the tests that enforce it |
 | [All-in-one testing](/doc/practices/all-in-one-testing/) | Developer, quality engineer | One suite covering several levels without duplicating intent |
+
+[Domain-Driven Design](/doc/practices/ddd/) is the odd one in that list: its
+strategic half is a mixed-room activity like the others, but its tactical half is
+a discipline a developer applies alone, every day, in the naming and the
+structure of the code. That half is a pattern catalogue and lives with the
+others, under
+[tactical DDD patterns](/doc/code-design/tactical-ddd-patterns/).
 
 ## What they are run with
 
@@ -61,7 +69,7 @@ something fails when they are breached. That tooling has its own section:
 ## What they are not
 
 They are not a process to adopt wholesale. A team running two of them well is
-better off than a team running eleven of them as ceremony. Start with the one
+better off than a team running twelve of them as ceremony. Start with the one
 that addresses the failure your team actually has — usually
 [example mapping](/doc/practices/example-mapping/), because "we built the wrong
 thing" is the most common and the most expensive.

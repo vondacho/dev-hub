@@ -47,7 +47,14 @@ software is trying to get done. [Story mapping](/doc/practices/story-mapping/)
 lays that journey along a backbone and cuts it into releases, the first of which
 crosses the whole journey.
 
-*Out:* a domain map, bounded-context candidates, a story map with slices.
+The seams the workshop finds get names, and the names get a discipline:
+[domain-driven design](/doc/practices/ddd/) turns the clusters into bounded
+contexts and fixes one ubiquitous language per context. That language is the one
+every later step is conducted in — the cards in example mapping, the
+`Given / When / Then`, the class names in step 6.
+
+*Out:* a domain map, bounded contexts with a glossary each, a story map with
+slices.
 *Serves:* the right thing.
 
 ### 2. Shaping — what one story means
@@ -100,6 +107,11 @@ use case port. Inside that outer loop runs the usual red-green-refactor cycle,
 and the design that emerges is described with the shared vocabulary of the
 [pattern catalogues](/doc/code-design/).
 
+This is where the language from step 1 is spent or wasted. The
+[tactical DDD patterns](/doc/code-design/tactical-ddd-patterns/) are what keep it:
+the words the domain expert used become the class names, the method names and the
+package tree, so the code can be read back to the person who defined the rule.
+
 *Out:* working software, and a suite that says why each part behaves as it does.
 *Serves:* the right thing is what drives it; the thing right is what the refactor
 step buys — and it is the step that gets skipped when the process is under
@@ -136,6 +148,7 @@ starts again one slice further along.
 | Activity | Artefact | Consumed by |
 |----------|----------|-------------|
 | Event storming | Domain map, seams | Architecture, [C4 model](/go/c4), [event catalogue](/go/events) |
+| [DDD](/doc/practices/ddd/) | Bounded contexts, one ubiquitous language each | Every step below — the words on the cards, in the scenarios, and in the code |
 | User journey | The journey, as the first artefact | Story mapping, UI design |
 | Story mapping | Backbone, slices, candidate stories | Grooming, three amigos |
 | Three amigos | A story that is clear, or visibly ambiguous | Example mapping |

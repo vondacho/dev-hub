@@ -97,6 +97,8 @@ export const paths: readonly LearningPath[] = [
 			'The pattern catalogue taught the way it is actually used: as a shared vocabulary for a problem you already have, not a shelf to shop from. Including when not to reach for one.',
 		lessons: [
 			{ title: 'GoF, thirty years on: which ones still earn their keep', video: true },
+			{ title: 'Tactical DDD: value objects, entities and aggregates, and what each one is for' },
+			{ title: 'Strategic DDD: subdomains, bounded contexts and the context map', video: true },
 			{ title: 'Architecture patterns: layers, hexagons, and what the boundary is for' },
 			{ title: 'Integration patterns and the fallacies of distributed computing' },
 			{ title: 'Use case patterns: the shape of an application boundary' },

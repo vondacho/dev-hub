@@ -1,6 +1,6 @@
 ---
 title: Code design
-description: The four pattern catalogues — GoF, architecture, integration and use case — as a shared vocabulary rather than a shelf to shop from.
+description: The five pattern catalogues — GoF, tactical DDD, architecture, integration and use case — as a shared vocabulary rather than a shelf to shop from.
 ---
 
 Patterns-oriented design is one of the three attitudes this hub is built on. This
@@ -11,14 +11,28 @@ that make it the right answer**. The name is doing most of the work: it lets two
 developers discuss a design in five words instead of fifty, and it lets a
 codebase be read by someone who did not write it.
 
-## The four catalogues
+## The five catalogues
 
 | Catalogue | Scale | The question it answers |
 |-----------|-------|-------------------------|
 | [GoF patterns](/doc/code-design/gof-patterns/) | Within a module | How should these classes relate? |
+| [Tactical DDD patterns](/doc/code-design/tactical-ddd-patterns/) | Within a bounded context | What is this concept, and what is it called? |
 | [Architecture patterns](/doc/code-design/architecture-patterns/) | Within a system | Where do the boundaries go, and what may cross them? |
 | [Integration patterns](/doc/code-design/integration-patterns/) | Between systems | How do two things that fail independently talk? |
 | [Use case patterns](/doc/code-design/usecase-patterns/) | At the application boundary | What shape does one unit of business work take? |
+
+## The one that is different
+
+Four of these change how code is *structured*. The
+[tactical DDD](/doc/code-design/tactical-ddd-patterns/) catalogue also changes
+what it is *called* — the class names, the method names and the package tree come
+from the language the business already speaks, rather than from the framework or
+the schema. That gives it the widest blast radius of the five: a structure is
+read at review time, a name is read every day.
+
+It is the developer's half of the [DDD practice](/doc/practices/ddd/), whose
+other half — subdomains, bounded contexts, context maps — is decided in a room
+with domain experts before any of this applies.
 
 ## Vocabulary, not a shopping list
 
@@ -48,6 +62,8 @@ line — and how the answer is communicated to whoever reads the code next.
 
 ## Status
 
-Outline. The four catalogue pages state their scope, their selection principle
-and their main entries; the per-pattern pages with worked examples per
-[stack](/doc/stacks/) are not written yet.
+The [tactical DDD](/doc/code-design/tactical-ddd-patterns/) page is written out
+with examples. The other four state their scope, their selection principle and
+their main entries, each with a worked example of the entry that is most often
+got wrong; the full per-pattern pages, with a rendering per
+[stack](/doc/stacks/), are not written yet.

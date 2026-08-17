@@ -1,0 +1,165 @@
+---
+title: Domain-Driven Design
+description: Putting the business model at the centre and keeping the code's language identical to the business's — with the strategic half deciding boundaries and the tactical half deciding what the developer types.
+---
+
+Domain-Driven Design is the practice of building software whose **primary
+organising principle is the business domain**, not the framework, not the
+database schema, and not the layers a generator produced.
+
+It was named by Eric Evans in *Domain-Driven Design: Tackling Complexity in the
+Heart of Software* (2003), and made concrete for practitioners by Vaughn Vernon's
+*Implementing Domain-Driven Design* (2013). Its claim is narrow and testable: in
+a domain that is genuinely complicated, the cost of change is dominated by
+translation — between what the business says, what the analyst wrote, what the
+model calls it, and what the table column is named. DDD removes the translation
+by refusing to have more than one language.
+
+## The goal
+
+**One model, one language, one boundary at a time.** The words the domain expert
+uses in the room are the words in the class names, the method names, the test
+names and the messages on the wire. When the expert says "a voucher is
+*redeemed*", there is a `redeem` method — not `updateStatus(2)`.
+
+That is the whole idea. Everything below is machinery for keeping it true as the
+system grows.
+
+## What it buys
+
+**Conversations that transfer.** A model expressed in the business's own words
+can be checked by the business. A model expressed in `OrderDataManager` and
+`processFlag` cannot be checked by anyone but its author, which is why it drifts.
+
+**Change localised by meaning.** When the boundaries follow the domain's seams, a
+business change lands in one place. When they follow technical layers, a business
+change lands in all of them — controller, service, DTO, entity, mapper — which is
+the everyday experience most teams mistake for normal.
+
+**Invariants that have an owner.** "An order's total is the sum of its lines" is
+either enforced by one object that cannot be bypassed, or re-implemented in every
+caller until two of them disagree. DDD's tactical patterns exist mostly to give
+each rule exactly one home.
+
+**A vocabulary that survives handover.** The ubiquitous language outlives the
+people, the framework and usually the database. It is the part of the system that
+is actually worth documenting.
+
+## What it costs
+
+It is not free and it is not universal. The modelling conversations are real
+calendar time; the tactical patterns add types and indirection; and a team that
+adopts the vocabulary without the conversations gets the cost with none of the
+benefit — `Aggregate` suffixes over a CRUD application.
+
+The honest rule: **DDD pays where the domain is the hard part.** If the hard part
+is throughput, or the domain is "store this form and show it again later", the
+translation cost DDD removes was never the cost you were paying.
+
+## Strategic and tactical
+
+DDD is two practices that share a name, and confusing them is the most common way
+teams get it wrong — a team doing tactical patterns inside a boundary nobody ever
+drew has bought the syntax of DDD and none of the benefit.
+
+| | Strategic DDD | Tactical DDD |
+|---|---|---|
+| **Question** | What are the models, where do they end, and how do they talk? | Inside one model, what shape does the code take? |
+| **Scale** | The system, and the organisation around it | One bounded context, one package tree |
+| **Decided by** | Architects, domain experts, product — in a room | The developer, while writing the code |
+| **Artefacts** | Subdomains, bounded contexts, a context map, a glossary | Value objects, entities, aggregates, domain events, repositories |
+| **Changed** | Rarely, and expensively | Continuously, at refactor cost |
+| **Fails as** | One enormous model everyone edits and nobody owns | An anaemic model: data classes plus a service that does everything |
+
+Both halves are needed and they fail in opposite directions. Strategic work
+without tactical work produces beautifully bounded contexts full of getters and
+setters. Tactical work without strategic work produces exquisite aggregates
+inside a boundary drawn by a database schema.
+
+## The strategic half, briefly
+
+**Ubiquitous language.** One language per bounded context, used by everyone,
+written down as a glossary that is allowed to change. The same word may mean
+different things in two contexts, and that is a feature — the mistake is forcing
+them into one shared definition.
+
+**Subdomains.** *Core* is what the business competes on; build it, staff it well,
+and this is where DDD earns its cost. *Supporting* is necessary and specific;
+build it plainly. *Generic* is solved (billing, identity, notifications); buy it,
+and do not model it.
+
+**Bounded contexts.** The boundary inside which one model and one language hold.
+This is the unit that becomes a module, a deployable, or a team's ownership — and
+it is exactly what [event storming](/doc/practices/event-storming/) is looking
+for when it hunts for seams.
+
+**Context mapping.** How two contexts relate, named honestly: *partnership*,
+*shared kernel*, *customer / supplier*, *conformist*, *anticorruption layer*,
+*open host service*, *published language*, *separate ways*. The names are
+political as much as technical, which is why writing the map down usually starts
+an overdue conversation.
+
+The seams that come out of this are what the [C4 model](/go/c4) draws and what
+the [event catalogue](/go/events) registers, so the boundary stops being folklore.
+
+## The tactical half — where the developer acts
+
+This is the half that changes what you type every day, and it has its own page in
+the pattern catalogues:
+
+**→ [Tactical DDD patterns](/doc/code-design/tactical-ddd-patterns/)** — value
+objects, entities, aggregates, domain events, repositories, domain services,
+factories and specifications, with the naming and package-structure rules that
+follow from them.
+
+It lives in [code design](/doc/code-design/) rather than here because that is
+what it is: a pattern catalogue, sitting alongside
+[GoF](/doc/code-design/gof-patterns/),
+[architecture](/doc/code-design/architecture-patterns/),
+[integration](/doc/code-design/integration-patterns/) and
+[use case](/doc/code-design/usecase-patterns/) patterns, and consumed at the same
+moment as those — while the code is being written.
+
+## How it connects to the other practices
+
+DDD is not a stage in the chain; it is the language the rest of the chain is
+conducted in.
+
+| Practice | What DDD contributes |
+|---|---|
+| [Event storming](/doc/practices/event-storming/) | The workshop DDD's strategic half is usually discovered in — its clusters are candidate bounded contexts |
+| [Example mapping](/doc/practices/example-mapping/) | Rules are candidate invariants; the words on the cards are the ubiquitous language being drafted |
+| [BDD](/doc/practices/bdd/) | `Given / When / Then` written in the ubiquitous language — the same nouns and verbs as the code |
+| [ATDD](/doc/practices/atdd/) | The acceptance test names the domain behaviour, so it survives every refactor that does not change behaviour |
+| [Contract-first](/doc/practices/contract-first/) | A published language at a context boundary is a contract; an anticorruption layer is what protects you from someone else's |
+| [Code design](/doc/code-design/) | The tactical patterns, and the naming rules that make a package tree readable as a domain |
+
+The test of whether it is working is cheap to apply: **read a class name aloud to
+a domain expert.** If they recognise it, the language is ubiquitous. If you have
+to translate, it is not — and the translation you just performed is the cost DDD
+was supposed to remove.
+
+## Common failure modes
+
+- **Tactical patterns, no boundary.** Aggregates and value objects inside a
+  single model spanning the whole company. The patterns cannot save a model that
+  has no edge.
+- **The anaemic domain model.** Entities with fields and accessors, all behaviour
+  in a `Service`. This is the default outcome of applying the vocabulary without
+  the modelling, and it is described in detail on the
+  [tactical patterns page](/doc/code-design/tactical-ddd-patterns/).
+- **DDD on a generic subdomain.** Modelling an invoicing engine you could have
+  bought. The cost is real and the competitive return is zero.
+- **The glossary as a deliverable.** A language nobody speaks in the standup is
+  not ubiquitous, it is a document. It has to be the words in the code, or it is
+  not doing anything.
+- **One database, many contexts.** Two models sharing tables are one model with
+  two names. The boundary is wherever the schema says it is.
+
+## Status
+
+Written. The strategic half is summarised here on purpose — the decisions it
+produces land in the [C4 model](/go/c4) and the
+[event catalogue](/go/events) rather than in this hub. The tactical half is
+where the developer acts, and it is written out with examples in
+[tactical DDD patterns](/doc/code-design/tactical-ddd-patterns/).

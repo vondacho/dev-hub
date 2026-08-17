@@ -59,6 +59,52 @@ unavoidable — the cost is that every step needs a defined way to be undone.
 retry without a timeout and a backoff is an amplifier for an outage, not a
 mitigation.
 
+## Worked example — the two that are always needed
+
+**Idempotent receiver.** At-least-once delivery is what the broker actually
+gives you, so the consumer decides whether a message has been seen — and it
+decides it in the same transaction as the work, or the decision is a race:
+
+```java title="Seen-once, in one transaction with the effect"
+@Transactional
+public void on(PaymentTaken event) {
+    if (!processedMessages.claim(event.messageId()))   // INSERT ... ON CONFLICT DO NOTHING
+        return;                                        // a duplicate: already handled
+
+    Order order = orders.withId(event.orderId()).orElseThrow();
+    order.markPaid(event.paidAt());
+    orders.save(order);
+}
+```
+
+Checking `processedMessages` first and inserting afterwards is the version
+everyone writes and it is wrong: two deliveries in flight both read "not seen"
+and both charge the customer. The claim has to be the atomic act.
+
+**Transactional outbox.** Writing to the database and publishing a message are
+two systems, so they cannot both succeed:
+
+```java title="One transaction, one durable record of the intent to publish"
+@Transactional
+public void ship(OrderId id, TrackingNumber tracking) {
+    Order order = orders.withId(id).orElseThrow();
+    order.ship(tracking);
+    orders.save(order);
+    outbox.append(order.releaseEvents());   // same transaction, same database
+}
+```
+
+A separate relay reads the outbox and publishes, marking rows as sent. It will
+occasionally publish twice — a crash between publish and mark — which is exactly
+why the receiver above is idempotent. The two patterns are one design: **the
+sender promises at-least-once, the receiver absorbs it.** Systems that implement
+only one of the two fail in the field rather than in the test suite.
+
+Note what the outbox holds: the [domain events](/doc/code-design/tactical-ddd-patterns/)
+the aggregate raised, which is why raising them inside the aggregate rather than
+in the service layer matters — an event emitted next to the save can be emitted
+without the save.
+
 ## Where the contracts live
 
 Every one of these boundaries is a [contract](/doc/practices/contract-first/).
@@ -68,5 +114,6 @@ shape exists only in code is an integration nobody can change safely.
 
 ## Status
 
-Outline. The per-pattern pages, each with a worked example per
-[stack](/doc/stacks/), are not written yet.
+Outline, with the reliability pair worked through because they are the two no
+message-driven system gets to skip. The per-pattern pages, each with a rendering
+per [stack](/doc/stacks/), are not written yet.
