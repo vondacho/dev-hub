@@ -40,7 +40,7 @@ export default defineConfig({
       customCss: ['./src/styles/docs.css'],
       sidebar: [
         { label: 'Overview', link: '/doc/' },
-        { label: 'Process', link: '/doc/process/' },
+        { label: 'The Process', link: '/doc/process/' },
         {
           label: 'Attitudes',
           items: [
@@ -55,15 +55,15 @@ export default defineConfig({
           label: 'Practices',
           items: [
             { label: 'Overview', link: '/doc/practices/' },
-            { label: 'Event storming', link: '/doc/practices/event-storming/' },
             { label: 'DDD', link: '/doc/practices/ddd/' },
+            { label: 'Event storming', link: '/doc/practices/event-storming/' },
             { label: 'Story mapping', link: '/doc/practices/story-mapping/' },
+            { label: 'BDD', link: '/doc/practices/bdd/' },
             { label: 'Three amigos', link: '/doc/practices/three-amigos/' },
             { label: 'Example mapping', link: '/doc/practices/example-mapping/' },
             { label: 'Digital artefacts', link: '/doc/practices/digital-artefacts/' },
             { label: 'Ticketing', link: '/doc/practices/story-tickets/' },
             { label: 'Grooming', link: '/doc/practices/grooming/' },
-            { label: 'BDD', link: '/doc/practices/bdd/' },
             { label: 'ATDD', link: '/doc/practices/atdd/' },
             { label: 'API-first', link: '/doc/practices/api-first/' },
             { label: 'Contract-first', link: '/doc/practices/contract-first/' },
