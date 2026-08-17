@@ -1,0 +1,281 @@
+---
+title: Digital artefacts
+description: Why the wall has to become a file — the story DSL and Gherkin as version-controlled outputs that Cucumber, Playwright and the tracker consume as they stand, with nothing retyped in between.
+---
+
+A workshop that ends in a photograph has produced a souvenir. The output of
+[story mapping](/doc/practices/story-mapping/) and
+[example mapping](/doc/practices/example-mapping/) has to leave the room as a
+**file the tool chain can read without a human in between** — or the agreement
+reached that afternoon starts decaying the moment everyone stands up.
+
+This is the step where *connected* stops being an adjective. Two specialists who
+agree in a room and then write their agreement down twice, in two formats, have
+not been connected — they have been synchronised once, and are now drifting.
+
+<figure>
+  <img
+    src="/img/practices/digital-artefacts.svg"
+    alt="Three columns: the two workshops on the left, the version-controlled story file and Gherkin feature file they emit in the middle, and the tools that read those files on the right — Jira for the ticket, Cucumber for the acceptance test, Playwright for the browser journey."
+    width="820"
+    height="400"
+  />
+  <figcaption>
+    The wall is where the agreement is reached; the file is what the agreement
+    becomes. Every arrow is a copy, a parse or a generation — never a person
+    reading one artefact and typing another.
+  </figcaption>
+</figure>
+
+## The two artefacts
+
+| Workshop | Emits | In | Read by |
+|---|---|---|---|
+| [Story mapping](/doc/practices/story-mapping/) | The backbone, the slices, and one story per cell | A story DSL — `As a … I want … so that …` | The tracker, the team, whoever asks *why* |
+| [Example mapping](/doc/practices/example-mapping/) | Rules, examples, open questions | [Gherkin](/doc/practices/bdd/) — `Feature` / `Rule` / `Example` | [Cucumber](/doc/testing-tools/cucumber/), [Playwright](/doc/testing-tools/playwright/), the tracker |
+
+They are not equally standardised, and pretending otherwise would set a team up
+for disappointment. **Gherkin is a real standard with real parsers**: the file
+you write is the file Cucumber executes, in every language this hub covers. The
+story DSL is a *convention you adopt* — the sentence is universal, the file
+format is yours. That asymmetry decides how much to invest in each, and it is
+the first thing on this page worth remembering.
+
+## What story mapping emits
+
+One file per cell of the map, holding the story in the DSL everybody already
+recognises, plus the coordinates that a flat backlog throws away:
+
+```yaml title="stories/checkout/redeem-a-voucher.yaml"
+id: CHK-014
+activity: Pay                 # position on the backbone
+slice: release-1              # which horizontal cut it belongs to
+
+story:
+  as: a returning customer
+  i_want: to apply a voucher code at checkout
+  so_that: I pay the lower price I was promised
+
+scenarios: features/checkout/redeem-a-voucher.feature
+questions: []                 # red cards; a non-empty list blocks emission
+```
+
+Four things are being kept here that a ticket alone loses:
+
+**The `so_that` clause.** It carries the *why*, it is the first thing dropped
+when a story is retyped, and it is the only part that can answer "should we still
+build this?" six months later. A story whose `so_that` reads "so that the feature
+is complete" has no benefit and is a task with a story's grammar.
+
+**The position on the map.** `activity` and `slice` are what let the map be
+rebuilt from the repository rather than redrawn from memory. A backlog that has
+lost them is the flat list [story mapping](/doc/practices/story-mapping/) existed
+to prevent.
+
+**The link to the scenarios.** One field, and the story stops being a summary of
+its own acceptance criteria and becomes a pointer to the executable ones.
+
+**Readiness, as data.** `questions` is the red cards from
+[example mapping](/doc/practices/example-mapping/). Non-empty means the story is
+not ready, and that is now a condition a script can check rather than a judgement
+someone makes under sprint-planning pressure.
+
+A caution worth stating: `as: a user` for every story is the classic smell. If
+every role is "a user", no role was ever identified, and the sentence has become
+a template being filled in rather than a decision being recorded.
+
+## What example mapping emits
+
+Here the mapping is almost one-to-one, which is the fact that makes this practice
+pay for itself. Gherkin has a keyword for three of the four card colours:
+
+| Card | Gherkin | Note |
+|---|---|---|
+| **Story** (yellow) | `Feature:` | One per file |
+| **Rule** (blue) | `Rule:` | A real keyword since Gherkin 6 — before that teams faked it with comments |
+| **Example** (green) | `Example:` (or `Scenario:`) | Same keyword, same meaning as the card |
+| **Question** (red) | *nothing* | Deliberate. See below |
+
+```gherkin title="features/checkout/redeem-a-voucher.feature"
+Feature: Redeem a voucher
+
+  Rule: A voucher must not be expired
+
+    Example: A voucher that expired yesterday is refused
+      Given a voucher "SPRING20" that expired yesterday
+      When the customer applies it to a basket of 50.00 CHF
+      Then the voucher is refused
+      And the basket total is unchanged
+
+    Example: A voucher that expires tomorrow is accepted
+      Given a voucher "SPRING20" that expires tomorrow
+      When the customer applies it to a basket of 50.00 CHF
+      Then the basket total is 40.00 CHF
+
+  Rule: The discount never exceeds the order total
+
+    Example: A full-value voucher on a smaller basket
+      Given a voucher worth 100.00 CHF
+      When the customer applies it to a basket of 30.00 CHF
+      Then the basket total is 0.00 CHF
+      And no refund is owed
+```
+
+Read that against the [example map](/doc/practices/example-mapping/) and it is
+the same wall, in text. The blue cards became the `Rule` headings, the green
+cards became the examples with their real values intact, and the yellow card
+became the `Feature`. Nobody rephrased anything, which is the entire point:
+**every rephrasing is an opportunity for the meaning to drift, and the drift is
+silent.**
+
+**There is no keyword for a red card, and that is the design.** An open question
+is not a specification, so it cannot be written as one. If a file has to carry
+one for a day, it is a tagged, excluded placeholder that fails the readiness
+check:
+
+```gherkin
+  @question
+  Rule: Vouchers on sale-price items
+    # Do sale items count as eligible? — asked 2026-08-14, waiting on Legal
+```
+
+A `@question` tag that survives to sprint planning is the same failure as a red
+card that became a ticket: the unknown was not resolved, it was scheduled.
+
+## Where the files live
+
+Beside the code they specify, in the same repository, under the same review:
+
+```text
+repo/
+├── stories/
+│   └── checkout/
+│       └── redeem-a-voucher.yaml          ← from story mapping
+├── features/
+│   └── checkout/
+│       ├── redeem-a-voucher.feature       ← from example mapping
+│       └── steps/                          ← step definitions, code
+└── src/
+    └── pricing/                            ← the bounded context it specifies
+```
+
+Not in a wiki, not in an attachment, not in the ticket description. A
+specification that is not versioned alongside the code cannot be reviewed with
+the change that alters it, and will contradict the code within a sprint without
+anyone being notified.
+
+## What consumes them, and how
+
+**[Cucumber](/doc/testing-tools/cucumber/) — literally.** The `.feature` file is
+the input, unmodified. This is the only consumer that executes the artefact as it
+stands, and it is why Gherkin is worth its cost: the agreed specification and the
+regression suite are one file, so they cannot disagree.
+
+**[Playwright](/doc/testing-tools/playwright/) — by name, mostly.** The site's
+position holds: do not drive every scenario through a browser. The handful of
+journeys that genuinely need one carry **the same scenario names**, so a failure
+in the browser report points at a rule someone agreed to rather than at a test
+title someone invented. Tools exist to run Gherkin directly in Playwright
+(`playwright-bdd` among them); they are reasonable for that handful and a trap
+if they tempt the whole suite into the browser.
+
+**Jira — generated, one direction.** The ticket summary comes from the story
+file, and the description is rendered from the `Rule` and `Example` blocks the
+ticket covers. [Ticket emission](/doc/practices/story-tickets/) becomes a script:
+select whole scenarios, render, create. Xray and Zephyr Scale can hold Gherkin in
+test issues if the organisation requires it there — useful, and it does not
+change where the source of truth is.
+
+**The reader.** A `.feature` file is legible to a product owner without a build,
+and greppable by everyone. That is not a side benefit; it is the property that
+makes the artefact worth having when the person who ran the workshop has left.
+
+## One direction only
+
+The repository is the source of truth. The tracker is a **scheduling view over
+it**, and the arrow points one way:
+
+```text
+story map / example map  →  files in the repo  →  tracker
+                                     ↓
+                             Cucumber, Playwright
+```
+
+Two-way synchronisation between a feature file and a tracker sounds like
+thoroughness and produces a system in which neither side can be trusted: an edit
+made in Jira does not run in the pipeline, an edit made in the file does not show
+on the board, and a conflict between them has no defined winner. Pick the side
+that executes.
+
+This is also why the ticket is allowed to close and disappear while the scenario
+keeps running on every commit. The requirement should outlive the tracker entry,
+which is the right way round and the opposite of what most teams have.
+
+## Why this is what "connected" means
+
+The [practices](/doc/practices/) exist to connect specialists. A digital artefact
+is what makes the connection survive the meeting:
+
+**Against knowledge loss.** A wall is gone in a week and a photograph is
+unsearchable, undiffable and unexecutable. A file is none of those things. When
+the person who facilitated the session leaves, the rules they captured are still
+running in the pipeline, and `git log` says who agreed to each one and when.
+
+**Against misunderstanding.** Every human retyping between two formats is a
+translation, and translations lose things quietly. The chain from green card to
+pipeline report is the same string throughout — the scenario name on the wall, in
+the file, in the ticket, in the build output. When those four strings match by
+construction, "is this ticket done?" is answered by a build rather than by a
+meeting.
+
+**Against the specification-code gap.** The specification is executed on every
+push. A specification that has drifted from the code does not sit quietly in a
+wiki being wrong; it goes red.
+
+That is the whole argument for
+[all-in-one testing](/doc/practices/all-in-one-testing/), for
+[contract-first](/doc/practices/contract-first/), and for this page: **an
+agreement nothing enforces is an agreement that has already started to expire.**
+
+## Failure modes
+
+- **The photograph.** The most common outcome by a wide margin. The workshop
+  ran, the wall was good, and the output is a JPEG in a chat thread.
+- **Feature files nobody executes.** Gherkin written and then not wired to
+  anything is documentation with a syntax tax. Either attach it to
+  [Cucumber](/doc/testing-tools/cucumber/) or write the examples as plain
+  [acceptance tests](/doc/practices/atdd/) and keep the conversation.
+- **Written afterwards by one person.** Transcription from a conversation that
+  happened is fine and is the intent here. Composition *instead of* the
+  conversation is the anti-pattern that gives BDD its reputation, and the file
+  looks identical either way — only the room knows which happened.
+- **The specification in the ticket description.** Read once, never versioned,
+  contradicted by the code within a sprint, and gone when the project is
+  archived.
+- **A DSL that grows a committee.** The story file is four fields and a pointer.
+  When it acquires twelve mandatory keys and a schema review, it has become
+  process, and teams route around process.
+- **Steps written for the sentence, not the concept.** The
+  [step-reuse limit](/doc/testing-tools/cucumber/) applies here: reuse a step
+  when the *domain concept* is the same, not when the sentence looks similar.
+
+## Where it fits
+
+Upstream: the two mapping workshops
+([story mapping](/doc/practices/story-mapping/),
+[example mapping](/doc/practices/example-mapping/)) are what produce the content,
+and [DDD](/doc/practices/ddd/) is what decides the words — the nouns and verbs in
+these files should be the ones in the code.
+
+Downstream: [ticket emission](/doc/practices/story-tickets/) reads the files,
+[ATDD](/doc/practices/atdd/) turns the first scenario red, and the
+[testing tools](/doc/testing-tools/) keep it that way.
+
+## Status
+
+Written, and honest about its two halves. The Gherkin side is standard,
+supported everywhere, and directly executable. The story-file side is a
+convention proposed here rather than an industry format — the sentence is
+universal, the YAML shape above is a starting point to adapt, and the emission
+script that renders tickets from these files is not written in this repository
+yet.

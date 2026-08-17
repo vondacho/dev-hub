@@ -65,8 +65,15 @@ story into rules, examples and open questions in twenty-five minutes. The
 examples become [BDD](/doc/practices/bdd/) scenarios in the language of the
 business.
 
-*Out:* rules, scenarios, and the open questions that stop the story from being
-estimated.
+Neither workshop ends with a photograph. Both leave the room as
+[digital artefacts](/doc/practices/digital-artefacts/) — a story file in the
+`As a … I want … so that …` DSL, and a Gherkin `.feature` file whose `Rule` and
+`Example` blocks are the blue and green cards unaltered. That is the step where
+the chain becomes machine-readable, and everything downstream reads those files
+rather than re-reading the wall.
+
+*Out:* rules, scenarios in a versioned `.feature` file, and the open questions
+that stop the story from being estimated.
 *Serves:* the right thing — completeness in particular, since the red cards are
 the cases that would otherwise be settled by an assumption.
 
@@ -153,6 +160,7 @@ starts again one slice further along.
 | Story mapping | Backbone, slices, candidate stories | Grooming, three amigos |
 | Three amigos | A story that is clear, or visibly ambiguous | Example mapping |
 | Example mapping | Rules, examples, open questions | BDD scenarios |
+| [Digital artefacts](/doc/practices/digital-artefacts/) | A story `.yaml` and a Gherkin `.feature`, versioned | Cucumber, Playwright, the tracker — as they stand |
 | BDD | `Given / When / Then` in business language | Tickets, acceptance tests |
 | Ticket emission | Story tickets carrying whole scenarios | Grooming, the sprint |
 | Grooming | Ready, sized, ordered backlog | Planning, forecasting |

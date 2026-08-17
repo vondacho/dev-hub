@@ -79,6 +79,10 @@ export default defineConfig({
             { label: 'Story mapping', link: '/doc/practices/story-mapping/' },
             { label: 'Three amigos', link: '/doc/practices/three-amigos/' },
             { label: 'Example mapping', link: '/doc/practices/example-mapping/' },
+            // Between the two mapping workshops and ticket emission on purpose:
+            // the file exists before a ticket is generated from it, and both
+            // workshops feed it.
+            { label: 'Digital artefacts', link: '/doc/practices/digital-artefacts/' },
             { label: 'From examples to tickets', link: '/doc/practices/story-tickets/' },
             { label: 'Grooming and estimation', link: '/doc/practices/grooming/' },
             { label: 'BDD', link: '/doc/practices/bdd/' },

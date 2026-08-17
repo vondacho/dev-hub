@@ -62,6 +62,36 @@ examples written on the wall are the ones that become `Given / When / Then`, and
 the ones that decide how the story is cut into
 [tickets](/doc/practices/story-tickets/).
 
+### The digital artefact
+
+The map leaves the room as a Gherkin feature file, and the translation is almost
+mechanical — three of the four card colours have a keyword of their own:
+
+| Card | Gherkin | Note |
+|---|---|---|
+| **Story** (yellow) | `Feature:` | One per file |
+| **Rule** (blue) | `Rule:` | A real keyword since Gherkin 6 |
+| **Example** (green) | `Example:` (or `Scenario:`) | Same word, same meaning as the card |
+| **Question** (red) | *nothing* | An open question is not a specification, so it cannot be written as one |
+
+```gherkin title="features/checkout/redeem-a-voucher.feature"
+Feature: Redeem a voucher
+
+  Rule: A voucher must not be expired
+
+    Example: A voucher that expired yesterday is refused
+      Given a voucher "SPRING20" that expired yesterday
+      When the customer applies it to a basket of 50.00 CHF
+      Then the voucher is refused
+      And the basket total is unchanged
+```
+
+That file is executed by [Cucumber](/doc/testing-tools/cucumber/) exactly as it
+stands, and it is what a [Story ticket](/doc/practices/story-tickets/) description
+is generated from. The wall and the regression suite become the same artefact —
+which is the argument set out in full under
+[digital artefacts](/doc/practices/digital-artefacts/).
+
 ## Not story mapping
 
 Different axis, different session.

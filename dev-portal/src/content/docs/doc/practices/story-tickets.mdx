@@ -26,6 +26,7 @@ the way, because every rephrasing is an opportunity for the meaning to drift.
 | Rule | [Example mapping](/doc/practices/example-mapping/) | A blue card |
 | Example | Example mapping | A green card, with real values |
 | Scenario | [BDD](/doc/practices/bdd/) | `Given / When / Then` |
+| File | [Digital artefacts](/doc/practices/digital-artefacts/) | A `.feature` and a story `.yaml`, under version control |
 | **Ticket** | This step | A subset of scenarios, deliverable whole |
 | Acceptance test | [ATDD](/doc/practices/atdd/) | The same scenario, executable |
 
@@ -41,6 +42,13 @@ green — not a judgement anyone has to make in a review meeting.
 | **Rule** (blue) | A heading in the description, grouping the scenarios it governs |
 | **Example** (green) | One `Given / When / Then` scenario in the description, and one acceptance test |
 | **Question** (red) | Not a ticket. A blocker on the story until it is answered |
+
+None of that is typed twice. The cards already left the workshop as
+[files](/doc/practices/digital-artefacts/) — a story `.yaml` and a Gherkin
+`.feature` — so emission is a **generation step**: select the whole scenarios
+this ticket covers, render the description from their `Rule` and `Example`
+blocks, create the issue. A person choosing the split is the decision; a person
+retyping the specification is the defect.
 
 A red card that becomes a ticket has been converted from "we do not know" into
 "someone will decide later, alone, under time pressure". That is the exact
@@ -96,8 +104,9 @@ the tracker entry, which is the right way round.
 
 The tracker stops being where requirements are written and becomes where they are
 *scheduled*. The requirement was written on a wall by three people and lives in a
-feature file under version control; the ticket is a scheduling artefact that
-points at it.
+[feature file under version control](/doc/practices/digital-artefacts/); the
+ticket is a scheduling artefact that points at it. The arrow runs one way —
+repository to tracker — because only one of the two executes.
 
 Teams that get this backwards write the specification into the ticket
 description, where it is read once, never versioned, and contradicted by the code

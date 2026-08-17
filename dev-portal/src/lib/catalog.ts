@@ -105,7 +105,7 @@ export const subcatalogs: readonly Subcatalog[] = [
 		title: 'Practices',
 		question: 'Which rituals connect the specialists, and how are they run?',
 		description:
-			'The twelve practices that keep a team connected, in the order a feature passes through them: event storming, DDD, story mapping, three amigos, example mapping, ticket emission, grooming, BDD, ATDD, API-first, contract-first and all-in-one testing.',
+			'The thirteen practices that keep a team connected, in the order a feature passes through them: event storming, DDD, story mapping, three amigos, example mapping, digital artefacts, ticket emission, grooming, BDD, ATDD, API-first, contract-first and all-in-one testing.',
 		icon: 'M8 7.5a3 3 0 1 1 0-.1ZM3 20v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1m3-13.5a3 3 0 1 1 0-.1ZM14 20v-1a4 4 0 0 1 4-4h.5a3 3 0 0 1 3 3v2',
 		href: '/doc/practices/',
 		cta: 'Read the practices',

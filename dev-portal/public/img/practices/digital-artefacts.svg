@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 400" width="820" height="400" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif">
+  <title>From the wall to the tool chain</title>
+  <desc>Two workshops on the left, the two version-controlled files they emit in the middle, and the tools that consume those files on the right — a story file feeding the tracker, and a Gherkin feature file feeding the tracker, Cucumber and Playwright.</desc>
+
+  <rect x="0" y="0" width="820" height="400" rx="10" fill="#f4f6f9"/>
+
+  <!-- column headers -->
+  <g font-size="12.5" fill="#3d4551" text-anchor="middle" font-weight="600">
+    <text x="140" y="30">The workshop</text>
+    <text x="410" y="30">The repository</text>
+    <text x="680" y="30">The tool chain</text>
+  </g>
+  <g font-size="11" fill="#5b6472" text-anchor="middle" font-style="italic">
+    <text x="140" y="46">a wall, for an afternoon</text>
+    <text x="410" y="46">versioned, reviewed, diffed</text>
+    <text x="680" y="46">reads it as it stands</text>
+  </g>
+
+  <!-- ============ column A — the workshops ============ -->
+  <g fill="none" stroke="#b9c2cd" stroke-width="1.2">
+    <rect x="30" y="60" width="220" height="106" rx="8"/>
+    <rect x="30" y="206" width="220" height="140" rx="8"/>
+  </g>
+  <g font-size="11.5" fill="#3d4551" font-weight="600">
+    <text x="44" y="80">Story mapping</text>
+    <text x="44" y="226">Example mapping</text>
+  </g>
+
+  <!-- story map miniature -->
+  <g fill="#7ab8f5" stroke="#4a95dd">
+    <rect x="44" y="90" width="40" height="15" rx="2"/>
+    <rect x="92" y="90" width="40" height="15" rx="2"/>
+    <rect x="140" y="90" width="40" height="15" rx="2"/>
+    <rect x="188" y="90" width="40" height="15" rx="2"/>
+  </g>
+  <g fill="#ffffff" stroke="#9aa5b4">
+    <rect x="44" y="112" width="40" height="15" rx="2"/>
+    <rect x="92" y="112" width="40" height="15" rx="2"/>
+    <rect x="140" y="112" width="40" height="15" rx="2"/>
+    <rect x="188" y="112" width="40" height="15" rx="2"/>
+    <rect x="44" y="140" width="40" height="15" rx="2"/>
+    <rect x="92" y="140" width="40" height="15" rx="2"/>
+  </g>
+  <path d="M38 134 H242" stroke="#5b6472" stroke-width="1.1" stroke-dasharray="5 4" fill="none"/>
+
+  <!-- example map miniature -->
+  <rect x="105" y="234" width="70" height="18" rx="2" fill="#f7e463" stroke="#d5c134"/>
+  <g fill="#7ab8f5" stroke="#4a95dd">
+    <rect x="44" y="262" width="60" height="18" rx="2"/>
+    <rect x="110" y="262" width="60" height="18" rx="2"/>
+    <rect x="176" y="262" width="60" height="18" rx="2"/>
+  </g>
+  <g fill="#a5d977" stroke="#7fbc50">
+    <rect x="44" y="290" width="60" height="18" rx="2"/>
+    <rect x="110" y="290" width="60" height="18" rx="2"/>
+    <rect x="44" y="316" width="60" height="18" rx="2"/>
+  </g>
+  <rect x="176" y="290" width="60" height="18" rx="2" fill="#ef8ba0" stroke="#cf3d59"/>
+
+  <!-- ============ column B — the files ============ -->
+  <g fill="#ffffff" stroke="#7a8494" stroke-width="1.3">
+    <rect x="300" y="66" width="220" height="94" rx="6"/>
+    <rect x="300" y="212" width="220" height="128" rx="6"/>
+  </g>
+
+  <text x="312" y="86" font-size="10.5" fill="#10233a" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="600">redeem-a-voucher.yaml</text>
+  <g font-size="10" fill="#3d4551" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+    <text x="312" y="108">as: a returning customer</text>
+    <text x="312" y="126">i_want: to apply a voucher</text>
+    <text x="312" y="144">so_that: I pay the lower price</text>
+  </g>
+
+  <text x="312" y="232" font-size="10.5" fill="#10233a" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="600">redeem-a-voucher.feature</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#3d4551">
+    <rect x="312" y="248" width="9" height="9" rx="1.5" fill="#f7e463" stroke="#d5c134"/>
+    <text x="328" y="256">Feature: Redeem a voucher</text>
+    <rect x="324" y="274" width="9" height="9" rx="1.5" fill="#7ab8f5" stroke="#4a95dd"/>
+    <text x="340" y="282">Rule: Not expired</text>
+    <rect x="336" y="300" width="9" height="9" rx="1.5" fill="#a5d977" stroke="#7fbc50"/>
+    <text x="352" y="308">Example: Expired yesterday</text>
+    <text x="352" y="326">  Given / When / Then</text>
+  </g>
+
+  <!-- ============ column C — the tool chain ============ -->
+  <g fill="#ffffff" stroke="#7a8494" stroke-width="1.3">
+    <rect x="570" y="90" width="220" height="60" rx="6"/>
+    <rect x="570" y="180" width="220" height="60" rx="6"/>
+    <rect x="570" y="270" width="220" height="60" rx="6"/>
+  </g>
+  <g font-size="12" fill="#10233a" font-weight="600">
+    <text x="586" y="115">Jira — Story ticket</text>
+    <text x="586" y="205">Cucumber — acceptance test</text>
+    <text x="586" y="295">Playwright — journey</text>
+  </g>
+  <g font-size="10.5" fill="#5b6472">
+    <text x="586" y="133">description generated, not retyped</text>
+    <text x="586" y="223">executed on every push</text>
+    <text x="586" y="313">the same names in the report</text>
+  </g>
+
+  <!-- ============ arrows ============ -->
+  <g stroke="#5b6472" stroke-width="1.4" fill="none">
+    <!-- workshop -> file -->
+    <path d="M250 113 H292"/>
+    <path d="M284 108 l9 5 -9 5"/>
+    <path d="M250 276 H292"/>
+    <path d="M284 271 l9 5 -9 5"/>
+    <!-- story file -> tracker -->
+    <path d="M520 113 H562"/>
+    <path d="M554 108 l9 5 -9 5"/>
+    <!-- feature file -> tracker, cucumber, playwright -->
+    <path d="M520 240 H556 V120 H562"/>
+    <path d="M554 115 l9 5 -9 5"/>
+    <path d="M520 262 H546 V210 H562"/>
+    <path d="M554 205 l9 5 -9 5"/>
+    <path d="M520 290 H536 V300 H562"/>
+    <path d="M554 295 l9 5 -9 5"/>
+  </g>
+
+  <text x="410" y="378" font-size="12" fill="#5b6472" text-anchor="middle">Nothing is retyped between the wall and the pipeline — every arrow above is a copy, a parse or a generation.</text>
+</svg>

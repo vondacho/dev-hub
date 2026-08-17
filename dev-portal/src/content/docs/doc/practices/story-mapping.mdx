@@ -100,6 +100,35 @@ through [example mapping](/doc/practices/example-mapping/), and only the
 scenarios that come out of that become
 [tickets](/doc/practices/story-tickets/).
 
+### The digital artefact
+
+The photograph is not the output. Each cell leaves the room as a file, written in
+the DSL everyone already recognises and carrying the two coordinates a flat
+backlog destroys:
+
+```yaml title="stories/checkout/redeem-a-voucher.yaml"
+id: CHK-014
+activity: Pay                 # position on the backbone
+slice: release-1              # which horizontal cut it belongs to
+
+story:
+  as: a returning customer
+  i_want: to apply a voucher code at checkout
+  so_that: I pay the lower price I was promised
+
+scenarios: features/checkout/redeem-a-voucher.feature
+questions: []                 # red cards; a non-empty list blocks emission
+```
+
+`activity` and `slice` are what let the map be **rebuilt from the repository**
+rather than redrawn from memory, and `so_that` is the clause that can still
+answer "should we build this?" six months later — it is also the first thing lost
+when a story is retyped into a tracker.
+
+The file is what the tracker, and eventually the pipeline, reads. See
+[digital artefacts](/doc/practices/digital-artefacts/) for the whole chain and
+for the direction rule that keeps it trustworthy.
+
 ## Common failure modes
 
 - **A backbone of features rather than activities.** `Search`, `Filters`,
