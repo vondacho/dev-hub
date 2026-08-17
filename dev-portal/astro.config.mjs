@@ -37,62 +37,32 @@ export default defineConfig({
       // refuses to enable search when prerendering is off. Only the Starlight
       // routes are affected; everything else stays on-demand.
       prerender: true,
-      // Starlight's own theme plus one file of additions. It is not the portal's
-      // global.css: that one imports Tailwind, whose preflight would reset the
-      // base styles Starlight relies on.
       customCss: ['./src/styles/docs.css'],
-      // Content lives under src/content/docs/doc/, so Starlight owns /doc/*
-      // and leaves the site root to the portal's own home page.
-      //
-      // Three sections, and each one is the target of a panel elsewhere in the
-      // portal: Practices is where the Catalog's Practices panel lands, MCP is
-      // where the home page's MCP panel lands, and Code design is where the
-      // Catalog's Code design panel lands. Renaming a section here means
-      // changing the href in src/lib/catalog.ts or src/pages/index.astro too.
       sidebar: [
         { label: 'Overview', link: '/doc/' },
-        // The synthesis page: it introduces the two questions every activity
-        // answers and connects the artefacts from inception to the cluster, so
-        // it sits directly under the Overview rather than inside a section.
-        { label: 'The process', link: '/doc/process/' },
+        { label: 'Process', link: '/doc/process/' },
         {
           label: 'Attitudes',
           items: [
             { label: 'Overview', link: '/doc/attitudes/' },
             { label: 'Test-first', link: '/doc/attitudes/test-first/' },
             { label: 'User-first', link: '/doc/attitudes/user-first/' },
-            // The disposition, not the ritual. /doc/practices/contract-first/
-            // is the ritual, and each page points at the other — the split is
-            // the same one that separates this whole section from Practices.
             { label: 'Contract-first', link: '/doc/attitudes/contract-first/' },
-            // Directly after contract-first: it is that attitude specialised to
-            // the boundary whose consumer is another developer, which is also
-            // where it meets user-first.
             { label: 'API-first', link: '/doc/attitudes/api-first/' },
           ],
         },
         {
-          // Ordered as a feature passes through them, matching the table on
-          // /doc/practices/ — the two orders used to disagree, and three new
-          // pages had nowhere coherent to be inserted.
           label: 'Practices',
           items: [
             { label: 'Overview', link: '/doc/practices/' },
             { label: 'Event storming', link: '/doc/practices/event-storming/' },
-            // Straight after event storming: that workshop finds the seams,
-            // this is what naming them and keeping the language intact is
-            // called. Its tactical half is a pattern catalogue and lives under
-            // Code design, not here.
-            { label: 'Domain-Driven Design', link: '/doc/practices/ddd/' },
+            { label: 'DDD', link: '/doc/practices/ddd/' },
             { label: 'Story mapping', link: '/doc/practices/story-mapping/' },
             { label: 'Three amigos', link: '/doc/practices/three-amigos/' },
             { label: 'Example mapping', link: '/doc/practices/example-mapping/' },
-            // Between the two mapping workshops and ticket emission on purpose:
-            // the file exists before a ticket is generated from it, and both
-            // workshops feed it.
             { label: 'Digital artefacts', link: '/doc/practices/digital-artefacts/' },
-            { label: 'From examples to tickets', link: '/doc/practices/story-tickets/' },
-            { label: 'Grooming and estimation', link: '/doc/practices/grooming/' },
+            { label: 'Ticketing', link: '/doc/practices/story-tickets/' },
+            { label: 'Grooming', link: '/doc/practices/grooming/' },
             { label: 'BDD', link: '/doc/practices/bdd/' },
             { label: 'ATDD', link: '/doc/practices/atdd/' },
             { label: 'API-first', link: '/doc/practices/api-first/' },
@@ -101,8 +71,6 @@ export default defineConfig({
           ],
         },
         {
-          // Where the general advice has to name a framework. Migrated from
-          // /catalog/stacks; the old routes redirect here.
           label: 'Stacks',
           items: [
             { label: 'Overview', link: '/doc/stacks/' },
@@ -121,7 +89,7 @@ export default defineConfig({
             { label: 'Microcks', link: '/doc/testing-tools/microcks/' },
             { label: 'Cucumber', link: '/doc/testing-tools/cucumber/' },
             { label: 'Playwright', link: '/doc/testing-tools/playwright/' },
-            { label: 'Mobile testing tools', link: '/doc/testing-tools/mobile/' },
+            { label: 'Mobile', link: '/doc/testing-tools/mobile/' },
           ],
         },
         {
@@ -140,13 +108,10 @@ export default defineConfig({
           items: [
             { label: 'Overview', link: '/doc/code-design/' },
             { label: 'GoF patterns', link: '/doc/code-design/gof-patterns/' },
-            // The tactical half of the DDD practice. It is a pattern catalogue
-            // consumed while the code is written, so it belongs beside the
-            // other four rather than under Practices with its strategic half.
-            { label: 'Tactical DDD patterns', link: '/doc/code-design/tactical-ddd-patterns/' },
             { label: 'Architecture patterns', link: '/doc/code-design/architecture-patterns/' },
-            { label: 'Integration patterns', link: '/doc/code-design/integration-patterns/' },
+            { label: 'Tactical DDD patterns', link: '/doc/code-design/tactical-ddd-patterns/' },
             { label: 'Use case patterns', link: '/doc/code-design/usecase-patterns/' },
+            { label: 'Integration patterns', link: '/doc/code-design/integration-patterns/' },
           ],
         },
       ],
