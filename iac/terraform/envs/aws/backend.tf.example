@@ -1,0 +1,19 @@
+# Copy to backend.tf and fill in, then `terraform init -migrate-state`.
+#
+# Local state is fine for the first apply from one laptop and wrong from the
+# second: a cluster whose state file exists in one place only is a cluster that
+# can be adopted by nobody and destroyed by anybody.
+#
+# The bucket must already exist and should have versioning on — S3 native
+# locking (use_lockfile) replaces the DynamoDB table older guides ask for.
+
+terraform {
+  backend "s3" {
+    bucket = "CHANGE-ME-terraform-state"
+    key    = "dev-hub/aws/terraform.tfstate"
+    region = "eu-central-1"
+
+    encrypt      = true
+    use_lockfile = true
+  }
+}

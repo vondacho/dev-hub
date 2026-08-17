@@ -1,0 +1,21 @@
+---
+# docker, nerdctl or podman.
+container_engine: docker
+
+# Target architecture. linux/amd64 explicitly, because a build on an Apple
+# Silicon laptop otherwise produces an arm64 image that lands on an amd64 node
+# and dies with "exec format error" — a failure that looks nothing like its
+# cause. Set linux/arm64 for Graviton nodes, or both for a multi-arch push.
+image_platform: "linux/amd64"
+
+# Run before pushing when the registry needs it. ECR tokens last 12 hours, so
+# this is not a one-off. Empty skips the step.
+registry_login_command: ""
+
+# buildx builds and pushes in one step and is the only way to cross-build for
+# another architecture. Turned off for an engine that has no buildx, which
+# falls back to a plain build followed by a push — and then image_platform is
+# only honoured if the engine happens to support it.
+use_buildx: true
+
+only: []

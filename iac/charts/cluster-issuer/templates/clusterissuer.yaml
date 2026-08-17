@@ -1,0 +1,26 @@
+{{- if not .Values.email }}
+{{- fail "email is required: Let's Encrypt refuses ACME registration without a contact address" }}
+{{- end }}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/part-of: dev-hub
+spec:
+  acme:
+    email: {{ .Values.email | quote }}
+    server: {{ if .Values.staging }}https://acme-staging-v02.api.letsencrypt.org/directory{{ else }}https://acme-v02.api.letsencrypt.org/directory{{ end }}
+    # The ACME account key. Cluster-scoped issuer, so it lives in the namespace
+    # cert-manager runs in — losing it costs a re-registration, nothing more.
+    privateKeySecretRef:
+      name: {{ .Values.name }}-account-key
+    solvers:
+      # HTTP-01 rather than DNS-01: it needs no cloud credential and no zone
+      # delegation, only that the hostname already resolves to this cluster's
+      # ingress. Swap to DNS-01 when issuing for a name that does not yet, or
+      # for a wildcard.
+      - http01:
+          ingress:
+            ingressClassName: {{ .Values.ingressClassName }}

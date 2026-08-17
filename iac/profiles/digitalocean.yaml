@@ -1,0 +1,38 @@
+# DigitalOcean (DOKS) profile.
+#
+# Layered over iac/profiles/common.yaml. The DigitalOcean load balancer is
+# configured on the ingress-nginx *Service*, not here — see the
+# service_annotations input of the platform module.
+
+ingress:
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+# DOCR needs a pull secret, unlike ECR. With `registry_integration` enabled on
+# the cluster (the cluster module's default) DigitalOcean maintains a secret
+# named after the registry in every namespace and patches the *default*
+# ServiceAccount — but the chart runs under its own ServiceAccount, so the
+# secret has to be named explicitly. The name is the registry name, which is
+# environment-specific: the overlay fills this in.
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+# DOKS node pools are homogeneous by default, so there is nothing to select or
+# tolerate. A dedicated pool would be labelled here.
+nodeSelector: {}
+tolerations: []
+
+# The smallest useful DOKS node is 2 vCPU / 2 GiB and the system daemonsets
+# already claim a slice of it. Two replicas at 192Mi fit; keep the request
+# honest so the scheduler can actually place both on a two-node pool.
+resources:
+  requests:
+    cpu: 100m
+    memory: 192Mi
+  limits:
+    memory: 512Mi

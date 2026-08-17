@@ -1,0 +1,26 @@
+# Terraform
+.terraform/
+.terraform.tfstate.lock.info
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Anything that names an account, a domain or a token. The .example files next
+# to them are the ones that get committed.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+backend.tf
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# The lock file *is* committed — it is the record of which provider builds were
+# verified. Nothing to ignore here; this line exists so nobody adds one.
+
+# Ansible
+*.retry
+ansible/collections/
+ansible/inventories/*/vault.yml

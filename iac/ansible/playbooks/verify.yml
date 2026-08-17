@@ -1,0 +1,76 @@
+---
+# Prove the delivery worked, using the chart's own tests rather than a second
+# opinion written here.
+#
+#   ansible-playbook playbooks/verify.yml -i inventories/aws
+#
+# `helm test` runs the hooks under helm/<chart>/templates/tests. For dev-portal
+# that is one URL per thing that can independently fail — /healthz, /,
+# /catalog, and three /doc/* pages that only answer if the prerendered
+# Starlight output actually shipped in the image. A bare health check passes
+# while every rendered page is broken.
+
+- name: Verify the dev-hub releases
+  hosts: controller
+  gather_facts: false
+
+  vars:
+    iac_root: "{{ (playbook_dir ~ '/../..') | realpath }}"
+    repo_root: "{{ (playbook_dir ~ '/../../..') | realpath }}"
+    only: []
+
+  tasks:
+    - name: Read the component registry
+      ansible.builtin.include_vars:
+        file: "{{ iac_root }}/components.yaml"
+        name: registry_file
+
+    - name: Select the components to verify
+      ansible.builtin.set_fact:
+        selected_components: >-
+          {{ registry_file.components if (only | length == 0)
+             else registry_file.components | dict2items
+                  | selectattr('key', 'in', only) | items2dict }}
+
+    - name: Rollout status
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: "{{ item.value.release }}"
+        namespace: "{{ item.value.namespace }}"
+        kubeconfig: "{{ kubeconfig_path | expanduser }}"
+        context: "{{ kube_context | default(omit, true) }}"
+        wait: true
+        wait_condition:
+          type: Available
+          status: "True"
+        wait_timeout: 300
+      loop: "{{ selected_components | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: helm test
+      ansible.builtin.command:
+        argv:
+          - helm
+          - test
+          - "{{ item.value.release }}"
+          - --namespace
+          - "{{ item.value.namespace }}"
+          - --kubeconfig
+          - "{{ kubeconfig_path | expanduser }}"
+          - --kube-context
+          - "{{ kube_context }}"
+      loop: "{{ selected_components | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      changed_when: false
+      register: helm_tests
+
+    - name: Where each component answers
+      ansible.builtin.debug:
+        msg: >-
+          {{ url_scheme }}://{{ item.value.host }}.{{ base_domain }}
+      loop: "{{ selected_components | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"

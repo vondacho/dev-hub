@@ -1,0 +1,28 @@
+---
+# Restrict delivery to these components. Empty means every component in
+# iac/components.yaml — the normal case.
+only: []
+
+# Layer 4 of the profile stack (see iac/profiles/README.md): raw YAML per
+# component, applied after everything else.
+component_values: {}
+
+url_scheme: https
+tls_enabled: true
+ingress_class_name: ""
+# Merged by Helm over the profile's annotations rather than replacing them, so
+# the cert-manager issuer the profile asks for survives. For environment
+# concerns: a WAF, a rate limit, an ACM certificate ARN.
+ingress_annotations: {}
+image_pull_secrets: []
+
+create_namespaces: true
+namespace_labels: {}
+
+# Roll a failed release back rather than leaving it half-applied.
+helm_atomic: true
+helm_wait_timeout: 10m
+
+# Where the computed values files are written. The playbook points this at a
+# temporary directory it cleans up; the default is only a readable fallback.
+values_workdir: /tmp

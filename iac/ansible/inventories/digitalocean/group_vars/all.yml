@@ -1,0 +1,61 @@
+---
+# Delivery to a DOKS cluster.
+#
+# Ansible does not create the cluster. Point a kubeconfig at one first:
+#
+#   doctl kubernetes cluster kubeconfig save dev-hub-prod
+#
+# That writes a context named do-<region>-<cluster>, with a credential that
+# refreshes through doctl rather than expiring in a week.
+
+# --- where -----------------------------------------------------------------
+kubeconfig_path: "~/.kube/config"
+kube_context: "do-fra1-dev-hub-prod"
+
+# --- what ------------------------------------------------------------------
+profile: digitalocean
+
+# One registry per DigitalOcean account, account-wide.
+registry: "registry.digitalocean.com/dev-hub"
+image_tag: "latest"
+
+# The secret DOKS maintains in every namespace when registry integration is on
+# — it is named after the registry. The chart runs under its own
+# ServiceAccount, so naming it here is not optional: DigitalOcean only patches
+# the *default* ServiceAccount.
+image_pull_secrets:
+  - "dev-hub"
+
+# --- how it is addressed ---------------------------------------------------
+base_domain: "dev.example.com"
+url_scheme: "https"
+ingress_class_name: "nginx"
+tls_enabled: true
+
+# --- platform --------------------------------------------------------------
+deploy_platform: true
+acme_email: "platform@example.com"
+acme_staging: true
+
+# DOKS installs its own; a second fights the first over the metrics.k8s.io
+# APIService.
+metrics_server: false
+
+ingress_service_annotations:
+  service.beta.kubernetes.io/do-loadbalancer-name: "dev-hub"
+  service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+
+# The other half of that annotation. The two are one setting split across two
+# systems: enable neither or both, or every request arrives mangled.
+ingress_nginx_extra_values:
+  controller:
+    config:
+      use-proxy-protocol: "true"
+
+# --- images ----------------------------------------------------------------
+container_engine: docker
+image_platform: "linux/amd64"
+
+registry_login_command: "doctl registry login"
+
+component_values: {}

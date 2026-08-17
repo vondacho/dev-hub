@@ -1,0 +1,31 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+#
+# The API token is not a variable — export it instead, so it stays out of the
+# file and out of the plan output:
+#
+#   export DIGITALOCEAN_TOKEN=dop_v1_...
+
+environment = "prod"
+region      = "fra1"
+
+# dev-portal.<base_domain>. DNS is not managed here: after the first apply,
+# point the `dns_names` output at `ingress_load_balancer_ip` with A records.
+base_domain = "dev.example.com"
+
+# A DigitalOcean account has exactly one registry, account-wide. Name the one
+# that exists; only set create_registry when there is none yet.
+registry_name   = "dev-hub"
+create_registry = false
+
+acme_email   = "platform@example.com"
+acme_staging = true
+
+# Prefer a git SHA from CI.
+image_tag = "latest"
+
+# node_size      = "s-2vcpu-4gb"
+# node_min_nodes = 2
+# node_max_nodes = 4
+
+# Paid add-on. Worth it for production, not for a preview environment.
+ha_control_plane = false

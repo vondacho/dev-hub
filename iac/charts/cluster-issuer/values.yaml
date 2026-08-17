@@ -1,0 +1,17 @@
+# Every value is supplied by the platform module; these are the fallbacks that
+# make `helm template` on the chart alone produce something readable.
+
+# ClusterIssuer name. Must match the cert-manager.io/cluster-issuer annotation
+# the components carry from iac/profiles/*.yaml.
+name: letsencrypt
+
+# ACME contact address. Required — Let's Encrypt refuses registration without
+# one, and it is the only channel a broken renewal is announced on.
+email: ""
+
+# Issue from the staging CA: untrusted certificates, but usable rate limits
+# while DNS and ingress are still moving.
+staging: false
+
+# IngressClass the HTTP-01 solver creates its challenge ingress on.
+ingressClassName: nginx

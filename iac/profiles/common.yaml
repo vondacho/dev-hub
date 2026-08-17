@@ -1,0 +1,58 @@
+# Helm values shared by every non-local environment.
+#
+# Layered on top of the chart's own values.yaml, and under the provider profile
+# next to this file:
+#
+#   helm/<chart>/values.yaml   chart defaults, the contract
+#   iac/profiles/common.yaml   this file — "a real cluster, not a laptop"
+#   iac/profiles/<provider>.yaml
+#   overlay computed per environment (image, hosts, TLS, pull secrets)
+#
+# Only keys the chart actually declares belong here. Helm silently ignores an
+# unknown key, so a typo here is a value that quietly never applies — check
+# against helm/<chart>/values.yaml before adding one.
+
+# Two replicas: the portal is stateless and the chart's RollingUpdate is
+# maxUnavailable 0, so a rollout or a node drain never takes the site down.
+replicaCount: 2
+
+image:
+  # Real registry, immutable tags: there is never a reason to re-pull a tag
+  # already on the node.
+  pullPolicy: IfNotPresent
+  # repository and tag come from the environment overlay — they name the
+  # registry that environment provisioned.
+
+# Replicas are spread over nodes by a soft podAntiAffinity — but that rule has
+# to select the component's *own* pods, so it is written into the computed
+# overlay where the release name is known, not here. A selector hard-coded in a
+# file shared by every component would make each new component anti-affine to
+# the first one instead of to itself.
+
+# Node's default heap heuristic reads the *machine's* memory, not the cgroup
+# limit, so on a large node it will happily plan past the container limit and
+# get OOM-killed. Keep this under resources.limits.memory with room for the
+# non-heap side.
+nodeOptions: "--max-old-space-size=384"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 192Mi
+  limits:
+    # Still no CPU limit — SSR and startup are bursty, and throttling a Node
+    # event loop shows up as latency, not as a saved cent.
+    memory: 512Mi
+
+ingress:
+  enabled: true
+  # className, host and TLS are provider- and environment-specific: the
+  # profile next to this file sets the class, the overlay sets the host.
+
+# Fail fast on a cluster where a rollout is racing a node autoscaler.
+probes:
+  startup:
+    enabled: true
+    initialDelaySeconds: 2
+    periodSeconds: 2
+    failureThreshold: 30

@@ -1,0 +1,57 @@
+---
+# Delivery to an EKS cluster.
+#
+# Ansible does not create the cluster — that is the Terraform environment's
+# job, or somebody else's. What it needs is a kubeconfig entry pointing at one:
+#
+#   aws eks update-kubeconfig --name dev-hub-prod --region eu-central-1
+#
+# The context name that writes is the cluster ARN, which is what to put below.
+
+# --- where -----------------------------------------------------------------
+kubeconfig_path: "~/.kube/config"
+kube_context: "arn:aws:eks:eu-central-1:CHANGE-ME:cluster/dev-hub-prod"
+
+# --- what ------------------------------------------------------------------
+profile: aws
+
+# ECR. Matches the `registry` output of the AWS Terraform environment.
+registry: "CHANGE-ME.dkr.ecr.eu-central-1.amazonaws.com"
+image_tag: "latest"
+
+# None: the node role carries AmazonEC2ContainerRegistryReadOnly, so ECR pulls
+# need no secret.
+image_pull_secrets: []
+
+# --- how it is addressed ---------------------------------------------------
+base_domain: "dev.example.com"
+url_scheme: "https"
+ingress_class_name: "nginx"
+tls_enabled: true
+
+# --- platform --------------------------------------------------------------
+# On when Ansible owns the whole delivery. Turn it off when the Terraform
+# environment already installed the platform — both paths install the same
+# charts, and the second one to run will simply reconcile the first's release.
+deploy_platform: true
+acme_email: "platform@example.com"
+acme_staging: true
+
+# EKS ships without metrics-server.
+metrics_server: true
+
+ingress_service_annotations:
+  service.beta.kubernetes.io/aws-load-balancer-type: "external"
+  service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
+  service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+
+# --- images ----------------------------------------------------------------
+container_engine: docker
+image_platform: "linux/amd64"
+
+# Run before pushing. ECR tokens last 12 hours, so this is not a one-off.
+registry_login_command: >-
+  aws ecr get-login-password --region eu-central-1
+  | docker login --username AWS --password-stdin CHANGE-ME.dkr.ecr.eu-central-1.amazonaws.com
+
+component_values: {}

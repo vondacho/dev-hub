@@ -1,0 +1,60 @@
+# Registry of the dev-hub components that get delivered to a cluster.
+#
+# This file is the single source of truth for "what is there to deploy", and it
+# is read by both delivery paths:
+#
+#   Terraform  iac/terraform/modules/components  (yamldecode)
+#   Ansible    iac/ansible/playbooks/*.yml       (include_vars)
+#
+# Nothing here duplicates the chart. `chart` points into helm/, which stays the
+# only place a Kubernetes manifest is authored — the profiles under
+# iac/profiles/ and the overlay computed per environment are layered on top of
+# that chart's own values.yaml, never instead of it.
+#
+# Adding a component is one entry here plus its chart under helm/. Both delivery
+# paths pick it up with no further edit.
+
+components:
+  dev-portal:
+    # Chart directory, relative to the repository root.
+    chart: helm/dev-portal
+
+    # Build context for the container image, relative to the repository root.
+    # Used by iac/scripts/build-push.sh and the Ansible `image` role.
+    source: dev-portal
+
+    # Image name inside the environment's registry. The registry host and the
+    # tag are environment-specific and are prepended/appended at delivery time,
+    # so this stays a bare name: <registry>/<image>:<tag>.
+    image: dev-portal
+
+    # Namespace the release is installed into. Created if missing.
+    namespace: dev-hub
+
+    # Helm release name. Also the label selector the deploy scripts use.
+    release: dev-portal
+
+    # Host label. The ingress host becomes "<host>.<base_domain>" for the
+    # environment being delivered to — dev-portal.example.com, and
+    # dev-portal.localhost on a local cluster where base_domain is "localhost".
+    host: dev-portal
+
+    # Browser-facing links this component renders, as chart value key -> host
+    # label. They are resolved the same way as `host` above, so a component
+    # points at its neighbours without anyone hard-coding a domain.
+    #
+    # These are *browser*-facing on purpose: the visitor's browser resolves
+    # them, so an in-cluster address would be wrong even though the portal is
+    # server-rendered — and doubly wrong here, because api-hub and arch-hub are
+    # separate releases in their own namespaces. See helm/README.md.
+    #
+    # When a neighbouring hub lives under a different domain than dev-hub,
+    # override the whole value from the environment instead
+    # (`component_values` in the Terraform envs, `component_values` in the
+    # Ansible group_vars).
+    links:
+      apiPortalUrl: api-portal
+      archPortalUrl: arch-portal
+      archC4Url: arch-c4
+      archEventcatalogUrl: arch-eventcatalog
+      archAppmapUrl: arch-appmap

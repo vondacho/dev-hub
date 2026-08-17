@@ -1,0 +1,42 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored — it
+# names an account and a domain, which are environment facts, not repository
+# facts.
+
+environment = "prod"
+region      = "eu-central-1"
+
+# Every component is published as <component.host>.<base_domain>, so this one
+# gives dev-portal.dev.example.com. DNS is not managed here: after the first
+# apply, point the `dns_names` output at `ingress_load_balancer_hostname`.
+base_domain = "dev.example.com"
+
+# Let's Encrypt sends renewal failures here. Required.
+acme_email = "platform@example.com"
+
+# Staging CA while the DNS is still moving: untrusted certificates, but the
+# rate limits are survivable. Flip to false once a name resolves.
+acme_staging = true
+
+# Prefer a git SHA from CI over a moving tag. A tag re-pushed under the same
+# name renders an identical Deployment, so nothing rolls.
+image_tag = "latest"
+
+# Narrow this. 0.0.0.0/0 is the module default because a real list can only
+# come from your network, not from a repository.
+# endpoint_public_access_cidrs = ["203.0.113.0/24"]
+
+# node_instance_types = ["t3.medium"]
+# node_desired_size   = 2
+# node_max_size       = 4
+
+# One NAT gateway rather than one per AZ: cheaper, and a single point of
+# failure for outbound traffic. Set false for production egress that matters.
+single_nat_gateway = true
+
+# Anything true of this environment only, merged last over the profiles.
+# component_values = {
+#   dev-portal = <<-YAML
+#     app:
+#       apiPortalUrl: https://api.corp.example
+#   YAML
+# }

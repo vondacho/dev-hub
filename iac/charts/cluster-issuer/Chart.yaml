@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cluster-issuer
+description: A single cert-manager ClusterIssuer, so the platform module can create it in the same apply that installs cert-manager
+type: application
+version: 0.1.0
+appVersion: "1"

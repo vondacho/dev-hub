@@ -1,0 +1,15 @@
+# Install into iac/ansible/collections (gitignored):
+#
+#   ansible-galaxy collection install -r requirements.yml
+#
+# kubernetes.core also needs the Python client on the controller:
+#
+#   pip install kubernetes
+
+collections:
+  - name: kubernetes.core
+    version: ">=5.0.0"
+
+  # Only for the diff/assert helpers in the verify playbook.
+  - name: community.general
+    version: ">=9.0.0"

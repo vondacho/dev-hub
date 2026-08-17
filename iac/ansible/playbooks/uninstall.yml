@@ -1,0 +1,68 @@
+---
+# Remove the dev-hub releases.
+#
+#   ansible-playbook playbooks/uninstall.yml -i inventories/aws
+#   ansible-playbook playbooks/uninstall.yml -i inventories/aws -e drop_namespaces=true
+#
+# Releases only by default. The namespace is left in place: it is cheap, and
+# deleting it takes everything else in it — which will not be this component's
+# to delete once a second dev-hub component lives there. The same reasoning as
+# helm/dev-portal/uninstall.sh.
+#
+# The platform is never removed here. Taking the ingress controller away drops
+# every hostname in the cluster, including the ones this repository does not
+# own.
+
+- name: Remove the dev-hub releases
+  hosts: controller
+  gather_facts: false
+
+  vars:
+    iac_root: "{{ (playbook_dir ~ '/../..') | realpath }}"
+    repo_root: "{{ (playbook_dir ~ '/../../..') | realpath }}"
+    only: []
+    drop_namespaces: false
+
+  tasks:
+    - name: Read the component registry
+      ansible.builtin.include_vars:
+        file: "{{ iac_root }}/components.yaml"
+        name: registry_file
+
+    - name: Select the components to remove
+      ansible.builtin.set_fact:
+        selected_components: >-
+          {{ registry_file.components if (only | length == 0)
+             else registry_file.components | dict2items
+                  | selectattr('key', 'in', only) | items2dict }}
+
+    - name: Confirm what is about to go
+      ansible.builtin.debug:
+        msg: >-
+          Uninstalling {{ selected_components.keys() | list | join(', ') }}
+          from context '{{ kube_context | default('(current)', true) }}'
+          {{ '— and their namespaces' if drop_namespaces | bool else '' }}
+
+    - name: helm uninstall
+      kubernetes.core.helm:
+        release_name: "{{ item.value.release }}"
+        release_namespace: "{{ item.value.namespace }}"
+        release_state: absent
+        kubeconfig: "{{ kubeconfig_path | expanduser }}"
+        context: "{{ kube_context | default(omit, true) }}"
+        wait: true
+      loop: "{{ selected_components | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Namespaces
+      kubernetes.core.k8s:
+        state: absent
+        api_version: v1
+        kind: Namespace
+        name: "{{ item }}"
+        kubeconfig: "{{ kubeconfig_path | expanduser }}"
+        context: "{{ kube_context | default(omit, true) }}"
+        wait: true
+      loop: "{{ selected_components | dict2items | map(attribute='value.namespace') | unique | list }}"
+      when: drop_namespaces | bool

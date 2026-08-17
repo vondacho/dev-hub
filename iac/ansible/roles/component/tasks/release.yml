@@ -1,0 +1,125 @@
+---
+# One component. `entry` is a {key, value} pair from the registry.
+
+- name: "{{ entry.key }} | name the parts"
+  ansible.builtin.set_fact:
+    component: "{{ entry.value }}"
+    component_host: "{{ entry.value.host }}.{{ base_domain }}"
+    # Reset: set_fact persists across iterations of the including loop, and a
+    # component with no links would otherwise inherit the previous one's.
+    component_links: {}
+
+# Each component's browser-facing links resolved under this environment's
+# domain. Browser-facing on purpose — the visitor's browser resolves them, so
+# an in-cluster address would be wrong here. See helm/README.md.
+- name: "{{ entry.key }} | resolve the browser-facing links"
+  ansible.builtin.set_fact:
+    component_links: >-
+      {{ component_links | combine({
+           item.key: url_scheme ~ '://' ~ item.value ~ '.' ~ base_domain
+         }) }}
+  loop: "{{ component.links | default({}) | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+# Layer 4 of the profile stack. Built as a structure and serialised, rather
+# than templated as text: an overlay assembled by string indentation is one
+# that eventually indents a key wrong and silently applies nothing.
+- name: "{{ entry.key }} | compute the environment overlay"
+  ansible.builtin.set_fact:
+    component_overlay: "{{ overlay_base | combine(overlay_links) }}"
+  vars:
+    overlay_ingress:
+      enabled: true
+      hosts:
+        - host: "{{ component_host }}"
+          paths:
+            - path: /
+              pathType: Prefix
+      tls: "{{ [{'secretName': component.release ~ '-tls', 'hosts': [component_host]}] if tls_enabled | bool else [] }}"
+    overlay_base:
+      image:
+        repository: "{{ registry }}/{{ component.image }}"
+        tag: "{{ image_tag }}"
+      imagePullSecrets: "{{ image_pull_secrets | map('community.general.dict_kv', 'name') | list }}"
+      # Spread a component's replicas over nodes. Soft, so a single-node
+      # cluster can still place the pod — and selecting on the release, because
+      # app.kubernetes.io/instance is the one selector label that is certainly
+      # this component's own.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: "{{ component.release }}"
+      # className left out entirely when unset, so the profile's own value
+      # survives — merging an empty string over it would not.
+      ingress: >-
+        {{ overlay_ingress
+           | combine({'className': ingress_class_name} if ingress_class_name else {})
+           | combine({'annotations': ingress_annotations} if ingress_annotations else {}) }}
+    # Omitted when the component declares none, so the chart's defaults stay in
+    # force rather than being overwritten with {}.
+    overlay_links: "{{ {'app': component_links} if component_links else {} }}"
+
+- name: "{{ entry.key }} | namespace"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig_path | expanduser }}"
+    context: "{{ kube_context | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ component.namespace }}"
+        labels: "{{ {'app.kubernetes.io/part-of': 'dev-hub'} | combine(namespace_labels) }}"
+  when: create_namespaces | bool
+
+- name: "{{ entry.key }} | write the computed values"
+  ansible.builtin.copy:
+    content: "{{ component_overlay | to_nice_yaml(indent=2) }}"
+    dest: "{{ values_workdir }}/{{ entry.key }}-overlay.yaml"
+    mode: "0600"
+  # See deploy.yml: written under --check too, so a dry run renders the same
+  # values a real run would.
+  check_mode: false
+
+- name: "{{ entry.key }} | write the environment override"
+  ansible.builtin.copy:
+    content: "{{ component_values[entry.key] }}"
+    dest: "{{ values_workdir }}/{{ entry.key }}-override.yaml"
+    mode: "0600"
+  check_mode: false
+  when: entry.key in component_values
+
+- name: "{{ entry.key }} | collect the values stack"
+  ansible.builtin.set_fact:
+    # Ordered, last wins. The chart's own values.yaml is not in this list —
+    # Helm reads it itself. See iac/profiles/README.md for the full stack.
+    component_values_files: >-
+      {{ [
+           iac_root ~ '/profiles/common.yaml',
+           iac_root ~ '/profiles/' ~ profile ~ '.yaml',
+           values_workdir ~ '/' ~ entry.key ~ '-overlay.yaml',
+         ] + ([values_workdir ~ '/' ~ entry.key ~ '-override.yaml']
+              if entry.key in component_values else []) }}
+
+- name: "{{ entry.key }} | helm upgrade --install"
+  kubernetes.core.helm:
+    release_name: "{{ component.release }}"
+    chart_ref: "{{ repo_root }}/{{ component.chart }}"
+    release_namespace: "{{ component.namespace }}"
+    create_namespace: false
+    kubeconfig: "{{ kubeconfig_path | expanduser }}"
+    context: "{{ kube_context | default(omit, true) }}"
+    values_files: "{{ component_values_files }}"
+    atomic: "{{ helm_atomic }}"
+    wait: true
+    wait_timeout: "{{ helm_wait_timeout }}"
+
+- name: "{{ entry.key }} | where it answers"
+  ansible.builtin.debug:
+    msg: "{{ url_scheme }}://{{ component_host }}"

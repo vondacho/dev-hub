@@ -1,0 +1,30 @@
+---
+# The whole delivery, in the order the pieces depend on each other:
+#
+#   1. images     — the release fails on a pull otherwise, minutes in
+#   2. platform   — the ingress class and issuer the components annotate against
+#   3. components — the charts under helm/
+#   4. verify     — the chart's own helm test, against the real ingress
+#
+#   ansible-playbook playbooks/site.yml -i inventories/aws
+#   ansible-playbook playbooks/site.yml -i inventories/aws --skip-tags images
+#
+# Each stage is also a playbook of its own; this file only fixes the order.
+# The platform stage is skipped when the environment sets deploy_platform:
+# false, which is right when Terraform already installed it.
+
+- name: Images
+  ansible.builtin.import_playbook: build-push.yml
+  tags: [images]
+
+- name: Platform
+  ansible.builtin.import_playbook: platform.yml
+  tags: [platform]
+
+- name: Components
+  ansible.builtin.import_playbook: deploy.yml
+  tags: [components]
+
+- name: Verify
+  ansible.builtin.import_playbook: verify.yml
+  tags: [verify]

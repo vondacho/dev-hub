@@ -1,0 +1,26 @@
+# Any conformant Kubernetes cluster — a managed cluster from a provider with no
+# module here (GKE, AKS, Scaleway, Hetzner, OVH), a self-managed k3s/RKE2/kubeadm
+# cluster, or a local one.
+#
+# This is the profile the `generic` environment uses, and it is deliberately the
+# thinnest: it assumes an IngressClass and a working LoadBalancer or NodePort,
+# and nothing else. Anything a specific provider does better belongs in a
+# profile of its own next to this file — copy this one and add to it.
+
+ingress:
+  enabled: true
+  # Empty uses whatever the cluster marks as its default IngressClass. Set it
+  # explicitly from the environment (`ingress_class_name`) when the cluster has
+  # several, or none marked default — Traefik on Rancher Desktop/k3s, nginx
+  # where the platform module installed it.
+  className: ""
+  annotations: {}
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+nodeSelector: {}
+tolerations: []

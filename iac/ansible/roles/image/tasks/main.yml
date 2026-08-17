@@ -1,0 +1,55 @@
+---
+# Build and push the component images.
+#
+# Deliberately shells out rather than using a container collection: the engine
+# is whatever the operator has (docker, nerdctl, podman), the build is a single
+# command in every one of them, and a collection here would add a dependency
+# that buys nothing.
+
+- name: Read the component registry
+  ansible.builtin.include_vars:
+    file: "{{ iac_root }}/components.yaml"
+    name: registry_file
+
+- name: Select the components to build
+  ansible.builtin.set_fact:
+    selected_components: >-
+      {{ registry_file.components if (only | length == 0)
+         else registry_file.components | dict2items
+              | selectattr('key', 'in', only) | items2dict }}
+
+- name: Check the build engine is present
+  ansible.builtin.command: "{{ container_engine }} version"
+  changed_when: false
+
+- name: Log in to the registry
+  ansible.builtin.shell: "{{ registry_login_command }}"
+  changed_when: true
+  no_log: true
+  when: registry_login_command | length > 0
+
+- name: Build and push
+  ansible.builtin.command:
+    argv: >-
+      {{ [container_engine] +
+         (['buildx', 'build', '--platform', image_platform, '--push']
+          if use_buildx | bool else ['build']) +
+         ['-t', registry ~ '/' ~ item.value.image ~ ':' ~ image_tag,
+          repo_root ~ '/' ~ item.value.source] }}
+  loop: "{{ selected_components | dict2items }}"
+  loop_control:
+    label: "{{ registry }}/{{ item.value.image }}:{{ image_tag }}"
+  changed_when: true
+
+- name: Push
+  ansible.builtin.command:
+    argv:
+      - "{{ container_engine }}"
+      - push
+      - "{{ registry }}/{{ item.value.image }}:{{ image_tag }}"
+  loop: "{{ selected_components | dict2items }}"
+  loop_control:
+    label: "{{ registry }}/{{ item.value.image }}:{{ image_tag }}"
+  changed_when: true
+  # buildx pushed already, as part of the build.
+  when: not use_buildx | bool

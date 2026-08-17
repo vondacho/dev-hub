@@ -1,0 +1,21 @@
+---
+# Install the cluster-side platform: an ingress controller, cert-manager and a
+# ClusterIssuer.
+#
+#   ansible-playbook playbooks/platform.yml -i inventories/digitalocean
+#
+# Skipped by the site playbook when the environment sets deploy_platform: false
+# — which is the right setting when the Terraform environment already installed
+# it, or when the cluster came with its own controller.
+
+- name: Install the dev-hub platform
+  hosts: controller
+  gather_facts: false
+
+  vars:
+    iac_root: "{{ (playbook_dir ~ '/../..') | realpath }}"
+    repo_root: "{{ (playbook_dir ~ '/../../..') | realpath }}"
+
+  roles:
+    - role: platform
+      when: deploy_platform | default(true) | bool

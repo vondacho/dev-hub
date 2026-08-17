@@ -1,0 +1,40 @@
+---
+# Delivery of the dev-hub components from the charts under helm/.
+#
+# The Ansible counterpart of iac/terraform/modules/components, reading the same
+# registry and layering the same profiles in the same order. The two paths are
+# interchangeable: whichever runs second reconciles the release the first
+# installed rather than fighting it.
+
+- name: Read the component registry
+  ansible.builtin.include_vars:
+    file: "{{ iac_root }}/components.yaml"
+    name: registry_file
+
+- name: Select the components to deliver
+  ansible.builtin.set_fact:
+    selected_components: >-
+      {{ registry_file.components if (only | length == 0)
+         else registry_file.components | dict2items
+              | selectattr('key', 'in', only) | items2dict }}
+
+- name: Fail when a requested component is not in the registry
+  ansible.builtin.assert:
+    that: only | difference(registry_file.components.keys() | list) | length == 0
+    fail_msg: >-
+      Not in iac/components.yaml:
+      {{ only | difference(registry_file.components.keys() | list) | join(', ') }}
+
+- name: Report what will be delivered
+  ansible.builtin.debug:
+    msg: >-
+      {{ selected_components.keys() | list | join(', ') }}
+      -> {{ registry }}:{{ image_tag }}
+      on *.{{ base_domain }} with profile '{{ profile }}'
+
+- name: Deliver each component
+  ansible.builtin.include_tasks: release.yml
+  loop: "{{ selected_components | dict2items }}"
+  loop_control:
+    loop_var: entry
+    label: "{{ entry.key }}"

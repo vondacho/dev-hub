@@ -1,0 +1,60 @@
+---
+# Delivery to any conformant cluster: a managed cluster from a provider with no
+# Terraform module here, a self-managed one, or a local one.
+#
+# This inventory's variables are the Ansible equivalent of a
+# terraform.tfvars — copy the file, do not edit it in place for a real
+# environment, and keep tokens out of it (see vault.yml at the bottom).
+
+# --- where -----------------------------------------------------------------
+kubeconfig_path: "~/.kube/config"
+# Empty uses the current context. Name it: the current context is how a laptop
+# deploys to production by accident.
+kube_context: "rancher-desktop"
+
+# --- what ------------------------------------------------------------------
+# Profile from iac/profiles to layer on the chart defaults.
+profile: generic
+
+# Registry the cluster pulls from, without a trailing slash.
+registry: "localhost:5000"
+image_tag: "dev"
+
+# Pull secrets, which must already exist in the component namespaces.
+image_pull_secrets: []
+
+# --- how it is addressed ---------------------------------------------------
+# Each component is published as <component.host>.<base_domain>.
+base_domain: "localhost"
+url_scheme: "http"
+
+# Empty falls back to the profile's, which for `generic` means the cluster's
+# default IngressClass. Rancher Desktop and k3s ship Traefik.
+ingress_class_name: "traefik"
+
+tls_enabled: false
+
+# --- platform --------------------------------------------------------------
+# Off: a cluster somebody else provisioned usually already has an ingress
+# controller, and a second one fights the first over the LoadBalancer.
+deploy_platform: false
+acme_email: ""
+acme_staging: false
+
+# --- images ----------------------------------------------------------------
+# docker, nerdctl or podman. buildx is used when the engine is docker, because
+# a build on an Apple Silicon laptop otherwise produces arm64 images that
+# CrashLoopBackOff on amd64 nodes with an exec format error.
+container_engine: docker
+image_platform: "linux/amd64"
+
+# --- per-environment overrides ---------------------------------------------
+# Raw YAML per component, applied last — after chart defaults, common profile,
+# provider profile and the computed overlay.
+component_values: {}
+
+# Secrets belong in a vault file next to this one, which .gitignore keeps out
+# of the repository:
+#
+#   ansible-vault create inventories/generic/vault.yml
+#   ansible-playbook playbooks/site.yml -i inventories/generic --ask-vault-pass

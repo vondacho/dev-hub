@@ -1,0 +1,40 @@
+# AWS (EKS) profile.
+#
+# Layered over iac/profiles/common.yaml. Everything here is a choice that is
+# true on EKS and false elsewhere; anything that is merely true of *this*
+# account or domain belongs in the environment overlay instead.
+
+ingress:
+  # ingress-nginx, installed by the platform module, rather than the AWS Load
+  # Balancer Controller. One ALB per ingress is the expensive default, and the
+  # portability of the whole iac/ layer rests on every provider terminating
+  # traffic the same way: one cloud L4 load balancer in front of one nginx.
+  #
+  # To use ALB instead, install aws-load-balancer-controller in the platform
+  # module, set className to "alb" and add the alb.ingress.kubernetes.io/*
+  # annotations here — the chart passes ingress.annotations through verbatim.
+  className: nginx
+  annotations:
+    # Requested from cert-manager. Harmless when cert-manager is not installed:
+    # the ingress simply serves plain HTTP and no Certificate is created.
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+# ECR is read through the node role's AmazonEC2ContainerRegistryReadOnly policy,
+# so there is no imagePullSecret to carry on EKS. On DOKS there is — see
+# digitalocean.yaml.
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  # No IRSA annotation: the portal calls no AWS API. When one is ever needed,
+  # add it from the environment overlay so the role ARN stays with the account
+  # that owns it:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::<account>:role/<role>
+  annotations: {}
+
+# Managed node groups are spread over the private subnets of every AZ, so the
+# soft anti-affinity from common.yaml is enough — no nodeSelector, and nothing
+# to tolerate on a default node group.
+nodeSelector: {}
+tolerations: []

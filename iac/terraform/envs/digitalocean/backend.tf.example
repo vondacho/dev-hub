@@ -1,0 +1,29 @@
+# Copy to backend.tf and fill in, then `terraform init -migrate-state`.
+#
+# DigitalOcean Spaces is S3-compatible, so the s3 backend works against it —
+# with the AWS-specific validations switched off, since there is no AWS account
+# behind the endpoint to check anything against.
+#
+# The credentials are Spaces keys, not the DigitalOcean API token:
+#
+#   export AWS_ACCESS_KEY_ID=<spaces key>
+#   export AWS_SECRET_ACCESS_KEY=<spaces secret>
+
+terraform {
+  backend "s3" {
+    bucket = "CHANGE-ME-terraform-state"
+    key    = "dev-hub/digitalocean/terraform.tfstate"
+    region = "us-east-1" # ignored by Spaces, still required by the backend
+
+    endpoints = {
+      s3 = "https://fra1.digitaloceanspaces.com"
+    }
+
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
+    skip_s3_checksum            = true
+    use_path_style              = true
+  }
+}

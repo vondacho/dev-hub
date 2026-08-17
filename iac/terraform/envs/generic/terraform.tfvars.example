@@ -1,0 +1,43 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+#
+# Two things this environment is good for:
+#
+#   1. a managed cluster from a provider with no module here — GKE, AKS,
+#      Scaleway, Hetzner, OVH — or a self-managed one;
+#   2. exercising the cloud delivery mechanics against a local cluster, when
+#      you want to catch a profile mistake before an apply that bills.
+#
+# For everyday local work use ./helm/dev-portal/deploy.sh instead: it builds
+# straight into the node's image store and needs no registry at all.
+
+# --- a managed cluster somewhere else -------------------------------------
+# kubeconfig_path = "~/.kube/config"
+# kube_context    = "gke_my-project_europe-west6_dev-hub"
+# profile         = "generic"
+# registry        = "ghcr.io/vondacho"
+# image_tag       = "0.0.1"
+# base_domain     = "dev.example.com"
+# ingress_class_name = "nginx"
+# image_pull_secrets = ["ghcr"]
+# tls_enabled     = true
+
+# --- the local cluster, cloud-style ---------------------------------------
+kube_context = "rancher-desktop"
+profile      = "generic"
+
+# A registry the cluster can actually reach. localhost:5000 works with a
+# registry container the node can resolve; otherwise push to a real one.
+registry  = "localhost:5000"
+image_tag = "dev"
+
+# *.localhost resolves to 127.0.0.1, so dev-portal.localhost reaches Traefik
+# with no DNS anywhere.
+base_domain = "localhost"
+url_scheme  = "http"
+
+# Rancher Desktop and k3s ship Traefik as the default class.
+ingress_class_name = "traefik"
+
+# No issuer on a local cluster, and nothing to issue for.
+tls_enabled     = false
+deploy_platform = false

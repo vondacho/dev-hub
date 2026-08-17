@@ -1,0 +1,20 @@
+---
+# Build every component image and push it to the environment's registry.
+#
+#   ansible-playbook playbooks/build-push.yml -i inventories/aws
+#   ansible-playbook playbooks/build-push.yml -i inventories/aws -e image_tag=$(git rev-parse --short HEAD)
+#
+# The images have to exist before deploy.yml runs — a release whose image is
+# not in the registry fails as an ImagePullBackOff several minutes into a wait,
+# which reads like a cluster problem and is not.
+
+- name: Build and push dev-hub images
+  hosts: controller
+  gather_facts: false
+
+  vars:
+    iac_root: "{{ (playbook_dir ~ '/../..') | realpath }}"
+    repo_root: "{{ (playbook_dir ~ '/../../..') | realpath }}"
+
+  roles:
+    - image

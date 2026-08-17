@@ -1,0 +1,46 @@
+---
+# Deliver the dev-hub components from the charts under helm/.
+#
+#   ansible-playbook playbooks/deploy.yml -i inventories/aws
+#   ansible-playbook playbooks/deploy.yml -i inventories/aws -e 'only=["dev-portal"]'
+#
+# The cluster is not created here — this path assumes a kubeconfig that already
+# reaches one. Use the Terraform environments for the cluster itself.
+
+- name: Deliver dev-hub components
+  hosts: controller
+  gather_facts: false
+
+  vars:
+    # playbooks -> ansible -> iac -> repository root
+    iac_root: "{{ (playbook_dir ~ '/../..') | realpath }}"
+    repo_root: "{{ (playbook_dir ~ '/../../..') | realpath }}"
+
+  pre_tasks:
+    - name: Somewhere to write the computed values
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: dev-hub-values
+      register: values_dir
+      changed_when: false
+      # Runs under --check too. Writing the values into a temporary directory
+      # changes nothing in the cluster, and skipping it would leave the dry run
+      # with no values to render — a check that proves nothing.
+      check_mode: false
+
+    - name: Point the role at it
+      ansible.builtin.set_fact:
+        values_workdir: "{{ values_dir.path }}"
+
+  roles:
+    - component
+
+  post_tasks:
+    # The rendered values name a registry and, in principle, a secret. They are
+    # a build artefact, not a record.
+    - name: Clean up
+      ansible.builtin.file:
+        path: "{{ values_dir.path }}"
+        state: absent
+      changed_when: false
+      check_mode: false
