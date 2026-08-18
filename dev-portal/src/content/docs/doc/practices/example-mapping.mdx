@@ -1,6 +1,6 @@
 ---
 title: Example mapping
-description: Turning a story into rules, examples and open questions in twenty-five minutes, using four colours of card.
+description: Turning a story into rules, examples and open questions in twenty-five minutes, using four colours of card — and the move from the story grammar into the scenario grammar that a test runner can execute.
 ---
 
 A timeboxed conversation that takes one story and breaks it into four kinds of
@@ -91,6 +91,45 @@ stands, and it is what a [Story ticket](/doc/practices/story-tickets/) descripti
 is generated from. The wall and the regression suite become the same artefact —
 which is the argument set out in full under
 [digital artefacts](/doc/practices/digital-artefacts/).
+
+## The second formal language
+
+[Story mapping](/doc/practices/story-mapping/) moves a room out of narrative into
+the story grammar — one role, one capability, one benefit. Example mapping moves
+it one rung further, and that rung is where the words stop being a description
+and start being executable.
+
+| Level | Language | Shape | What it supports |
+|---|---|---|---|
+| Narrative | Whatever the room speaks | Prose, conversation, a wall | Shared understanding, and nothing a machine can check |
+| **Story-oriented** | The story grammar | `As a … I want … so that …` | [Ticketing](/doc/practices/story-tickets/) — scheduling, ordering, sizing |
+| **Scenario-oriented** | [Gherkin](/doc/practices/bdd/) | `Given … When … Then …` | [Functional acceptance testing](/doc/practices/atdd/) — a machine-checked "done" |
+
+The two formal levels are not competing formats and neither replaces the other.
+They answer different questions and different tools consume them: the story level
+answers *what does someone want, and why*, and a tracker reads it; the scenario
+level answers *what exactly happens, with these values*, and
+[Cucumber](/doc/testing-tools/cucumber/) runs it.
+
+The transition is what this session is for. A green card is the moment a sentence
+acquires values — "a voucher that expired yesterday", "a basket of 50.00 CHF" —
+and a sentence with values has an outcome someone can observe, which is the
+property `As a … I want …` cannot have no matter how carefully it is worded.
+
+Two rules follow, and both are cheap to apply:
+
+- **Do not write scenarios in narrative.** "Then the discount is applied
+  correctly" is a narrative sentence wearing Gherkin's clothes. *Correctly* is
+  the word that survived the translation, and it carries no value anyone can
+  check.
+- **Do not write stories in scenario grammar.** A ticket whose summary is a
+  `Given / When / Then` has skipped the level that carries the *why*, and the
+  `so that` clause is the only part that can still answer "should we build this?"
+  six months from now.
+
+Both formal levels are the same [ubiquitous language](/doc/practices/ddd/) — same
+nouns, same verbs, two grammars. DDD decides the words; these two levels decide
+the sentence shapes those words are allowed to appear in.
 
 ## Not story mapping
 

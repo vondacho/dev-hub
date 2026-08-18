@@ -1,6 +1,6 @@
 ---
 title: Use case patterns
-description: The shape of one unit of business work at the application boundary — where the acceptance test attaches and the transaction begins.
+description: The shape of one unit of business work at the application boundary — where the acceptance test attaches, where the transaction begins, and the stereotype vocabulary that keeps the classes around it balanced.
 ---
 
 A use case is one thing the system does for someone. It sits at the application
@@ -53,6 +53,80 @@ controller, which only knows which URL was hit.
 **Result rather than exception for expected failures.** "Payment declined" is an
 outcome, not an exceptional condition. Modelling it as a return value keeps it in
 the signature where a caller has to handle it.
+
+## Well-balanced code
+
+This catalogue is where *balance* is decided, more than any other on this site,
+because the use case is the class every other class in the application layer
+hangs off. Balance is not an aesthetic preference: it is the observable property
+that **no class carries noticeably more than its neighbours, and what each one
+carries matches what its name promises.**
+
+The two failures are the same failure at opposite ends:
+
+- **The heavy class.** `OrderService`, eleven methods, six dependencies.
+  Everything touching orders accumulates there because the name is broad enough
+  to admit anything, and nothing is ever obviously out of place.
+- **The empty class.** `OrderMapperHelperImpl`, one method, one caller,
+  delegating. Indirection with no decision inside it, added because a layer
+  diagram said something should exist at that level.
+
+The cheapest check is a directory listing. If `ls -l application/` shows one file
+of 400 lines beside nine of 12, the responsibilities were not distributed — they
+were collected in one place and the rest is packaging. Balance is what
+[SRP](/doc/attitudes/test-first/) looks like when it is applied to a package
+rather than to a single class.
+
+## The stereotype vocabulary
+
+Balance is only enforceable if each class's role has a name. The names below are
+the ones most codebases already half-use, inconsistently; stating them completely
+is what turns a habit into a vocabulary. **A suffix is a promise about what the
+class does and — more usefully — about what it must not do.**
+
+At the boundary:
+
+| Stereotype | Holds | Must not |
+|---|---|---|
+| **Controller** | One inbound transport. Translates an HTTP request into a use case request, and the response back out. | Decide anything, hold state, or name a domain type in its public signature. |
+| **Listener** | The same job for what arrives unasked: a message, a domain event, a scheduled tick. | Contain the reaction. It delegates to a use case — otherwise the rule is only reachable by publishing a message, including from its tests. |
+| **Client** | The mirror of the controller, outbound. Owns one remote protocol: its endpoints, timeouts, retries and error translation. | Let the remote's payload types travel inward. It returns your model, or a `Result`. |
+
+In the flow:
+
+| Stereotype | Holds | Must not |
+|---|---|---|
+| **Handler** | Exactly one command or event type, and what to do when it arrives. In command-bus codebases this is what a use case is called. | Handle two message types. A handler with a `switch` on message kind is a bus that was inlined. |
+| **Processor** | One step over a stream or a batch: takes an item, produces an item, composes with the next step. | Be the name for "does the work". A processor that cannot be composed with another processor is a use case that was named badly. |
+| **Service** | A stateless domain operation belonging to no single entity — pricing across a basket, a policy that needs three aggregates to answer. | Be the default suffix. `Service` on a class with eleven public methods is a namespace, and it is the single most common shape this catalogue exists to fix. |
+| **Strategy** | One named decision with more than one real implementation, selected at runtime. | Exist with one implementation, or with implementations that are each a single expression — that is a function value. See [GoF](/doc/code-design/gof-patterns/). |
+
+Between representations:
+
+| Stereotype | Holds | Must not |
+|---|---|---|
+| **Mapper** | Translation between two *representations of the same concept* across a boundary: entity ↔ DTO, DTO ↔ use case request. | Contain a rule. A mapper with an `if` on a business condition is a use case hiding in the plumbing, and no test will be looking for it there. |
+| **Converter** | Translation of one *value* into another: `String` → `Money`, an epoch into an `Instant`. Total, pure, no I/O. | Reach a repository. Purity is what makes it testable with no fixture and reusable everywhere, and it is lost the first time it is allowed a dependency. |
+
+The use case itself is deliberately absent from the list. It is named for the
+operation — `CancelOrder`, `RedeemVoucher` — because it is the one class in the
+application layer whose role is not plumbing.
+
+Two rules make the vocabulary worth having:
+
+**A class that deserves two of these names deserves two classes.**
+`OrderMapperService` is not a compound noun, it is an unresolved decision, and it
+will grow in whichever of the two directions is least convenient.
+
+**A domain name beats a stereotype every time.** These suffixes name a role in
+the plumbing; [tactical DDD](/doc/code-design/tactical-ddd-patterns/) names the
+concept. `PricingPolicy` says more than `PriceService`, and `CancelOrder` says
+more than `OrderCommandHandler`. Reach for a stereotype when the class genuinely
+is plumbing — and treat the reach itself as a question worth asking: *is this
+actually the domain, and have I just failed to name it?*
+
+The daily habits that keep this vocabulary honest are set out under
+[design hygiene](/doc/code-design/#hygiene).
 
 ## Worked example — the namespace, and the use case
 
@@ -128,7 +202,8 @@ does, which no controller layer has ever provided.
 
 ## Status
 
-Outline, with the use case shape worked through above. The renderings per
+Outline, with the use case shape and the stereotype vocabulary worked through
+above. The renderings per
 [stack](/doc/stacks/) are not written yet; the
 [Spring Boot](/doc/stacks/spring-boot/) and [Quarkus](/doc/stacks/quarkus/)
 blueprint repositories already carry this shape in code.

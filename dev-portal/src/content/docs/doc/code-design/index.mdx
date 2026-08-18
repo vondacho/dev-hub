@@ -1,6 +1,6 @@
 ---
 title: Code design
-description: The five pattern catalogues — GoF, tactical DDD, architecture, integration and use case — as a shared vocabulary rather than a shelf to shop from.
+description: The five pattern catalogues — GoF, tactical DDD, architecture, integration and use case — as a shared vocabulary rather than a shelf to shop from, and the five habits of design hygiene that spend it.
 ---
 
 Patterns-oriented design is one of the three attitudes this hub is built on. This
@@ -52,6 +52,44 @@ Every pattern page here states what the pattern buys, what it costs, and when
 *not* to use it. A catalogue that only lists benefits teaches developers to
 over-apply, which is precisely how patterns acquired their bad reputation in the
 first place.
+
+## Hygiene
+
+Patterns are usually taught as a design activity, done at design time. Most of
+their value is collected somewhere else entirely: in the ordinary, unglamorous
+upkeep of code that already exists. That upkeep deserves a name — **hygiene** —
+and it is five habits, none of them heroic, all of them cheap when done
+continuously and expensive when deferred:
+
+**Naming.** The name says what the class holds; the class holds what the name
+says. Divergence between the two is the earliest defect to appear in a codebase
+and the cheapest to fix, and it is the one most reliably ignored because nothing
+fails when it is wrong.
+
+**Balancing.** Responsibility spread across the classes of a package rather than
+collected in one of them. The check is a directory listing: one 400-line file
+beside nine 12-line files is not a package, it is a class with attendants. This
+is worked through under
+[use case patterns](/doc/code-design/usecase-patterns/).
+
+**SRP.** One reason to change. It is the lever behind testability — the mechanism
+is set out under [test-first](/doc/attitudes/test-first/) — and balancing is what
+it looks like once a package rather than a class is in view.
+
+**OCP.** New behaviour arrives as a new implementation rather than as an edit to
+an existing `switch`. Achievable only where the seam already has a name, which is
+what these catalogues supply; without one, "open for extension" is a wish.
+
+**Pattern language.** The shared vocabulary itself, including the
+[stereotype names](/doc/code-design/usecase-patterns/) — service, strategy,
+converter, listener, handler, mapper, processor, client, controller — used
+consistently enough that a suffix is a promise rather than a decoration.
+
+The fifth habit is what makes the other four enforceable. Naming, balancing, SRP
+and OCP are all judgements about whether a class does one *recognisable* thing,
+and recognisable presupposes a vocabulary of things to recognise. Without it,
+each of the four is a matter of taste, and taste loses every argument it has with
+a deadline.
 
 ## The connection to craftsmanship
 

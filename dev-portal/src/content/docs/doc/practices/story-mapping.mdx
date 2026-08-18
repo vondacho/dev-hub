@@ -1,6 +1,6 @@
 ---
 title: Story mapping
-description: Laying the user's journey out along a backbone and slicing it into releases, so a backlog keeps the narrative a flat list destroys.
+description: Laying the user's journey out along a backbone and slicing it into releases, so a backlog keeps the narrative a flat list destroys — and the move from narrative speech into the story grammar.
 ---
 
 A workshop that arranges everything the product might do into two dimensions: the
@@ -128,6 +128,36 @@ when a story is retyped into a tracker.
 The file is what the tracker, and eventually the pipeline, reads. See
 [digital artefacts](/doc/practices/digital-artefacts/) for the whole chain and
 for the direction rule that keeps it trustworthy.
+
+## The language changes in the room
+
+A map starts in **narrative language** — people describing what a user does, in
+whatever words they arrived with, with all the ambiguity that implies. It has to
+start there, because narrative is the only language everyone in the room already
+shares. It cannot end there, because narrative is not checkable: two people can
+nod at the same sentence and be holding different pictures.
+
+The workshop's quieter second output is the move out of narrative into the
+**first of two formal languages** the rest of the chain runs on.
+
+`As a <role> I want <capability> so that <benefit>` is formal in the only sense
+that matters here: it has a fixed number of slots, each slot has to be filled
+with something specific, and an empty or generic slot is *visible*. `as: a user`
+fails the form. `so_that: the feature is complete` fails the form. The grammar
+does not make a story correct — it makes an under-specified story impossible to
+hide behind fluent prose.
+
+This level is **story-oriented**: one role, one capability, one reason. That is
+exactly the granularity a tracker works at, which is why this is the level that
+supports [ticket emission](/doc/practices/story-tickets/) — a ticket is a
+scheduling record of *one thing someone wants*, and the story grammar is that
+sentence already in the right shape.
+
+What this level structurally cannot do is decide whether the thing works. `so
+that I pay the lower price I was promised` has no values, no preconditions and no
+observable outcome. Testability is the second formal level's job, and it is
+picked up one session later, in
+[example mapping](/doc/practices/example-mapping/).
 
 ## Common failure modes
 
